@@ -18,7 +18,16 @@
 
 # fill in the scripts that should go with the distribution:
 dist_bin_SCRIPTS = \
+	bin/content-framework-build \
+	bin/content-framework-check \
+	bin/content-framework-create \
+	bin/content-framework-pull \
+	bin/content-framework-push \
+	bin/content-framework-rename \
+	bin/content-framework-snippet \
 	bin/content-framework-sync \
+	bin/content-framework-tag-filter \
+	bin/content-framework-tag-replace-items \
 	bin/content-framework-version
 
 @PACKAGE@testdir=$(prefix)/neurospaces/$(PACKAGE)
@@ -66,12 +75,6 @@ dist-hook:
 #	@echo "======================== Installing CPAN modules"
 #	( cd cpan ; ./cpan_install *.gz )
 #	touch $(top_srcdir)/neurospaces_cpan_modules
-
-install-exec-local:
-	( cd $(bindir) ; for script in `ls userdocs-* | grep -v version | grep -v sync | grep -v pull | grep -v push` ; do ln -vsf {userdocs,content-framework}-`echo $$script | cut -f2- -d-` ; done )
-
-uninstall-local:
-	( cd $(bindir) ; echo content-framework-* ; $(RM) content-framework-* )
 
 html-upload-prepare:
 	rm -fr html/htdocs/neurospaces_project/$(PACKAGE)
