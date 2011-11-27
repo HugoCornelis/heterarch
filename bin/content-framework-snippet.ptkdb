@@ -1,0 +1,34 @@
+$files = {
+           '_<bin/userdocs-snippet' => [
+                                         {
+                                           'expr' => undef,
+                                           'value' => '1',
+                                           'text' => '    read_cmd_line();
+',
+                                           'fname' => 'bin/userdocs-snippet',
+                                           'type' => 'user',
+                                           'line' => 70
+                                         },
+                                         {
+                                           'expr' => undef,
+                                           'value' => '1',
+                                           'text' => '	    if ($content)
+',
+                                           'fname' => 'bin/userdocs-snippet',
+                                           'type' => 'user',
+                                           'line' => '177'
+                                         },
+                                         {
+                                           'expr' => undef,
+                                           'value' => '1',
+                                           'text' => '		my $snippets = $document->find_snippets();
+',
+                                           'fname' => 'bin/userdocs-snippet',
+                                           'type' => 'user',
+                                           'line' => 138
+                                         }
+                                       ]
+         };
+$expr_list = [];
+$eval_saved_text = undef;
+$main_win_geometry = '1272x720+0+0';

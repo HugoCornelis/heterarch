@@ -1,0 +1,118 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -d:ptkdb -w
+#
+
+use strict;
+
+
+$| = 1;
+
+
+BEGIN
+{
+    # during tests
+
+    push @INC, '../glue/swig/perl';
+
+    # during distcheck
+
+    push @INC, '../../glue/swig/perl';
+
+    # after installation
+
+    push @INC, '/usr/local/glue/swig/perl';
+}
+
+
+BEGIN
+{
+    # for main during tests
+
+    push @INC, 'tests/glue/swig/perl';
+
+    # for main during check
+
+    push @INC, './glue/swig/perl';
+
+    # for main during distcheck
+
+    push @INC, '../../tests/glue/swig/perl';
+}
+
+
+use Getopt::Long;
+
+#use Neurospaces;
+
+use YAML;
+
+
+$SIG{__DIE__}
+    = sub {
+	use Carp;
+
+	confess @_;
+    };
+
+
+our $option_verbose;
+
+my $exit_code = 0;
+
+
+sub main
+{
+    read_cmd_line();
+
+    # nothing here yet.
+}
+
+
+sub read_cmd_line
+{
+    my $option_help;
+    my $option_version;
+
+    my $result
+	= GetOptions
+	    (
+	     "help!" => \$option_help,
+	     "v|verbose+" => \$option_verbose,
+	     "version" => \$option_version,
+	    );
+
+    if ($option_version)
+    {
+	my $version = "not defined";
+
+	print $version . "\n";
+
+	exit 1;
+    }
+
+    if ($option_help)
+    {
+	print
+	    "
+$0 <options>
+
+$0: configuration and versioning for this package.
+
+options:
+    --help               print usage information.
+    --verbose            set verbosity level.
+    --version            give version information.
+";
+
+	exit 1;
+    }
+
+}
+
+
+main();
+
+
+exit $exit_code;
+
+

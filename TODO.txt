@@ -1,0 +1,10 @@
+-*- outline -*-
+
+* Item 1
+** subitem 1
+*** subsubitem 1
+
+This file is in outline mode.  Outline mode is used by the emacs
+family of editors and can easily be converted to latex or html.
+
+

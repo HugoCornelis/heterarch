@@ -1,0 +1,610 @@
+#!/usr/bin/perl
+#!/usr/bin/perl -w -d:ptkdb
+
+
+use strict;
+use Getopt::Long;
+use YAML;
+
+
+my $output_filename = "userdocs_cron.out";
+my $descriptor_check = "";
+my $build_directory = "$ENV{HOME}/neurospaces_project/userdocs/source/snapshots/0";
+my $htaccess_file = "";
+
+#
+# options
+#
+my $option_output_directory = "/tmp";
+my $option_config = "";
+my $option_html_output_directory = "~/public_html";
+
+my $configuration
+    = {
+      };
+
+
+sub main
+{
+    {
+	my $result
+	    = GetOptions
+		(
+		 "config=s" => \$option_config,
+		 "outputdir=s" => \$option_output_directory,
+		);
+
+    }
+
+
+    if ($option_config)
+    {
+	parse_config_file($option_config);
+    }
+
+
+    my $output_path = $option_output_directory . "/" . $output_filename;
+
+    rotate_logs();
+
+    $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
+
+    # first we update the developer package to pick up 
+    # any build script changes. 
+
+    try_to("neurospaces_pull --regex developer",1); 
+
+    try_to("neurospaces_update --regex developer",1); 
+
+    try_to("neurospaces_configure --regex developer",1);
+
+    try_to("neurospaces_install --regex developer",1);
+
+
+    try_to("neurospaces_pull --regex userdocs",1); 
+
+    try_to("neurospaces_update --regex userdocs",1); 
+
+    try_to("neurospaces_configure --regex userdocs",1);
+
+    try_to("neurospaces_install --regex userdocs",1);
+
+    try_to("neurospaces_clean --regex userdocs",1);
+
+    #   try_to("userdocs-check > $output_path",1);
+
+    # collect the descriptor check info for the email
+    $descriptor_check = `userdocs-check --directory $build_directory`;
+
+    try_to("make website-prepare -C ~/neurospaces_project/userdocs/source/snapshots/0/ > $output_path",1);
+
+    # now do a link check.
+    my $webcheck_path = `which webcheck`;
+
+    if($webcheck_path ne "")
+    {
+
+	try_to("make webcheck -C ~/neurospaces_project/userdocs/source/snapshots/0/ >> $output_path",1);
+
+    }
+
+    copy_html_data();
+
+    set_index_page();
+
+    if($htaccess_file ne "")
+    {
+	copy_htacces_file();
+    }
+
+    my $text = produce_email_text();
+
+    try_to_mail("Userdocs cron has finished.",
+		"Userdocs has finished building.\n\n" . $text);
+}
+
+
+
+#
+# Forms the status message to be sent
+# in the cronjob email.
+#
+sub produce_email_text
+{
+
+  my $status_message = "";
+  my $outputfile = $option_output_directory . "/" . $output_filename;
+  my $die_messages = `grep die $outputfile`;
+
+  $status_message
+      .= (
+	  "$0:\nCheck for your output on the host machine here "
+	  . $option_output_directory
+	  . "/"
+	  . $output_filename . "\n"
+	 );
+
+  if (defined $configuration->{URL})
+  {
+      $status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
+  }
+
+
+  # add the publication report produced during the build
+
+  use IO::File;
+
+  my $publication_report_file = IO::File->new("</tmp/all_publication_results");
+
+  if ($publication_report_file)
+  {
+      local $/;
+
+      my $publication_report = <$publication_report_file>;
+
+      $status_message .= "\n" . $publication_report . "\n";
+  }
+  else
+  {
+      $status_message .= "\nunable to read a publication report (error opening /tmp/all_publication_results\n\n";
+  }
+
+
+  if($descriptor_check ne "")
+  {
+    $status_message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
+  }
+
+  #
+  # Now find all of the log files and check for error messages
+  #
+  my $errors = "";
+
+  my $logfiletext = `find ~/neurospaces_project/userdocs/source/snapshots/0 | grep output | grep html | grep \.log`;
+
+  my @logfiles = split(/\n/,$logfiletext);
+
+  my $logfile;
+
+  foreach $logfile(@logfiles)
+  {
+    my $latexerrors = `cat $logfile | grep ^!`;
+
+    if($latexerrors eq "")
+    {
+
+      next;
+
+    }
+    else
+    {
+      #my $filename = $logfile;
+      #$filename =~ m(.*output/(.*)\.log$);
+      my @tmp = split(/\//,$logfile);
+      my $tmp = $tmp[-1];
+      @tmp = split(/\./,$tmp);
+      my $filename = $tmp[0];
+
+      $status_message .= "\n\n"; 
+      $status_message .= "Error in document: ";
+      $status_message .= $filename;
+      $status_message .= " : \n\t";
+      $status_message .= $latexerrors;
+    }
+
+  }
+
+  return $status_message;
+
+}
+
+
+#
+# This will actually send mail.
+#
+# args ($subject,$message)
+#
+sub try_to_mail
+{
+    my $subject = shift;
+    my $message = shift;
+
+    if (!$configuration->{MAILTO})
+    {
+      print "No addressee indicated in configuration\n";
+      return;
+    }
+
+    my $sendto = $configuration->{MAILTO};
+    my $replyto = $configuration->{MAILFROM};
+
+    open(MAIL, "|/usr/sbin/sendmail -oi -t");
+    print MAIL "From: $replyto\n";
+    print MAIL "To: $sendto\n";
+    print MAIL "Subject: $subject\n\n";
+    print MAIL "$message\n";
+    close(MAIL);
+
+}
+
+
+#
+# ("command",vebosity level)
+#
+sub try_to
+{
+    my $command = shift;
+
+    my $no_verbose = shift;
+
+    my $allow_fail = shift;
+
+    if (!$no_verbose)
+    {
+	print "---\n";
+	print "$0: trying to $command\n";
+    }
+
+    my $output_path = $option_output_directory . "/" . $output_filename;
+
+    #! $command executed in a subshell such that redirection applies
+    #! to all commands.
+
+    system "( $command ) >>$output_path 2>&1";
+
+    if ($?)
+    {
+	if ($allow_fail)
+	{
+	    system "echo >>$output_path 2>&1 failed with $?: $command\n";
+	}
+	else
+	{
+	    report_error($command, $?);
+	}
+    }
+}
+
+
+
+
+
+sub report_error
+{
+    my $command = shift;
+
+    my $error_code = shift;
+
+    my $message = "$0: $command returned $error_code";
+
+    if($descriptor_check ne "")
+    {
+      $message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
+    }
+
+    try_to_mail("userdocs_cron error", $message);
+
+    die "$0: $command returned $error_code";
+}
+
+
+#
+# copies the resulting html data to a directory specified in
+# the config file and then sets up a sym link for it.
+#
+# It copies over the userdocs html data into a directory, then symlinks
+# to that directory.
+#
+# operations performed:
+#   cp userdocs_data html_dir/userdocs_data
+#   ln -s html_dir/userdocs_data html_dir/userdocs
+#
+sub copy_html_data
+{
+
+  my $html_symlink = $option_html_output_directory . "/" . "userdocs";
+  my $html_data_directory = $option_html_output_directory . "/" . "userdocs_data";
+  my $html_build_directory = "~/neurospaces_project/userdocs/source/snapshots/0/html/htdocs/neurospaces_project/userdocs/";
+
+  try_to("rm -rf $html_data_directory");
+  try_to("cp -rf $html_build_directory $html_data_directory",1);
+  try_to("rm -f $html_symlink",1);
+  try_to("ln -s $html_data_directory $html_symlink",1);
+
+}
+
+
+#
+# ($config_file) a file with a configuration in it.
+#
+sub parse_config_file
+{
+  my $config_file = shift;
+
+  if (! -e $config_file)
+  {
+      print "\n$config_file is an invalid filename\n";
+
+      return;
+  }
+
+  print "\nParsing configuration in $config_file\n\n";
+
+  $configuration = YAML::LoadFile($config_file);
+
+
+  if(!defined $configuration)
+  {
+
+    print "This YAML file is invalid\n";
+    return;
+
+  }
+
+  if(defined $configuration->{MAILTO})
+  {
+    chomp($configuration->{MAILTO});
+    print "\tSend to email: $configuration->{MAILTO}\n";
+  }
+
+  if(defined $configuration->{MAILFROM})
+  {
+    chomp($configuration->{MAILFROM});
+    print "\tSend from email: $configuration->{MAILFROM}\n";
+  }
+
+
+  if(defined $configuration->{HTMLDIR})
+  {
+    $option_html_output_directory = $configuration->{HTMLDIR};
+    chomp($configuration->{HTMLDIR});
+    print "\tThe directory for html output is: $configuration->{HTMLDIR}\n";
+  }
+
+  if(defined $configuration->{OUTPUTDIR})
+  {
+      #! note that this overrides an option from set by the command line
+
+      $option_output_directory = $configuration->{OUTPUTDIR};
+      chomp($option_output_directory);
+      print "\tOutput directory is $option_output_directory\n";
+  }
+
+
+  if(defined $configuration->{URL})
+  {
+      chomp($configuration->{URL});
+      print "\tThe link for accessing the userdocs is $configuration->{URL}\n";
+  }
+
+  if(defined $configuration->{LOGROTATE})
+  {
+
+    chomp($configuration->{LOGROTATE});
+    print "\tNumber of logs to rotate $configuration->{LOGROTATE}\n";
+
+  }
+
+
+  if(defined $configuration->{LOGDIR})
+  {
+
+    chomp($configuration->{LOGDIR});
+    print "\tDirectory to store past logs is $configuration->{LOGDIR}\n";
+
+  }
+
+
+  if(defined $configuration->{DOCUMENTROOT})
+  {
+
+    chomp($configuration->{DOCUMENTROOT});
+    $build_directory = $configuration->{DOCUMENTROOT};
+    print "\tThe root directory for all documents is $build_directory\n";
+
+  }
+
+
+  if(defined $configuration->{HTACCESS})
+  {
+
+    chomp($configuration->{HTACCESS});
+    $htaccess_file = $configuration->{HTACCESS};
+    print "\tThe htaccess file to use is $htaccess_file\n";
+
+  }
+
+
+
+  print "Done Parsing $config_file:\n";
+
+}
+
+
+
+# Rotates logs with the name '$logname'
+#
+sub rotate_logs
+{
+
+  my $output_dir = $configuration->{OUTPUTDIR};
+  my $logname =  $option_output_directory . "/" . $output_filename;
+  my $numlogs  = -1;
+
+  if(not defined $configuration->{LOGROTATE})
+  {
+    #i If we aren't rotating logs when we just delete 
+    #i the log from the last run.
+    #i
+    if (-e $logname)
+    {
+	system "rm -f $logname";
+    }
+    return;
+  }
+  else
+  {
+    $numlogs = $configuration->{LOGROTATE};
+  }
+
+
+  my $logdir = $output_dir;
+
+
+  if(defined $configuration->{LOGDIR})
+  {
+
+    $logdir = $configuration->{LOGDIR};
+
+    if(! -d $logdir)
+    {
+      mkdir $logdir
+    }
+
+    $logdir .= "/";
+  }
+
+
+  # we shift all of our logs if present. 
+  # Whatever log happens to be the last one should
+  # get overwritten with a previous log.
+  my $i;
+  for($i = $numlogs-1; $i > -1; $i--)
+  {
+
+    my $log = $logdir . $logname .'.' . $i;
+
+    if( -e $log )
+    {
+
+      # mv should preserve permissions.
+
+      my $nextlog = $logdir . $logname . '.' . ($i+1);
+
+      system "mv -f $log $nextlog";
+
+    }
+    else
+    {
+      next;
+    }
+
+  }
+
+  # after the shift, we should be able to move the 
+  # first log to slot 0. Now the original slot is open
+  # for a log run.
+  my $nextlog = $logdir . $logname . '.' . 0;
+  system "mv -f $logname $nextlog";
+
+  return;
+
+}
+
+
+#
+# This sets a "index.html" sim link to the documentation
+# homepage. In the future this will set up the documentation
+# frame, now it just puts in a list of documents.
+#
+sub set_index_page
+{
+
+
+  if(not defined $configuration->{HTMLDIR})
+  {
+    return;
+  }
+
+  my $index_file = $configuration->{HTMLDIR} . "/userdocs/index.html";
+
+  open(INDEX,">$index_file") or die "cannot open file for writing: $!";
+
+  my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
+<html>
+<head>
+  <meta
+ content=\"text/html; charset=ISO-8859-1\"
+ http-equiv=\"content-type\">
+  <title>GENESIS Documentation System</title>
+</head>
+<body>
+For the documentation homepage please click <a
+ href=\"documentation-homepage/documentation-homepage.html\">here.</a>
+<br>
+<br>
+This is a listing of all published documents in the documentation
+system. <br>
+<br>
+<br>
+<ul>
+";
+
+  # Start off the index page. 
+  print INDEX $html_starter;
+
+
+  my $documentlist = `userdocs-tag-filter published`;
+
+  my $tmp = YAML::Load($documentlist);
+
+  my @published_documents = @$tmp;
+
+  sort @published_documents;
+
+  foreach (@published_documents)
+  {
+
+    my $descriptor_file = $_ . "/descriptor.yml";
+
+    my $descriptor = YAML::LoadFile($descriptor_file);
+
+    my @dirs = split(/\//,$_);
+
+    my $documentname = $dirs[-1];
+
+    print INDEX "<li><a href=\"";
+
+    print INDEX $documentname . "/" . $documentname . ".html";
+
+    print INDEX "\">";
+
+    print INDEX $descriptor->{'document name'};
+
+    print INDEX "</a></li>\n";
+
+
+  }
+
+  print INDEX "</ul>\n</body>\n</html>\n";
+
+  close INDEX;
+
+  print "Done constructing index page\n";
+}
+
+
+#
+# This sub routine just copies an .htaccess file to the root web directory.
+#
+sub copy_htacces_file
+{
+
+  my $target_htaccess_file = $option_html_output_directory . "/userdocs/.htaccess";
+
+  if(-e $htaccess_file)
+  {
+
+    system "cp $htaccess_file $target_htaccess_file";
+
+  }
+
+}
+
+
+
+#
+# run the main program.
+#
+main();
+

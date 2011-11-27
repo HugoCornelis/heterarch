@@ -1,0 +1,315 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+BEGIN
+{
+    #! make check
+
+    push @INC, '../perl';
+
+    #! make distcheck
+
+    push @INC, '../../perl';
+
+    #! normal run
+
+    push @INC, './perl';
+
+    #! after install
+
+    push @INC, '/usr/local/glue/swig/perl';
+}
+
+
+use GENESIS3::Documentation;
+
+use Getopt::Long;
+
+use YAML;
+
+
+$SIG{__DIE__}
+    = sub {
+
+	use Carp;
+
+	confess @_;
+    };
+
+
+$SIG{INT}
+    = sub {
+	use Carp;
+
+	confess @_;
+
+	exit 1;
+    };
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+my $option_dry_run;
+my $option_regex = ".*";
+my $option_remove;
+my $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+my $option_verbose;
+
+
+sub main
+{
+    read_cmd_line();
+
+    # switch to the build directory
+
+    my $build_directory = "$ENV{HOME}/neurospaces_project/$option_set_name/source/snapshots/0/";
+
+    if (!chdir $build_directory)
+    {
+	die "$0: cannot change to the build directory ($build_directory)";
+    }
+
+    # get all documents from the command line
+
+    my $documents
+	= GENESIS3::Documentation::find_documentation
+	    (
+	     {
+	      (@ARGV ? (names => [ @ARGV, ]) : ()),
+	      tags => $option_tags,
+	     },
+	    );
+
+    if ($option_dry_run)
+    {
+	print Dump( { all_documents => $documents, }, );
+    }
+    else
+    {
+	# loop over all documents to be build
+
+	if (!scalar keys %$documents)
+	{
+	    print "$0: no documents to build\n";
+	}
+
+	foreach my $document_filename (sort keys %$documents)
+	{
+	    # convert filename to canonical name
+
+	    my $document_name = $document_filename;
+
+	    $document_name =~ s(/$)();
+
+	    $document_name =~ s(.*/)();
+
+	    chomp $document_name;
+
+	    if ($document_name !~ m/$option_regex/)
+	    {
+		next;
+	    }
+
+	    my $document
+		= GENESIS3::Documentation::Document->new
+		    (
+		     {
+		      filename => $document_filename,
+		      name => $document_name,
+		     },
+		    );
+
+	    # create all the replacements
+
+	    my $replacements = {};
+
+	    {
+		# loop over the expandable snippets
+
+		my $snippets = $document->find_snippets();
+
+		foreach my $snippet_name (keys %$snippets)
+		{
+		    my $snippet = $snippets->{$snippet_name};
+
+		    # if have to remove
+
+		    if ($option_remove)
+		    {
+			$replacements->{$snippet_name} = '';
+		    }
+
+		    # else
+
+		    else
+		    {
+			$replacements->{$snippet_name} = $snippet->replacement_string();
+		    }
+		}
+	    }
+
+	    # loop over all snippets in this document
+
+	    my $content;
+
+	    {
+		# slurp content
+
+		open my $descriptor, $document_filename
+		    or die $!;
+
+		undef $/;
+
+		$content = <$descriptor>;
+
+		close $descriptor;
+	    }
+
+	    if ($content)
+	    {
+		my $old_content = $content;
+
+		# loop over source text
+
+		#! assertion allows '"' to be escaped with a backslash
+
+		while ($content =~ m/% start: $program_name (.*)\n(.|\n)*?% end: $program_name/g)
+		{
+		    my $snippet_name = $1;
+
+		    my $position = pos($content);
+
+		    # snippet_name exists when found in the snippets directory
+		    # replacement is defined when there was no error
+
+		    if (exists $replacements->{$snippet_name}
+		        and defined $replacements->{$snippet_name})
+		    {
+			my $replacement = $replacements->{$snippet_name};
+
+			if ($option_verbose)
+			{
+			    print "For $document_name: found $program_name $snippet_name, expanding ... \n";
+			}
+
+			$content =~ s(% start: $program_name $snippet_name(.*\n)*% end: $program_name $snippet_name\n)(% start: $program_name $snippet_name\n$replacement% end: $program_name $snippet_name\n)g;
+
+			if ($option_verbose)
+			{
+			    print "For $document_name: new content at position $position is $replacement\n";
+			}
+
+			pos($content) = $position;
+		    }
+		    else
+		    {
+			print STDERR "For $document_name: $snippet_name has no replacement, skipped\n";
+		    }
+		}
+
+		if ($option_verbose)
+		{
+		    print "Done for $document_name\n";
+		    print "---------------------------------------------------------------------\n\n";
+		}
+
+		# if something has changed
+
+		if ((not $option_dry_run)
+		    and ($old_content ne $content))
+		{
+		    # replace the file
+
+		    open my $descriptor, ">$document_filename"
+			or die $!;
+
+		    print $descriptor $content;
+
+		    close $descriptor;
+		}
+
+	    }
+
+	}
+
+    }
+}
+
+
+sub read_cmd_line
+{
+    my $option_help = 0;
+    my $option_version;
+
+    my $result
+	= GetOptions(
+		     "dry-run!" => \$option_dry_run,
+		     "help!" => \$option_help,
+		     "regex=s" => \$option_regex,
+		     "remove!" => \$option_remove,
+		     "set-name=s" => \$option_set_name,
+		     "verbose+" => \$option_verbose,
+		     "version" => \$option_version,
+		    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	$0 =~ m(.*/(.*));
+
+	my $program_name = $1;
+
+	print
+	    "
+
+$program_name: insert external text snippets into a document.
+External text snippets can replace unix shell commands between
+backquotes with the output they generate.
+
+synopsis:
+    $0 <document name1> <document name2> ...
+
+options:
+    --dry-run         print what documents would be build without actually building them.
+    --help            print usage information.
+    --regex           selects snippets by name.
+    --remove          remove expandable snippets.
+    --set-name        select a document set (builtin default is userdocs).
+    --version         give version information.
+    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+
+";
+
+	exit 1;
+    }
+
+}
+
+
+main();
+
+

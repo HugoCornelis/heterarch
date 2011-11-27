@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#!
+
+
+use strict;
+
+
+use YAML;
+
+my $build_database_yaml = `neurospaces_build --help-all`;
+
+my $build_database = Load($build_database_yaml);
+
+my $all_packages = $build_database->{all_packages};
+
+my $content-framework_directory = $all_packages->{content-framework}->{directory};
+
+system "cd \"$content-framework_directory\" && content-framework-check";
+
+if ($?)
+{
+    die "$0: *** Error: content-framework-check concludes there is something wrong with your documentation workspace.";
+}
+
+system "neurospaces_sync --enable content-framework --regex content-framework --verbose";
+
+if ($?)
+{
+    die "$0: *** Error: $?";
+}
+else
+{
+    system "neurospaces_update --enable content-framework --regex content-framework --verbose";
+}
+
+

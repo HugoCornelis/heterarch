@@ -1,0 +1,30 @@
+$files = {
+           '_<bin/userdocs-tag-replace-items' => [
+                                                   {
+                                                     'expr' => undef,
+                                                     'value' => '1',
+                                                     'text' => '	if ($content)
+',
+                                                     'fname' => 'bin/userdocs-tag-replace-items',
+                                                     'type' => 'user',
+                                                     'line' => '364'
+                                                   },
+                                                   {
+                                                     'expr' => undef,
+                                                     'value' => '1',
+                                                     'text' => '	    $tagged_documents = YAML::Load(`userdocs-tag-filter \'$tag\'`);
+',
+                                                     'fname' => 'bin/userdocs-tag-replace-items',
+                                                     'type' => 'user',
+                                                     'line' => 270
+                                                   }
+                                                 ]
+         };
+$expr_list = [
+               {
+                 'expr' => '$_',
+                 'depth' => -1
+               }
+             ];
+$eval_saved_text = undef;
+$main_win_geometry = '1592x820+0+0';

@@ -1,0 +1,24 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#!
+
+
+use strict;
+
+# system "userdocs-check";
+
+# if ($?)
+# {
+#     die "$0: *** Error: userdocs-check says there is something wrong with your documentation workspace.";
+# }
+
+system "neurospaces_pull --enable userdocs --regex userdocs --verbose";
+
+if ($?)
+{
+    die "$0: *** Error: $?";
+}
+else
+{
+    system "neurospaces_update --enable userdocs --regex userdocs --verbose";
+}

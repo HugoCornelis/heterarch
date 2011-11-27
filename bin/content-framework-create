@@ -1,0 +1,178 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+use Getopt::Long;
+
+use YAML;
+use Data::Dumper;
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+my $option_verbose;
+my $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+
+
+my $template = "NewDocument";
+
+
+#
+# (document_name)
+#
+
+sub create_new_document
+{
+    my $build_directory = shift;
+
+    my $documentname = shift;
+
+    my $directory = $documentname;
+
+    my $cwd = `pwd`;
+
+    if ($option_verbose)
+    {
+	print "$0: entering $build_directory\n";
+    }
+
+    chdir "$build_directory";
+
+    mkdir "$documentname";
+
+    chdir "$documentname";
+
+    mkdir "figures";
+
+    mkdir "output";
+
+    system "cp -f $build_directory/$template/$template.tex $documentname.tex";
+
+    system "cp -f $build_directory/$template/figures/* figures";
+
+    # Add the $document to the descriptor yaml file. The user can make it more
+    # user readable. Prevents people from making multiple documents show up as 
+    # "New Document" in the contents pages.
+
+    my $descriptor = YAML::LoadFile("$build_directory/$template/descriptor.yml");
+
+    $descriptor->{'document name'} = "$documentname";
+
+    YAML::DumpFile("descriptor.yml", $descriptor);
+
+    if ($option_verbose)
+    {
+	print "$0: leaving $build_directory\n";
+    }
+
+    chdir "$cwd";
+}
+
+
+sub main
+{
+    read_cmd_line();
+
+    my $build_directory = "$ENV{HOME}/neurospaces_project/$option_set_name/source/snapshots/0";
+
+    # get all documents from the command line
+
+    my $documents
+	= {
+	   map
+	   {
+	       $_ => 1,
+	   }
+	   @ARGV,
+	  };
+
+    # make sure document names are 'compliant'
+
+    map
+    {
+	s(/$)();
+    }
+	keys %$documents;
+
+
+    if (!scalar keys %$documents)
+    {
+	print "$0: no documents to build\n";
+    }
+
+    foreach my $document (keys %$documents)
+    {
+	create_new_document($build_directory, $document);
+    }
+}
+
+
+sub read_cmd_line
+{
+    my $option_help = 0;
+    my $option_version;
+
+    my $result
+	= GetOptions
+	    (
+	     "help!" => \$option_help,
+	     "set-name=s" => \$option_set_name,
+	     "verbose+" => \$option_verbose,
+	     "version" => \$option_version,
+	    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	$0 =~ m(.*/(.*));
+
+	my $program_name = $1;
+
+	print
+	    "
+
+$program_name: Creates a new blank document for editing using the hardcoded 
+template file.  Arguments on the command line are taken as documents
+that need to be given a blank template.
+
+
+options:
+    --help            print usage information.
+    --set-name        select a document set (builtin default is userdocs).
+    --version         give version information.
+    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+
+";
+
+	exit 1;
+    }
+
+}
+
+
+main();
+
+

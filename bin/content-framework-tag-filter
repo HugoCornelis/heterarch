@@ -1,0 +1,197 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+use Getopt::Long;
+
+use YAML;
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+my $option_dry_run;
+my $option_regex = ".*";
+my $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+my $option_verbose;
+
+
+sub tag_filter
+{
+    my $filename = shift;
+
+    my $selector_tags = shift;
+
+    # default result: not selected
+
+    my $result = 0;
+
+    # convert the selected tags to a hash with false values
+
+    my $selected_tags
+	= {
+	   map
+	   {
+	       $_ => 0,
+	   }
+	   @$selector_tags,
+	  };
+
+    # load the document descriptor
+
+    my $descriptor = YAML::LoadFile($filename);
+
+    # loop over document tags
+
+    my $tags = $descriptor->{tags};
+
+    foreach (@$tags)
+    {
+	# set the selected tag
+
+	$selected_tags->{$_} = 1;
+    }
+
+    # if all selected flags are true
+
+    my $sum = 0;
+
+    map
+    {
+	$sum += $_
+    }
+	values %$selected_tags;
+
+    if (scalar keys %$selected_tags eq $sum)
+    {
+	# the document is selected
+
+	return 1;
+    }
+
+    # if there is one selector flag false
+
+    else
+    {
+	# the document must be filtered
+
+	return 0;
+    }
+}
+
+
+sub main
+{
+    read_cmd_line();
+
+    #t this should come from a query using neurospaces_build because
+    #t it is the only one that knows about the project layout.
+
+    my $build_directory = "$ENV{HOME}/neurospaces_project/userdocs/source/snapshots/0";
+
+    my $selected_tags = [ @ARGV, ];
+
+    if (!defined $selected_tags)
+    {
+	die "$0: please give a tag value on the command line";
+    }
+
+    my $all_documentation_descriptors
+	= [
+	   map
+	   {
+	       chomp; $_
+	   }
+	   `find "$build_directory" -name "descriptor.yml"`,
+	  ];
+
+    my $all_documentation_tag_filtered
+	= [
+	   map
+	   {
+	       s(/descriptor.yml$)()i; $_;
+	   }
+	   grep
+	   {
+	       tag_filter($_, $selected_tags);
+	   }
+	   @$all_documentation_descriptors,
+	  ];
+
+    print Dump($all_documentation_tag_filtered);
+}
+
+
+sub read_cmd_line
+{
+    my $option_help = 0;
+    my $option_version;
+
+    my $result
+	= GetOptions(
+		     "dry-run!" => \$option_dry_run,
+		     "help!" => \$option_help,
+		     "regex=s" => \$option_regex,
+		     "set-name=s" => \$option_set_name,
+		     "verbose+" => \$option_verbose,
+		     "version" => \$option_version,
+		    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	$0 =~ m(.*/(.*));
+
+	my $program_name = $1;
+
+	print
+	    "
+
+$program_name: insert external text snippets into a document.
+External text snippets can replace unix shell commands between
+backquotes with the output they generate.
+
+synopsis:
+    $0 <document name1> <document name2> ...
+
+options:
+    --dry-run         print what documents would be build without actually building them.
+    --help            print usage information.
+    --regex           selects snippets by name.
+    --set-name        select a document set (builtin default is userdocs).
+    --version         give version information.
+    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+
+";
+
+	exit 1;
+    }
+
+}
+
+
+main();
+
+

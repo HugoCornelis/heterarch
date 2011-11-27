@@ -1,0 +1,117 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+use Getopt::Long;
+use YAML;
+
+my $option_output_filename = "sitemap.xml";
+my $option_config = "";
+my $option_verbose = 0;
+my $option_help = 0;
+
+my $result
+= GetOptions
+  (
+   "output=s" => \$option_output_filename,
+   "config=s" => \$option_config,
+   "verbose!" => \$option_verbose,
+   "help!" => \$option_help,
+  );
+
+if (!$result)
+{
+  die "$0: *** Error: Error in option processing";
+}
+
+
+$SIG{__WARN__} = sub { die $_[0] };
+
+
+my $html_root = "";
+
+
+sub main
+{
+
+  if($option_help)
+  {
+    usage();
+  }
+
+
+  if($option_config eq "")
+  {
+
+    print "No userdocs configuration given.\n";
+
+    return 0;
+
+  }  
+
+
+  my $configuration;
+
+  if(-e $option_config)
+  {
+
+    $configuration = YAML::LoadFile($option_config);
+
+  }
+  else
+  {
+
+    print "Configuration file $option_config doesn't exist.\n";
+
+    return 0;
+
+  }
+
+
+  $html_root = $configuration->{HTMLDIR};
+  chomp($html_root);
+
+  $html_root .= "userdocs\/";
+
+  # fetch all pages from the html directory
+  my @pages = `find $html_root | grep \.html\$`;
+
+  chomp(@pages);
+
+  my $lastmod = get_lastmod();
+
+
+}
+
+
+# get xml for the last modified date.
+sub get_lastmod
+{
+
+  my ($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime time;
+
+  $year += 1900;
+  $mon+=1;
+
+  return "<lastmod>$year-$mon-$mday</lastmod>";
+
+}
+
+
+
+sub usage
+{
+  print 
+    "
+    --help        print this help message.
+    --config      The userdocs configuration to use.
+    --verbose     Prints output on every descriptor processed.
+";
+}
+
+
+main();

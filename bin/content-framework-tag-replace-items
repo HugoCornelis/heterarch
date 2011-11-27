@@ -1,0 +1,556 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+BEGIN
+{
+    #! make check
+
+    push @INC, '../perl';
+
+    #! make distcheck
+
+    push @INC, '../../perl';
+
+    #! normal run
+
+    push @INC, './perl';
+
+    #! after install
+
+    push @INC, '/usr/local/glue/swig/perl';
+}
+
+
+use GENESIS3::Documentation;
+
+use Getopt::Long;
+
+use YAML;
+
+
+my $program_name = $0;
+
+
+$program_name =~ s/.*\///;
+
+
+# parse options
+
+my $option_exclude = [];
+my $option_help;
+my $option_remove;
+my $option_verbose;
+
+
+sub read_cmd_line
+{
+    my $result
+	= GetOptions
+	    (
+	     "exclude=s" => $option_exclude,
+	     "help!" => \$option_help,
+	     "remove!" => \$option_remove,
+	     "v|verbose+" => \$option_verbose,
+	    );
+
+    if ($option_help)
+    {
+	print
+	    "
+$0: replace tags with the itemized contents in a set of documents.
+
+$0 <options> <tag> <document1> ...
+
+options :
+    --exclude         exclude this document from the expansion (may be given multiple times).
+    --help            print usage information.
+    --remove          remove content between delimiters.
+    --verbose         set verbosity level.
+";
+
+	exit 1;
+    }
+
+    my $exclude
+	= {
+	   map
+	   {
+	       $_ => 1;
+	   }
+	   @$option_exclude,
+	  };
+
+    $option_exclude = $exclude;
+
+}
+
+
+# A tag to check for in the given descriptor.
+#  arg1 descriptor containing tags
+#  arg2 tag to search for. 
+#
+#  note: duplicated code
+#
+# ($descriptor,$tag)
+#
+sub tag_defined
+{
+  my $descriptor = shift;
+  my $tag = shift;
+
+  my $tags = $descriptor->{tags};
+
+  foreach (@$tags)
+  {
+
+    if( $tag eq $_ )
+    {
+      return 1;
+    }
+  }
+
+  return 0;
+
+}
+
+
+
+sub update_links_latex
+{
+    my @items = @_;
+    my $item;
+    my $descriptorfile;
+
+    my @updated_links;
+
+    foreach $item (@items)
+    {
+	if ($item =~ m/\\href\{\.\.\/(.*\/).*.pdf\}{/)
+	{
+	    # chop should be safe here since it cuts off the "/"
+
+	    my $item_name = $1;
+
+	    chop($item_name);
+
+	    $descriptorfile = $1 . "descriptor.yml";
+
+	    if (-e $descriptorfile)
+	    {
+		my $descriptor = YAML::LoadFile($descriptorfile);
+
+		if (!defined $descriptor)
+		{
+		    print "Error: $descriptorfile contains invalid YAML\n";
+
+		    next;
+		}
+
+		# If the doc is flagged as a draft we skip
+		# to the next item so this doesn't get added to our
+		# updated list.
+
+		if (tag_defined($descriptor, 'draft') )
+		{
+		    next;
+		}
+
+		if (tag_defined($descriptor, 'obsolete') )
+		{
+		    next;
+		}
+	
+		my $document_name = $descriptor->{'document name'};
+
+		$item =~ s({\\bf \\underline{.+}})({\\bf \\underline{$document_name}})g;
+
+		if (defined $descriptor->{'summary'})
+		{
+		    chop($item);
+		    chop($item);
+
+		    $item .= " : " . $descriptor->{'summary'} . "\n\n";
+		}
+
+		push @updated_links, $item;
+	    }
+	    else
+	    {
+		print "Error: $descriptorfile doesn't exist\n";
+
+		next;
+	    }
+	}
+    }
+
+    # Sort the links on the contents pages by the document name.
+
+    my @updated_links_sorted
+	= sort
+	  {
+	      my $atmp = $a;
+	      $atmp =~ s(\\item \\href{../.*/.*}{\\bf \\underline{(.*)}}\n\n)($1)g;
+	      my $btmp = $b;
+	      $btmp =~ s(\\item \\href{../.*/.*}{\\bf \\underline{(.*)}}\n\n)($1)g;
+
+	      lc($atmp) cmp lc($btmp)
+	  }
+	      @updated_links;
+
+    return join "", @updated_links_sorted;
+}
+
+
+sub update_links_rst
+{
+    my @items = @_;
+    my $item;
+    my $descriptorfile;
+
+    my @updated_links;
+
+    foreach $item (@items)
+    {
+	if ($item =~ m/\`[^<]*<\.\.\/(.*\/).*.pdf\>\`_/)
+	{
+	    # chop should be safe here since it cuts off the "/"
+
+	    my $item_name = $1;
+
+	    chop($item_name);
+
+	    $descriptorfile = $1 . "descriptor.yml";
+
+	    if (-e $descriptorfile)
+	    {
+		my $descriptor = YAML::LoadFile($descriptorfile);
+
+		if (!defined $descriptor)
+		{
+		    print "Error: $descriptorfile contains invalid YAML\n";
+
+		    next;
+		}
+
+		# If the doc is flagged as a draft we skip
+		# to the next item so this doesn't get added to our
+		# updated list.
+
+		if (tag_defined($descriptor, 'draft') )
+		{
+		    next;
+		}
+
+		if (tag_defined($descriptor, 'obsolete') )
+		{
+		    next;
+		}
+	
+		my $document_name = $descriptor->{'document name'};
+
+# 		$item =~ s({\\bf \\underline{.+}})({\\bf \\underline{$document_name}})g;
+
+		$item =~ s(\.pdf>)(.html>)g;
+
+		if (defined $descriptor->{'summary'})
+		{
+		    chop($item);
+		    chop($item);
+
+		    $item =~ s(\`[^<]*<)(`$descriptor->{'document name'}: $descriptor->{summary} <)g;
+		}
+		else
+		{
+		    $item =~ s(\`[^<]*<)(`$descriptor->{'document name'} <)g;
+		}
+
+		push @updated_links, $item;
+	    }
+	    else
+	    {
+		print "Error: $descriptorfile doesn't exist\n";
+
+		next;
+	    }
+	}
+    }
+
+    # Sort the links on the contents pages by the document name.
+
+    my @updated_links_sorted
+	= sort
+	  {
+	      my $atmp = $a;
+	      $atmp =~ s(\\item \\href{../.*/.*}{\\bf \\underline{(.*)}}\n\n)($1)g;
+	      my $btmp = $b;
+	      $btmp =~ s(\\item \\href{../.*/.*}{\\bf \\underline{(.*)}}\n\n)($1)g;
+
+	      lc($atmp) cmp lc($btmp)
+	  }
+	      @updated_links;
+
+    return join "", @updated_links_sorted;
+}
+
+
+sub main
+{
+    read_cmd_line();
+
+    my $tag = shift @ARGV;
+
+    my $files = [ @ARGV, ];
+
+    if (!defined $tag)
+    {
+	die "$0: please give a tag value on the command line";
+    }
+
+    if (!@$files)
+    {
+	die "$0: please give a couple of filenames on the command line";
+    }
+
+    my $replacement_latex;
+    my $replacement_rst;
+
+    # if have to remove
+
+    if ($option_remove)
+    {
+	$replacement_latex = '';
+	$replacement_rst = '';
+    }
+
+    # else
+
+    else
+    {
+	# expand the tag to its documents
+
+	my $tagged_documents;
+
+	{
+	    undef $/;
+
+	    $tagged_documents = YAML::Load(`userdocs-tag-filter '$tag'`);
+	}
+
+	# generate a latex snippet for each of the tagged documents
+
+	my $tagged_documents_expanded_latex
+	    = [
+	       # insert links with underlined text
+
+	       map
+	       {
+		   "\\item \\href{../$_/$_.pdf}{\\bf \\underline{$_}}\n\n";
+	       }
+
+	       # sort alphabetically
+
+	       sort
+
+	       # exclude documents excluded by the options
+
+	       grep
+	       {
+		   my $result = 1;
+
+		   foreach my $excluded (keys %$option_exclude)
+		   {
+		       if (/$excluded/)
+		       {
+			   $result = 0;
+		       }
+		   }
+
+		   $result;
+	       }
+
+	       # convert to relative paths
+
+	       map
+	       {
+		   /.*\/(.*)/;
+
+		   $1;
+	       }
+	       @$tagged_documents,
+	      ];
+
+	# generate an rst snippet for each of the tagged documents
+
+	my $tagged_documents_expanded_rst
+	    = [
+	       # insert links with underlined text
+
+	       map
+	       {
+		   "- `$_ <../$_/$_.pdf>`_\n";
+	       }
+
+	       # sort alphabetically
+
+	       sort
+
+	       # exclude documents excluded by the options
+
+	       grep
+	       {
+		   my $result = 1;
+
+		   foreach my $excluded (keys %$option_exclude)
+		   {
+		       if (/$excluded/)
+		       {
+			   $result = 0;
+		       }
+		   }
+
+		   $result;
+	       }
+
+	       # convert to relative paths
+
+	       map
+	       {
+		   /.*\/(.*)/;
+
+		   $1;
+	       }
+	       @$tagged_documents,
+	      ];
+
+# 	use Data::Dumper;
+
+# 	print Dumper('tagged_documents_expanded from tagged_documents', $tagged_documents, $tagged_documents_expanded);
+
+	if (scalar @$tagged_documents_expanded_latex)
+	{
+	    # update the links in each snippet
+
+	    my $tagged_documents_expanded_text_latex = update_links_latex(@$tagged_documents_expanded_latex);
+
+	    $replacement_latex = "\\begin{itemize}\n\n$tagged_documents_expanded_text_latex\n\\end{itemize}\n\n";
+
+	    my $tagged_documents_expanded_text_rst = update_links_rst(@$tagged_documents_expanded_rst);
+
+	    $replacement_rst = "\n$tagged_documents_expanded_text_rst\n\n";
+	}
+	else
+	{
+	    $replacement_latex = '';
+	    $replacement_rst = '';
+	}
+    }
+
+    # loop over all documents
+
+    foreach my $document_name (@$files)
+    {
+	my $document
+	    = GENESIS3::Documentation::Document->new
+		(
+		 {
+		  name => $document_name,
+		 },
+		);
+
+	if ($option_verbose)
+	{
+	    print STDERR "---------------------------------------------------------------------\n";
+	    print STDERR "Expanding in \"$document_name\"\n";
+	}
+
+	# determine the marker start and end depending on the document file type
+
+	my $marker_start = "% start:";
+	my $marker_end = "% end:";
+
+	my $replacement = $replacement_latex;
+
+	if ($document->is_restructured_text())
+	{
+	    $marker_start = ".. start:";
+	    $marker_end = ".. end:";
+
+	    $replacement = $replacement_rst;
+	}
+
+	my $content;
+
+	{
+	    # slurp content
+
+	    open my $descriptor, $document->output_filename()
+		or die $!;
+	    undef $/;
+	    $content = <$descriptor>;
+	    close $descriptor;
+	}
+
+	if ($content)
+	{
+	    my $old_content = $content;
+
+	    # loop over source text
+
+	    #! assertion allows '"' to be escaped with a backslash
+
+	    if ($content =~ m/$marker_start $program_name $tag(.*\n)*$marker_end $program_name $tag\n/)
+	    {
+		my $position = pos($content);
+
+		if ($option_verbose)
+		{
+		    print STDERR "For $document_name: found $program_name $tag, expanding ... \n";
+		}
+
+		# replace the next line with the new text
+		#X removed a \s* at the end of $tag, removed a newline from the end of the wildcard .*
+		#$content =~ s/% start: $program_name $tag\s*\n(.*\n)*% end: $program_name $tag[^\n]*\n/% start: $program_name $tag\n$replacement% end: $program_name $tag\n/g;
+
+		$content =~ s($marker_start $program_name $tag(.*\n)*$marker_end $program_name $tag\n)($marker_start $program_name $tag\n$replacement$marker_end $program_name $tag\n)g;
+
+		if ($option_verbose)
+		{
+		    print STDERR "For $document_name: new content at position $position is $replacement\n";
+		}
+
+		pos($content) = $position;
+	    }
+
+	    if ($option_verbose)
+	    {
+		print STDERR "Done for $document_name\n";
+		print STDERR "---------------------------------------------------------------------\n\n";
+	    }
+
+	    # if something has changed
+
+	    if ($old_content ne $content)
+	    {
+		# replace the file
+
+		open my $descriptor, ">" . $document->output_filename()
+		    or die $!;
+		print $descriptor $content;
+		close $descriptor;
+
+
+	    }
+
+	}
+    }
+}
+
+
+main();
+
+

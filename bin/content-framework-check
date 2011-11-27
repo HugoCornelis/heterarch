@@ -1,0 +1,152 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+use Getopt::Long;
+use YAML;
+
+
+my $option_directory = ".";
+my $option_verbose = 0;
+
+
+$SIG{__WARN__} = sub { die $_[0] };
+
+
+
+sub main
+{
+    read_cmd_line();
+
+    my $result = 0;
+
+    my $all_documentation_descriptors
+	= [
+	   map
+	   {
+	       chomp; $_
+	   }
+	   `find $option_directory -name "descriptor.yml"`,
+	  ];
+
+    foreach my $documentation_descriptor (@$all_documentation_descriptors)
+    {
+        if ($option_verbose)
+	{
+	    print "Checking $documentation_descriptor :\t";
+	}
+
+	eval
+	{
+	    my $descriptor = YAML::LoadFile($documentation_descriptor);
+
+	    if (defined $descriptor)
+	    {
+	        if($option_verbose)
+		{
+		    print "is valid\n";
+		}
+	    }
+	    else
+	    {
+		print "$documentation_descriptor is empty\n";
+
+		$result = 1;
+	    }
+	};
+
+	if ($@)
+	{
+	    print "$documentation_descriptor contains malformed YAML ($@)\n";
+
+	    $result = 2;
+	}
+    }
+
+    return $result;
+}
+
+
+sub read_cmd_line
+{
+    my $option_help;
+
+    my $result
+	= GetOptions
+	    (
+	     "directory=s" => \$option_directory,
+	     "help!" => \$option_help,
+	     "verbose!" => \$option_verbose,
+	    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_help)
+    {
+	print
+	    "
+
+$0: check userdocs workspace for obvious errors.
+
+    --help        print this help message.
+    --directory   The directory to scan for descriptor files (default '.').
+    --verbose     Prints output on every descriptor processed.
+
+
+";
+
+	exit 0;
+    }
+
+}
+
+
+exit main();
+
+
+# #!/usr/bin/perl -w
+# #!/usr/bin/perl -d:ptkdb -w
+# #
+
+
+# use strict;
+
+
+# use Getopt::Long;
+
+# use YAML;
+
+
+# my $option_regex_selector;
+# my $option_tags = [];
+# my $option_verbose;
+
+# {
+#     my $result
+# 	= GetOptions
+# 	    (
+# 	     "regex-selector=s" => \$option_regex_selector,
+# 	     "tags=s" => $option_tags,
+# 	     "v|verbose+" => \$option_verbose,
+# 	    );
+
+#     if (!$result)
+#     {
+# 	die "$0: *** Error: Error in option processing";
+#     }
+# }
+
+# my $regex_options = defined $option_regex_selector ? "--regex '$option_regex_selector' " : '';
+# my $tags_options = scalar @$option_tags ? (join "--tag ", @$option_tags) : '';
+# my $verbose_options = defined $option_verbose ? "--verbose " x $option_verbose : '';
+
+# system "userdocs-build --check $verbose_options $regex_options $tags_options";
+
+

@@ -1,0 +1,169 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+use Getopt::Long;
+
+use YAML;
+use Data::Dumper;
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+my $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+my $option_verbose;
+
+
+sub rename_document
+{
+    my $srcdoc = shift;
+    my $dstdoc = shift;
+
+    if (not -d $srcdoc)
+    {
+	die "No document directory named $srcdoc\n";
+    }
+
+    my $descriptor_file = $srcdoc . "/descriptor.yml";
+
+    if (not -e $descriptor_file)
+    {
+	die "Document $srcdoc has no descriptor file present.\n";
+    }
+
+    my $build_directory = "$ENV{HOME}/neurospaces_project/$option_set_name/source/snapshots/0";
+
+    chdir "$build_directory";
+
+    if (-d $dstdoc)
+    {
+	die "Document with destination name already exists.\n";
+    }
+
+    # monotone seems to want the trailing slash so just being cautious
+    # and including it. 
+
+    my $srcdoc_dir = $srcdoc;
+
+    if (substr($srcdoc_dir,-1,1) ne '/')
+    {
+	$srcdoc_dir = $srcdoc . '/';
+    }
+
+    my $dstdoc_dir = $dstdoc;
+    if( substr($dstdoc_dir,-1,1) ne '/' )
+    {
+	$dstdoc_dir = $dstdoc . '/';
+    }
+
+    # update monotone repo by using monotones rename (aka mv) commmand
+    system "mtn mv $srcdoc_dir $dstdoc_dir";
+
+    # the tex file must now be moved in the workspace.
+    my $oldfile = $dstdoc_dir . $srcdoc . ".tex";
+    my $newfile = $dstdoc_dir . $dstdoc . ".tex";
+
+    system "mtn mv $oldfile $newfile";
+
+
+    print "Finished renaming $srcdoc to $dstdoc\n";
+}
+
+
+sub read_cmd_line
+{
+    my $option_help = 0;
+    my $option_version;
+
+    my $result
+	= GetOptions(
+		     "help!" => \$option_help,
+		     "set-name=s" => \$option_set_name,
+		     "verbose+" => \$option_verbose,
+		     "version" => \$option_version,
+		    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	$0 =~ m(.*/(.*));
+
+	my $program_name = $1;
+
+	print
+	    "
+
+$program_name: insert external text snippets into a document.
+External text snippets can replace unix shell commands between
+backquotes with the output they generate.
+
+synopsis:
+    $0 <document name1> <document name2> ...
+
+options:
+    --help            print usage information.
+    --set-name        select a document set (builtin default is userdocs).
+    --version         give version information.
+    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+
+";
+
+	exit 1;
+    }
+
+}
+
+
+sub main
+{
+    read_cmd_line();
+
+    my $src = $ARGV[0];
+    my $dst = $ARGV[1];
+
+    print "Rename document $src to $dst?\n>> ";
+
+    chomp (my $choice = <STDIN>);
+
+    if ($choice eq 'y')
+    {
+	rename_document($src, $dst);
+    }
+    else
+    {
+	print "No rename performed\n";
+
+	return;
+    }
+
+    print "\nDone!";
+}
+
+
+
+main();
+
+
