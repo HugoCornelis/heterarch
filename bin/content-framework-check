@@ -93,7 +93,7 @@ sub read_cmd_line
 	print
 	    "
 
-$0: check userdocs workspace for obvious errors.
+$0: check the workspace for obvious errors.
 
     --help        print this help message.
     --directory   The directory to scan for descriptor files (default '.').
@@ -147,6 +147,6 @@ exit main();
 # my $tags_options = scalar @$option_tags ? (join "--tag ", @$option_tags) : '';
 # my $verbose_options = defined $option_verbose ? "--verbose " x $option_verbose : '';
 
-# system "userdocs-build --check $verbose_options $regex_options $tags_options";
+# system "content-framework-build --check $verbose_options $regex_options $tags_options";
 
 

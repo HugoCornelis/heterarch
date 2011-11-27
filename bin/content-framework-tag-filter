@@ -99,7 +99,7 @@ sub main
     #t this should come from a query using neurospaces_build because
     #t it is the only one that knows about the project layout.
 
-    my $build_directory = "$ENV{HOME}/neurospaces_project/userdocs/source/snapshots/0";
+    my $build_directory = "$ENV{HOME}/neurospaces_project/${document_set_name}/source/snapshots/0";
 
     my $selected_tags = [ @ARGV, ];
 

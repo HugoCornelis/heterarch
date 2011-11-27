@@ -5,14 +5,14 @@
 
 use strict;
 
-# system "userdocs-check";
+# system "content-framework-check";
 
 # if ($?)
 # {
-#     die "$0: *** Error: userdocs-check says there is something wrong with your documentation workspace.";
+#     die "$0: *** Error: content-framework-check says there is something wrong with your documentation workspace.";
 # }
 
-system "neurospaces_pull --enable userdocs --regex userdocs --verbose";
+system "neurospaces_pull --enable content-framework --regex content-framework --verbose";
 
 if ($?)
 {
@@ -20,5 +20,5 @@ if ($?)
 }
 else
 {
-    system "neurospaces_update --enable userdocs --regex userdocs --verbose";
+    system "neurospaces_update --enable content-framework --regex content-framework --verbose";
 }

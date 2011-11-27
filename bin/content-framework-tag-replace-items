@@ -338,7 +338,7 @@ sub main
 	{
 	    undef $/;
 
-	    $tagged_documents = YAML::Load(`userdocs-tag-filter '$tag'`);
+	    $tagged_documents = YAML::Load(`${document_set_name}-tag-filter '$tag'`);
 	}
 
 	# generate a latex snippet for each of the tagged documents

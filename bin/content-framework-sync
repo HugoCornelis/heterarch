@@ -14,9 +14,9 @@ my $build_database = Load($build_database_yaml);
 
 my $all_packages = $build_database->{all_packages};
 
-my $content-framework_directory = $all_packages->{content-framework}->{directory};
+my $content_framework_directory = $all_packages->{content-framework}->{directory};
 
-system "cd \"$content-framework_directory\" && content-framework-check";
+system "cd \"$content_framework_directory\" && content-framework-check";
 
 if ($?)
 {
