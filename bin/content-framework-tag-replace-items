@@ -26,7 +26,7 @@ BEGIN
 }
 
 
-use GENESIS3::Documentation;
+use Neurospaces::Documentation;
 
 use Getopt::Long;
 
@@ -455,7 +455,7 @@ sub main
     foreach my $document_name (@$files)
     {
 	my $document
-	    = GENESIS3::Documentation::Document->new
+	    = Neurospaces::Documentation::Document->new
 		(
 		 {
 		  name => $document_name,

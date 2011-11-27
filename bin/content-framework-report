@@ -26,7 +26,7 @@ BEGIN
 }
 
 
-use GENESIS3::Documentation;
+use Neurospaces::Documentation;
 
 use Getopt::Long;
 
@@ -86,7 +86,7 @@ sub main
     # get all documents from the command line
 
     my $documents
-	= GENESIS3::Documentation::find_documentation
+	= Neurospaces::Documentation::find_documentation
 	    (
 	     {
 	      (@ARGV ? (names => [ @ARGV, ]) : ()),
@@ -125,7 +125,7 @@ sub main
 	    }
 
 	    my $document
-		= GENESIS3::Documentation::Document->new
+		= Neurospaces::Documentation::Document->new
 		    (
 		     {
 		      filename => $document_filename,

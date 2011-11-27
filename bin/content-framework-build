@@ -26,7 +26,7 @@ BEGIN
 }
 
 
-use GENESIS3::Documentation;
+use Neurospaces::Documentation;
 
 use Getopt::Long;
 
@@ -36,7 +36,7 @@ use YAML;
 $SIG{__DIE__}
     = sub {
 
-	GENESIS3::Documentation::Publications::publish_production_results();
+	Neurospaces::Documentation::Publications::publish_production_results();
 
 	use Carp;
 
@@ -91,7 +91,7 @@ sub main
     # get all documents from the command line
 
     my $documents
-	= GENESIS3::Documentation::find_documentation
+	= Neurospaces::Documentation::find_documentation
 	    (
 	     {
 	      (@ARGV ? (names => [ @ARGV, ]) : ()),
@@ -107,7 +107,7 @@ sub main
     {
 	# start the publication process
 
-	GENESIS3::Documentation::Publications::start_publication_production();
+	Neurospaces::Documentation::Publications::start_publication_production();
 
 	# prepare directory structure
 
@@ -144,7 +144,7 @@ sub main
 	    }
 
 	    my $document
-		= GENESIS3::Documentation::Document->new
+		= Neurospaces::Documentation::Document->new
 		    (
 		     {
 		      name => $document_name,
@@ -207,7 +207,7 @@ sub main
 
 # 		if (scalar %$operation_result)
 		{
-		    GENESIS3::Documentation::Publications::insert_publication_production_result
+		    Neurospaces::Documentation::Publications::insert_publication_production_result
 			    (
 			     $document,
 			     $operation_result,
@@ -222,7 +222,7 @@ sub main
 	{
 	    # extract and report the tags from the operation_result
 
-	    my $all_processed_tags = GENESIS3::Documentation::Publications::extract_processed_tags();
+	    my $all_processed_tags = Neurospaces::Documentation::Publications::extract_processed_tags();
 
 	    use YAML;
 
@@ -236,7 +236,7 @@ sub main
 
 	    if ($option_report_output)
 	    {
-		my $all_output = GENESIS3::Documentation::Publications::report_all_output();
+		my $all_output = Neurospaces::Documentation::Publications::report_all_output();
 
 		use YAML;
 
@@ -245,7 +245,7 @@ sub main
 
 	    # now also publish the publication production results
 
-	    GENESIS3::Documentation::Publications::publish_production_results();
+	    Neurospaces::Documentation::Publications::publish_production_results();
 	}
     }
 }
