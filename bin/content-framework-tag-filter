@@ -11,15 +11,35 @@ use Getopt::Long;
 use YAML;
 
 
+$SIG{__DIE__}
+    = sub {
+
+	Neurospaces::Documentation::Publications::publish_production_results();
+
+	use Carp;
+
+	confess @_;
+    };
+
+
+$SIG{INT}
+    = sub {
+	use Carp;
+
+	confess @_;
+
+	exit 1;
+    };
+
+
 $0 =~ m(.*/(.*));
 
 my $program_name = $1;
 
-$program_name =~ m((.*?)-(.*));
+$program_name =~ m((.*?)[_-](.*));
 
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
-
 
 my $option_dry_run;
 my $option_regex = ".*";
@@ -99,7 +119,7 @@ sub main
     #t this should come from a query using neurospaces_build because
     #t it is the only one that knows about the project layout.
 
-    my $build_directory = "$ENV{HOME}/neurospaces_project/${document_set_name}/source/snapshots/0";
+    my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
 
     my $selected_tags = [ @ARGV, ];
 

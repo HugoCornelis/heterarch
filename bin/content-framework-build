@@ -53,6 +53,7 @@ $SIG{INT}
 	exit 1;
     };
 
+
 $0 =~ m(.*/(.*));
 
 my $program_name = $1;

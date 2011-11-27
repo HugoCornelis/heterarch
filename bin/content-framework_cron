@@ -1,10 +1,57 @@
-#!/usr/bin/perl
+#!/usr/bin/perl -w
 #!/usr/bin/perl -w -d:ptkdb
+#
 
 
 use strict;
+
+
+BEGIN
+{
+    #! make check
+
+    push @INC, '../perl';
+
+    #! make distcheck
+
+    push @INC, '../../perl';
+
+    #! normal run
+
+    push @INC, './perl';
+
+    #! after install
+
+    push @INC, '/usr/local/glue/swig/perl';
+}
+
+
 use Getopt::Long;
+
+use Neurospaces::Documentation;
+
 use YAML;
+
+
+$SIG{__DIE__}
+    = sub {
+
+	Neurospaces::Documentation::Publications::publish_production_results();
+
+	use Carp;
+
+	confess @_;
+    };
+
+
+$SIG{INT}
+    = sub {
+	use Carp;
+
+	confess @_;
+
+	exit 1;
+    };
 
 
 $0 =~ m(.*/(.*));
@@ -320,16 +367,16 @@ sub report_error
 #
 sub copy_html_data
 {
+    my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
+    my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+    my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
 
-  my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
-  my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
-  my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+    try_to("mkdir --parents $option_html_output_directory");
 
-  try_to("rm -rf $html_data_directory");
-  try_to("cp -rf $html_build_directory $html_data_directory",1);
-  try_to("rm -f $html_symlink",1);
-  try_to("ln -s $html_data_directory $html_symlink",1);
-
+    try_to("rm -rf $html_data_directory");
+    try_to("cp -rf $html_build_directory $html_data_directory",1);
+    try_to("rm -f $html_symlink",1);
+    try_to("ln -s $html_data_directory $html_symlink",1);
 }
 
 
