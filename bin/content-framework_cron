@@ -122,7 +122,7 @@ sub main
     my $text = produce_email_text();
 
     try_to_mail("${documentation_set_name} cron has finished.",
-		"${documentation_set_name}has finished building.\n\n" . $text);
+		"${documentation_set_name} has finished building.\n\n" . $text);
 }
 
 
@@ -566,9 +566,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
 
   my $tmp = YAML::Load($documentlist);
 
-  my @published_documents = @$tmp;
-
-  sort @published_documents;
+  my @published_documents = sort @$tmp;
 
   foreach (@published_documents)
   {
