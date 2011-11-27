@@ -545,7 +545,7 @@ sub set_index_page
   <meta
  content=\"text/html; charset=ISO-8859-1\"
  http-equiv=\"content-type\">
-  <title>GENESIS Documentation System</title>
+  <title>Neurospaces Content Management System</title>
 </head>
 <body>
 For the documentation homepage please click <a

@@ -6,22 +6,22 @@ into the CBI architecture.
 """
 
 __author__ = "Mando Rodriguez"
-__copyright__ = "Copyright 2010, The GENESIS Project"
-__credits__ = ["Hugo Cornelis", "Dave Beeman"]
+__copyright__ = "Copyright 2011, The Neurospaces Project"
+__credits__ = ["Hugo Cornelis"]
 __license__ = "GPL"
 __version__ = "0.1"
-__maintainer__ = "Mando Rodriguez"
-__email__ = "rodrigueza14 at uthscsa dot edu"
+__maintainer__ = "Hugo Cornelis"
+__email__ = "hugo dot cornelis at gmail dot com"
 __status__ = "Development"
-__url__ = "http://genesis-sim.org"
+__url__ = "http://www.neurospaces.org/"
 __description__ = """
-This is the root management module for GENESIS. GENESIS is composed of several
-sub packages for reading and storing models, solvers, experimental protocols,
+This is the root module for Neurospaces.  Neurospaces is composed of several
+components for reading and storing computational models, solvers, experimental protocols,
 and GUI interfaces. The root 'neurospaces' package helps to determine which versions of
 packages are installed and performs updates, removal, and installation of needed
 packages to run a simulation. 
 """
-__download_url__ = "http://repo-genesis3.cbi.utsa.edu"
+__download_url__ = "http://www.neurospaces.org/"
 
 class PackageInfo:
         
