@@ -14,7 +14,9 @@
 ##############################################################################
 
 
-#SUBDIRS = perl python
+SUBDIRS = \
+	perl
+#	python
 
 # fill in the scripts that should go with the distribution:
 dist_bin_SCRIPTS = \
