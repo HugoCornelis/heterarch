@@ -28,7 +28,8 @@ dist_bin_SCRIPTS = \
 	bin/content-framework-sync \
 	bin/content-framework-tag-filter \
 	bin/content-framework-tag-replace-items \
-	bin/content-framework-version
+	bin/content-framework-version \
+	bin/content-framework_cron
 
 @PACKAGE@testdir=$(prefix)/neurospaces/$(PACKAGE)
 nobase_dist_@PACKAGE@test_DATA=@TEST_SPECIFICATION_FILES@

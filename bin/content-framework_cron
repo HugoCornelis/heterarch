@@ -7,14 +7,24 @@ use Getopt::Long;
 use YAML;
 
 
-my $output_filename = "userdocs_cron.out";
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+my $output_filename = "${documentation_set_name}_cron.out";
 my $descriptor_check = "";
-my $build_directory = "$ENV{HOME}/neurospaces_project/userdocs/source/snapshots/0";
+my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
 my $htaccess_file = "";
 
 #
 # options
 #
+
 my $option_output_directory = "/tmp";
 my $option_config = "";
 my $option_html_output_directory = "~/public_html";
@@ -49,8 +59,7 @@ sub main
 
     $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
 
-    # first we update the developer package to pick up 
-    # any build script changes. 
+    # upgrade the developer package
 
     try_to("neurospaces_pull --regex developer",1); 
 
@@ -60,47 +69,60 @@ sub main
 
     try_to("neurospaces_install --regex developer",1);
 
+    # upgrade the content-framework package
 
-    try_to("neurospaces_pull --regex userdocs",1); 
+    try_to("neurospaces_pull --regex content-framework",1); 
 
-    try_to("neurospaces_update --regex userdocs",1); 
+    try_to("neurospaces_update --regex content-framework",1); 
 
-    try_to("neurospaces_configure --regex userdocs",1);
+    try_to("neurospaces_configure --regex content-framework",1);
 
-    try_to("neurospaces_install --regex userdocs",1);
+    try_to("neurospaces_install --regex content-framework",1);
 
-    try_to("neurospaces_clean --regex userdocs",1);
+    try_to("neurospaces_clean --regex content-framework",1);
 
-    #   try_to("userdocs-check > $output_path",1);
+    # upgrade the content itself
+
+    try_to("neurospaces_pull --regex ${documentation_set_name}",1); 
+
+    try_to("neurospaces_update --regex ${documentation_set_name}",1); 
+
+    try_to("neurospaces_configure --regex ${documentation_set_name}",1);
+
+    try_to("neurospaces_install --regex ${documentation_set_name}",1);
+
+    try_to("neurospaces_clean --regex ${documentation_set_name}",1);
+
+    #   try_to("${documentation_set_name}-check > $output_path",1);
 
     # collect the descriptor check info for the email
-    $descriptor_check = `userdocs-check --directory $build_directory`;
 
-    try_to("make website-prepare -C ~/neurospaces_project/userdocs/source/snapshots/0/ > $output_path",1);
+    $descriptor_check = `${documentation_set_name}-check --directory $build_directory`;
 
-    # now do a link check.
+    try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ > $output_path",1);
+
+    # do a link check.
+
     my $webcheck_path = `which webcheck`;
 
-    if($webcheck_path ne "")
+    if ($webcheck_path ne "")
     {
-
-	try_to("make webcheck -C ~/neurospaces_project/userdocs/source/snapshots/0/ >> $output_path",1);
-
+	try_to("make webcheck -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
     }
 
     copy_html_data();
 
     set_index_page();
 
-    if($htaccess_file ne "")
+    if ($htaccess_file ne "")
     {
 	copy_htacces_file();
     }
 
     my $text = produce_email_text();
 
-    try_to_mail("Userdocs cron has finished.",
-		"Userdocs has finished building.\n\n" . $text);
+    try_to_mail("${documentation_set_name} cron has finished.",
+		"${documentation_set_name}has finished building.\n\n" . $text);
 }
 
 
@@ -111,7 +133,6 @@ sub main
 #
 sub produce_email_text
 {
-
   my $status_message = "";
   my $outputfile = $option_output_directory . "/" . $output_filename;
   my $die_messages = `grep die $outputfile`;
@@ -128,7 +149,6 @@ sub produce_email_text
   {
       $status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
   }
-
 
   # add the publication report produced during the build
 
@@ -149,8 +169,7 @@ sub produce_email_text
       $status_message .= "\nunable to read a publication report (error opening /tmp/all_publication_results\n\n";
   }
 
-
-  if($descriptor_check ne "")
+  if ($descriptor_check ne "")
   {
     $status_message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
   }
@@ -158,19 +177,20 @@ sub produce_email_text
   #
   # Now find all of the log files and check for error messages
   #
+
   my $errors = "";
 
-  my $logfiletext = `find ~/neurospaces_project/userdocs/source/snapshots/0 | grep output | grep html | grep \.log`;
+  my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep html | grep \.log`;
 
   my @logfiles = split(/\n/,$logfiletext);
 
   my $logfile;
 
-  foreach $logfile(@logfiles)
+  foreach $logfile (@logfiles)
   {
     my $latexerrors = `cat $logfile | grep ^!`;
 
-    if($latexerrors eq "")
+    if ($latexerrors eq "")
     {
 
       next;
@@ -195,7 +215,6 @@ sub produce_email_text
   }
 
   return $status_message;
-
 }
 
 
@@ -282,7 +301,7 @@ sub report_error
       $message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
     }
 
-    try_to_mail("userdocs_cron error", $message);
+    try_to_mail("${0}_cron error", $message);
 
     die "$0: $command returned $error_code";
 }
@@ -302,9 +321,9 @@ sub report_error
 sub copy_html_data
 {
 
-  my $html_symlink = $option_html_output_directory . "/" . "userdocs";
-  my $html_data_directory = $option_html_output_directory . "/" . "userdocs_data";
-  my $html_build_directory = "~/neurospaces_project/userdocs/source/snapshots/0/html/htdocs/neurospaces_project/userdocs/";
+  my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
+  my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+  my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
 
   try_to("rm -rf $html_data_directory");
   try_to("cp -rf $html_build_directory $html_data_directory",1);
@@ -533,8 +552,7 @@ For the documentation homepage please click <a
  href=\"documentation-homepage/documentation-homepage.html\">here.</a>
 <br>
 <br>
-This is a listing of all published documents in the documentation
-system. <br>
+This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
 <br>
 <br>
 <ul>
@@ -544,7 +562,7 @@ system. <br>
   print INDEX $html_starter;
 
 
-  my $documentlist = `userdocs-tag-filter published`;
+  my $documentlist = `${documentation_set_name}-tag-filter published`;
 
   my $tmp = YAML::Load($documentlist);
 
@@ -589,16 +607,12 @@ system. <br>
 #
 sub copy_htacces_file
 {
-
-  my $target_htaccess_file = $option_html_output_directory . "/userdocs/.htaccess";
+  my $target_htaccess_file = $option_html_output_directory . "/${documentation_set_name}/.htaccess";
 
   if(-e $htaccess_file)
   {
-
     system "cp $htaccess_file $target_htaccess_file";
-
   }
-
 }
 
 
