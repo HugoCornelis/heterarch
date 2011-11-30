@@ -575,18 +575,16 @@ sub rotate_logs
 #
 sub set_index_page
 {
+    if (not defined $configuration->{HTMLDIR})
+    {
+	return;
+    }
 
+    my $index_file = $configuration->{HTMLDIR} . "/${documentation_set_name}/index.html";
 
-  if(not defined $configuration->{HTMLDIR})
-  {
-    return;
-  }
+    open(INDEX,">$index_file") or die "cannot open file for writing: $!";
 
-  my $index_file = $configuration->{HTMLDIR} . "/${documentation_set_name}/index.html";
-
-  open(INDEX,">$index_file") or die "cannot open file for writing: $!";
-
-  my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
+    my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
 <html>
 <head>
   <meta
@@ -605,45 +603,59 @@ This is a listing of all published documents in the ${documentation_set_name} do
 <ul>
 ";
 
-  # Start off the index page. 
-  print INDEX $html_starter;
+    # Start off the index page. 
+    print INDEX $html_starter;
 
+    #t this needs to be replaced with the same loop as in the main build script.
+    #t likely saying that index generation should be part of the main build script.
 
-  my $documentlist = `${documentation_set_name}-tag-filter published`;
+    my $documentlist = `${documentation_set_name}-tag-filter published`;
 
-  my $tmp = YAML::Load($documentlist);
+    my $tmp = YAML::Load($documentlist);
 
-  my @published_documents = sort @$tmp;
+    my @published_documents = sort @$tmp;
 
-  foreach (@published_documents)
-  {
+    foreach (@published_documents)
+    {
+	my $descriptor_file = $_ . "/descriptor.yml";
 
-    my $descriptor_file = $_ . "/descriptor.yml";
+	my $descriptor = YAML::LoadFile($descriptor_file);
 
-    my $descriptor = YAML::LoadFile($descriptor_file);
+	my @dirs = split(/\//,$_);
 
-    my @dirs = split(/\//,$_);
+	my $documentname = $dirs[-1];
 
-    my $documentname = $dirs[-1];
+	print INDEX "<li><a href=\"";
 
-    print INDEX "<li><a href=\"";
+	my $document
+	    = Neurospaces::Documentation::Document->new
+		(
+		 {
+		  name => $documentname,
+		 },
+		);
 
-    print INDEX $documentname . "/" . $documentname . ".html";
+	my $suffix = ".html";
 
-    print INDEX "\">";
+	if ($document->is_pdf())
+	{
+	    $suffix = ".pdf";
+	}
 
-    print INDEX $descriptor->{'document name'};
+	print INDEX $documentname . "/" . $documentname . ".html";
 
-    print INDEX "</a></li>\n";
+	print INDEX "\">";
 
+	print INDEX $descriptor->{'document name'};
 
-  }
+	print INDEX "</a></li>\n";
+    }
 
-  print INDEX "</ul>\n</body>\n</html>\n";
+    print INDEX "</ul>\n</body>\n</html>\n";
 
-  close INDEX;
+    close INDEX;
 
-  print "Done constructing index page\n";
+    print "Done constructing index page\n";
 }
 
 
