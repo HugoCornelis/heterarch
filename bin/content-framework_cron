@@ -93,12 +93,10 @@ sub main
 
     }
 
-
     if ($option_config)
     {
 	parse_config_file($option_config);
     }
-
 
     my $output_path = $option_output_directory . "/" . $output_filename;
 
@@ -638,7 +636,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
 	    $suffix = ".pdf";
 	}
 
-	print INDEX $documentname . "/" . $documentname . ".html";
+	print INDEX $documentname . "/" . $documentname . $suffix;
 
 	print INDEX "\">";
 
