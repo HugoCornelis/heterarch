@@ -74,7 +74,7 @@ my $htaccess_file = "";
 
 my $option_output_directory = "/tmp";
 my $option_config = "";
-my $option_html_output_directory = "~/public_html";
+my $option_html_output_directory = "$ENV{HOME}/public_html";
 
 my $configuration
     = {
@@ -103,6 +103,10 @@ sub main
     my $output_path = $option_output_directory . "/" . $output_filename;
 
     rotate_logs();
+
+    # create empty output file
+
+    try_to("echo > $output_path",1);
 
     $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
 
@@ -146,7 +150,7 @@ sub main
 
     $descriptor_check = `${documentation_set_name}-check --directory $build_directory`;
 
-    try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ > $output_path",1);
+    try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
 
     # do a link check.
 
@@ -568,19 +572,11 @@ sub rotate_logs
 }
 
 
-#
-# This sets a "index.html" sim link to the documentation
-# homepage. In the future this will set up the documentation
-# frame, now it just puts in a list of documents.
-#
 sub set_index_page
 {
-    if (not defined $configuration->{HTMLDIR})
-    {
-	return;
-    }
+    my $index_file = $option_html_output_directory . "/${documentation_set_name}/index.html";
 
-    my $index_file = $configuration->{HTMLDIR} . "/${documentation_set_name}/index.html";
+#     my $index_file = $option_html_output_directory . "/html/index.html";
 
     open(INDEX,">$index_file") or die "cannot open file for writing: $!";
 
