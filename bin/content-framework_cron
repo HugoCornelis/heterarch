@@ -175,103 +175,98 @@ sub main
 }
 
 
-
-#
-# Forms the status message to be sent
-# in the cronjob email.
-#
 sub produce_email_text
 {
-  my $status_message = "";
-  my $outputfile = $option_output_directory . "/" . $output_filename;
-  my $die_messages = `grep die $outputfile`;
+    my $status_message = "";
 
-  $status_message
-      .= (
-	  "$0:\nCheck for your output on the host machine here "
-	  . $option_output_directory
-	  . "/"
-	  . $output_filename . "\n"
-	 );
+    my $outputfile = $option_output_directory . "/" . $output_filename;
 
-  if (defined $configuration->{URL})
-  {
-      $status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
-  }
+    my $die_messages = `grep die $outputfile`;
 
-  # add the publication report produced during the build
+    $status_message
+	.= (
+	    "$0:\nCheck for your output on the host machine here "
+	    . $option_output_directory
+	    . "/"
+	    . $output_filename . "\n"
+	   );
 
-  use IO::File;
+#     if (defined $configuration->{URL})
+#     {
+# 	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
+#     }
 
-  my $publication_report_file = IO::File->new("</tmp/all_publication_results");
+    my $url = $option_html_output_directory . "/${documentation_set_name}/index.html";
 
-  if ($publication_report_file)
-  {
-      local $/;
+    $status_message .= "Check the output over the web via this link " . $url . "\n";
 
-      my $publication_report = <$publication_report_file>;
+    # add the publication report produced during the build
 
-      $status_message .= "\n" . $publication_report . "\n";
-  }
-  else
-  {
-      $status_message .= "\nunable to read a publication report (error opening /tmp/all_publication_results\n\n";
-  }
+    use IO::File;
 
-  if ($descriptor_check ne "")
-  {
-    $status_message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
-  }
+    my $publication_report_file = IO::File->new("</tmp/all_publication_results");
 
-  #
-  # Now find all of the log files and check for error messages
-  #
-
-  my $errors = "";
-
-  my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep html | grep \.log`;
-
-  my @logfiles = split(/\n/,$logfiletext);
-
-  my $logfile;
-
-  foreach $logfile (@logfiles)
-  {
-    my $latexerrors = `cat $logfile | grep ^!`;
-
-    if ($latexerrors eq "")
+    if ($publication_report_file)
     {
+	local $/;
 
-      next;
+	my $publication_report = <$publication_report_file>;
 
+	$status_message .= "\n" . $publication_report . "\n";
     }
     else
     {
-      #my $filename = $logfile;
-      #$filename =~ m(.*output/(.*)\.log$);
-      my @tmp = split(/\//,$logfile);
-      my $tmp = $tmp[-1];
-      @tmp = split(/\./,$tmp);
-      my $filename = $tmp[0];
-
-      $status_message .= "\n\n"; 
-      $status_message .= "Error in document: ";
-      $status_message .= $filename;
-      $status_message .= " : \n\t";
-      $status_message .= $latexerrors;
+	$status_message .= "\nunable to read a publication report (error opening /tmp/all_publication_results\n\n";
     }
 
-  }
+    if ($descriptor_check ne "")
+    {
+	$status_message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
+    }
 
-  return $status_message;
+    # find all of the log files and check for error messages
+
+    my $errors = "";
+
+    my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep html | grep \.log`;
+
+    my @logfiles = split(/\n/,$logfiletext);
+
+    my $logfile;
+
+    foreach $logfile (@logfiles)
+    {
+	my $latexerrors = `cat $logfile | grep ^!`;
+
+	if ($latexerrors eq "")
+	{
+	    next;
+	}
+	else
+	{
+	    #my $filename = $logfile;
+	    #$filename =~ m(.*output/(.*)\.log$);
+	    my @tmp = split(/\//,$logfile);
+	    my $tmp = $tmp[-1];
+	    @tmp = split(/\./,$tmp);
+	    my $filename = $tmp[0];
+
+	    $status_message .= "\n\n";
+
+	    $status_message .= "Error in document: ";
+
+	    $status_message .= $filename;
+
+	    $status_message .= " : \n\t";
+
+	    $status_message .= $latexerrors;
+	}
+    }
+
+    return $status_message;
 }
 
 
-#
-# This will actually send mail.
-#
-# args ($subject,$message)
-#
 sub try_to_mail
 {
     my $subject = shift;
@@ -279,8 +274,8 @@ sub try_to_mail
 
     if (!$configuration->{MAILTO})
     {
-      print "No addressee indicated in configuration\n";
-      return;
+	print "No addressee indicated in configuration\n";
+	return;
     }
 
     my $sendto = $configuration->{MAILTO};
@@ -292,13 +287,13 @@ sub try_to_mail
     print MAIL "Subject: $subject\n\n";
     print MAIL "$message\n";
     close(MAIL);
-
 }
 
 
 #
-# ("command",vebosity level)
+# ("command", verbosity_level)
 #
+
 sub try_to
 {
     my $command = shift;
@@ -387,186 +382,176 @@ sub copy_html_data
 #
 sub parse_config_file
 {
-  my $config_file = shift;
+    my $config_file = shift;
 
-  if (! -e $config_file)
-  {
-      print "\n$config_file is an invalid filename\n";
+    if (!-e $config_file)
+    {
+	print "\n$config_file is an invalid filename\n";
 
-      return;
-  }
+	return;
+    }
 
-  print "\nParsing configuration in $config_file\n\n";
+    print "\nParsing configuration in $config_file\n\n";
 
-  $configuration = YAML::LoadFile($config_file);
+    $configuration = YAML::LoadFile($config_file);
 
+    if (!defined $configuration)
+    {
+	print "This YAML file is invalid\n";
 
-  if(!defined $configuration)
-  {
+	return;
+    }
 
-    print "This YAML file is invalid\n";
-    return;
+    if (defined $configuration->{MAILTO})
+    {
+	chomp($configuration->{MAILTO});
 
-  }
+	print "\tSend to email: $configuration->{MAILTO}\n";
+    }
 
-  if(defined $configuration->{MAILTO})
-  {
-    chomp($configuration->{MAILTO});
-    print "\tSend to email: $configuration->{MAILTO}\n";
-  }
+    if (defined $configuration->{MAILFROM})
+    {
+	chomp($configuration->{MAILFROM});
 
-  if(defined $configuration->{MAILFROM})
-  {
-    chomp($configuration->{MAILFROM});
-    print "\tSend from email: $configuration->{MAILFROM}\n";
-  }
+	print "\tSend from email: $configuration->{MAILFROM}\n";
+    }
 
+    if (defined $configuration->{HTMLDIR})
+    {
+	$option_html_output_directory = $configuration->{HTMLDIR};
 
-  if(defined $configuration->{HTMLDIR})
-  {
-    $option_html_output_directory = $configuration->{HTMLDIR};
-    chomp($configuration->{HTMLDIR});
-    print "\tThe directory for html output is: $configuration->{HTMLDIR}\n";
-  }
+	chomp($configuration->{HTMLDIR});
 
-  if(defined $configuration->{OUTPUTDIR})
-  {
-      #! note that this overrides an option from set by the command line
+	print "\tThe directory for html output is: $configuration->{HTMLDIR}\n";
+    }
 
-      $option_output_directory = $configuration->{OUTPUTDIR};
-      chomp($option_output_directory);
-      print "\tOutput directory is $option_output_directory\n";
-  }
+    if (defined $configuration->{OUTPUTDIR})
+    {
+	#! note that this overrides an option from set by the command line
 
+	$option_output_directory = $configuration->{OUTPUTDIR};
 
-  if(defined $configuration->{URL})
-  {
-      chomp($configuration->{URL});
-      print "\tThe link for accessing the content is $configuration->{URL}\n";
-  }
+	chomp($option_output_directory);
 
-  if(defined $configuration->{LOGROTATE})
-  {
+	print "\tOutput directory is $option_output_directory\n";
+    }
 
-    chomp($configuration->{LOGROTATE});
-    print "\tNumber of logs to rotate $configuration->{LOGROTATE}\n";
+#     if (defined $configuration->{URL})
+#     {
+# 	chomp($configuration->{URL});
 
-  }
+# 	print "\tThe link for accessing the content is $configuration->{URL}\n";
+#     }
 
+    if (defined $configuration->{LOGROTATE})
+    {
+	chomp($configuration->{LOGROTATE});
 
-  if(defined $configuration->{LOGDIR})
-  {
+	print "\tNumber of logs to rotate $configuration->{LOGROTATE}\n";
+    }
 
-    chomp($configuration->{LOGDIR});
-    print "\tDirectory to store past logs is $configuration->{LOGDIR}\n";
+    if (defined $configuration->{LOGDIR})
+    {
+	chomp($configuration->{LOGDIR});
 
-  }
+	print "\tDirectory to store past logs is $configuration->{LOGDIR}\n";
+    }
 
+    if (defined $configuration->{DOCUMENTROOT})
+    {
+	chomp($configuration->{DOCUMENTROOT});
 
-  if(defined $configuration->{DOCUMENTROOT})
-  {
+	$build_directory = $configuration->{DOCUMENTROOT};
 
-    chomp($configuration->{DOCUMENTROOT});
-    $build_directory = $configuration->{DOCUMENTROOT};
-    print "\tThe root directory for all documents is $build_directory\n";
+	print "\tThe root directory for all documents is $build_directory\n";
+    }
 
-  }
+    if (defined $configuration->{HTACCESS})
+    {
+	chomp($configuration->{HTACCESS});
 
+	$htaccess_file = $configuration->{HTACCESS};
 
-  if(defined $configuration->{HTACCESS})
-  {
+	print "\tThe htaccess file to use is $htaccess_file\n";
+    }
 
-    chomp($configuration->{HTACCESS});
-    $htaccess_file = $configuration->{HTACCESS};
-    print "\tThe htaccess file to use is $htaccess_file\n";
-
-  }
-
-
-
-  print "Done Parsing $config_file:\n";
-
+    print "Done Parsing $config_file:\n";
 }
 
 
+# rotates logs with the name '$logname'
 
-# Rotates logs with the name '$logname'
-#
 sub rotate_logs
 {
+    my $output_dir = $configuration->{OUTPUTDIR};
 
-  my $output_dir = $configuration->{OUTPUTDIR};
-  my $logname =  $option_output_directory . "/" . $output_filename;
-  my $numlogs  = -1;
+    my $logname =  $option_output_directory . "/" . $output_filename;
 
-  if(not defined $configuration->{LOGROTATE})
-  {
-    #i If we aren't rotating logs when we just delete 
-    #i the log from the last run.
-    #i
-    if (-e $logname)
+    my $numlogs  = -1;
+
+    if (not defined $configuration->{LOGROTATE})
     {
-	system "rm -f $logname";
-    }
-    return;
-  }
-  else
-  {
-    $numlogs = $configuration->{LOGROTATE};
-  }
+	# if not rotating logs, delete the log from the last run.
 
+	if (-e $logname)
+	{
+	    system "rm -f $logname";
+	}
 
-  my $logdir = $output_dir;
-
-
-  if(defined $configuration->{LOGDIR})
-  {
-
-    $logdir = $configuration->{LOGDIR};
-
-    if(! -d $logdir)
-    {
-      mkdir $logdir
-    }
-
-    $logdir .= "/";
-  }
-
-
-  # we shift all of our logs if present. 
-  # Whatever log happens to be the last one should
-  # get overwritten with a previous log.
-  my $i;
-  for($i = $numlogs-1; $i > -1; $i--)
-  {
-
-    my $log = $logdir . $logname .'.' . $i;
-
-    if( -e $log )
-    {
-
-      # mv should preserve permissions.
-
-      my $nextlog = $logdir . $logname . '.' . ($i+1);
-
-      system "mv -f $log $nextlog";
-
+	return;
     }
     else
     {
-      next;
+	$numlogs = $configuration->{LOGROTATE};
     }
 
-  }
+    my $logdir = $output_dir;
 
-  # after the shift, we should be able to move the 
-  # first log to slot 0. Now the original slot is open
-  # for a log run.
-  my $nextlog = $logdir . $logname . '.' . 0;
-  system "mv -f $logname $nextlog";
+    if (defined $configuration->{LOGDIR})
+    {
+	$logdir = $configuration->{LOGDIR};
 
-  return;
+	if(! -d $logdir)
+	{
+	    mkdir $logdir
+	}
 
+	$logdir .= "/";
+    }
+
+    # we shift all of our logs if present.
+    # Whatever log happens to be the last one should
+    # get overwritten with a previous log.
+
+    my $i;
+
+    for ($i = $numlogs - 1 ; $i > -1 ; $i--)
+    {
+	my $log = $logdir . $logname .'.' . $i;
+
+	if (-e $log)
+	{
+	    # mv should preserve permissions.
+
+	    my $nextlog = $logdir . $logname . '.' . ($i+1);
+
+	    system "mv -f $log $nextlog";
+	}
+	else
+	{
+	    next;
+	}
+    }
+
+    # after the shift, we should be able to move the
+    # first log to slot 0. Now the original slot is open
+    # for a log run.
+
+    my $nextlog = $logdir . $logname . '.' . 0;
+
+    system "mv -f $logname $nextlog";
+
+    return;
 }
 
 
@@ -597,7 +582,8 @@ This is a listing of all published documents in the ${documentation_set_name} do
 <ul>
 ";
 
-    # Start off the index page. 
+    # Start off the index page.
+
     print INDEX $html_starter;
 
     #t this needs to be replaced with the same loop as in the main build script.

@@ -156,7 +156,7 @@ sub main
 
 # 	    if (not scalar @$option_report_tags)
 	    {
-		# loop over all documentation operations
+		# identify all documentation operations
 
 		my $operation_result = {};
 
@@ -176,12 +176,16 @@ sub main
 			 )
 		      ];
 
+		# add email operation when necessary
+
 		if (scalar @$option_email)
 		{
 		    push @$operations, "email";
 
 		    $document->{email_adresses} = $option_email;
 		}
+
+		# loop over all documentation operations
 
 		foreach my $operation (@$operations)
 		{
