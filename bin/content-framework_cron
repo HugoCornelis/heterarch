@@ -63,6 +63,8 @@ $program_name =~ m((.*?)[_-](.*));
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
 
+my $home_page_document = "${documentation_set_name}-homepage";
+
 my $output_filename = "${documentation_set_name}_cron.out";
 my $descriptor_check = "";
 my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
@@ -161,7 +163,9 @@ sub main
 
     copy_html_data();
 
-    set_index_page();
+    contents_page_generate();
+
+    index_page_generate();
 
     if ($htaccess_file ne "")
     {
@@ -196,7 +200,7 @@ sub produce_email_text
 # 	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
 #     }
 
-    my $url = $option_html_output_directory . "/${documentation_set_name}/index.html";
+    my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
 
     $status_message .= "Check the output over the web via this link " . $url . "\n";
 
@@ -555,13 +559,37 @@ sub rotate_logs
 }
 
 
-sub set_index_page
+sub index_page_generate
 {
-    my $index_file = $option_html_output_directory . "/${documentation_set_name}/index.html";
+    my $document = "index.html";
 
-#     my $index_file = $option_html_output_directory . "/html/index.html";
+    my $html_document = $document;
 
-    open(INDEX,">$index_file") or die "cannot open file for writing: $!";
+    open(OUTPUT,">$html_document");
+
+    print OUTPUT "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n  <head>\n    <title>";
+
+    print OUTPUT $html_document . " (http redirect)";
+
+    print OUTPUT "</title>\n  </head>\n  <body><meta http-equiv=\"refresh\" content=\"0;URL=";
+
+    my $redirect_url = "$home_page_document/$home_page_document.html";
+
+    print OUTPUT $redirect_url;
+
+    print OUTPUT "\">\n  </body>\n</html>\n\n";
+
+    close(OUTPUT);
+}
+
+
+sub contents_page_generate
+{
+    my $contents_file = $option_html_output_directory . "/${documentation_set_name}/contents.html";
+
+#     my $contents_file = $option_html_output_directory . "/html/contents.html";
+
+    open(CONTENTS,">$contents_file") or die "cannot open file for writing: $!";
 
     my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
 <html>
@@ -572,8 +600,8 @@ sub set_index_page
   <title>Neurospaces Content Management System</title>
 </head>
 <body>
-For the documentation homepage please click <a
- href=\"documentation-homepage/documentation-homepage.html\">here.</a>
+For the home page please click <a
+ href=\"${home_page_document}/${home_page_document}.html\">here.</a>
 <br>
 <br>
 This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
@@ -582,12 +610,10 @@ This is a listing of all published documents in the ${documentation_set_name} do
 <ul>
 ";
 
-    # Start off the index page.
-
-    print INDEX $html_starter;
+    print CONTENTS $html_starter;
 
     #t this needs to be replaced with the same loop as in the main build script.
-    #t likely saying that index generation should be part of the main build script.
+    #t likely saying that contents generation should be part of the main build script.
 
     my $documentlist = `${documentation_set_name}-tag-filter published`;
 
@@ -605,7 +631,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
 
 	my $documentname = $dirs[-1];
 
-	print INDEX "<li><a href=\"";
+	print CONTENTS "<li><a href=\"";
 
 	my $document
 	    = Neurospaces::Documentation::Document->new
@@ -622,20 +648,20 @@ This is a listing of all published documents in the ${documentation_set_name} do
 	    $suffix = ".pdf";
 	}
 
-	print INDEX $documentname . "/" . $documentname . $suffix;
+	print CONTENTS $documentname . "/" . $documentname . $suffix;
 
-	print INDEX "\">";
+	print CONTENTS "\">";
 
-	print INDEX $descriptor->{'document name'};
+	print CONTENTS $descriptor->{'document name'};
 
-	print INDEX "</a></li>\n";
+	print CONTENTS "</a></li>\n";
     }
 
-    print INDEX "</ul>\n</body>\n</html>\n";
+    print CONTENTS "</ul>\n</body>\n</html>\n";
 
-    close INDEX;
+    close CONTENTS;
 
-    print "Done constructing index page\n";
+    print "Constructed the contents page\n";
 }
 
 
