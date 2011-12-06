@@ -561,9 +561,9 @@ sub rotate_logs
 
 sub index_page_generate
 {
-    my $document = "index.html";
+    my $index_file = $option_html_output_directory . "/${documentation_set_name}/index.html";
 
-    my $html_document = $document;
+    my $html_document = $index_file;
 
     open(OUTPUT,">$html_document");
 
