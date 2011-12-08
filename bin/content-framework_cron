@@ -195,14 +195,14 @@ sub produce_email_text
 	    . $output_filename . "\n"
 	   );
 
-#     if (defined $configuration->{URL})
-#     {
-# 	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
-#     }
+    if (defined $configuration->{URL})
+    {
+	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
+    }
 
-    my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
+#     my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
 
-    $status_message .= "Check the output over the web via this link " . $url . "\n";
+#     $status_message .= "Check the output over the web via this link " . $url . "\n";
 
     # add the publication report produced during the build
 
@@ -440,12 +440,12 @@ sub parse_config_file
 	print "\tOutput directory is $option_output_directory\n";
     }
 
-#     if (defined $configuration->{URL})
-#     {
-# 	chomp($configuration->{URL});
+    if (defined $configuration->{URL})
+    {
+	chomp($configuration->{URL});
 
-# 	print "\tThe link for accessing the content is $configuration->{URL}\n";
-#     }
+	print "\tThe link for accessing the content is $configuration->{URL}\n";
+    }
 
     if (defined $configuration->{LOGROTATE})
     {
