@@ -192,12 +192,15 @@ sub produce_email_text
 	    "$0:\nCheck for your output on the host machine here "
 	    . $option_output_directory
 	    . "/"
-	    . $output_filename . "\n"
+	    . $output_filename
+	    . "\n"
 	   );
 
     if (defined $configuration->{URL})
     {
-	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "\n";
+	$status_message .= "Check the output over the web via this link " . $configuration->{URL} . "/\n";
+
+	$status_message .= "The full contents is available here: " . $configuration->{URL} . "/contents.html\n";
     }
 
 #     my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
@@ -234,7 +237,7 @@ sub produce_email_text
 
     my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep html | grep \.log`;
 
-    my @logfiles = split(/\n/,$logfiletext);
+    my @logfiles = split(/\n/, $logfiletext);
 
     my $logfile;
 
