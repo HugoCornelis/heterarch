@@ -608,6 +608,8 @@ sub contents_page_generate
 For the home page please click <a
  href=\"${home_page_document}/${home_page_document}.html\">here.</a>
 <br>
+For the webcheck directory please click <a
+ href=\"webcheck/\">here.</a>
 <br>
 This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
 <br>
