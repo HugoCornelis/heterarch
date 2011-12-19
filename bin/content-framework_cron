@@ -202,7 +202,7 @@ sub produce_email_text
 
 	$status_message .= "The full contents is available here: " . $configuration->{URL} . "/contents.html\n";
 
-	$status_message .= "The webcheck output may be available here: " . $configuration->{URL} . "/webcheck.html\n";
+	$status_message .= "The webcheck output may be available here: " . $configuration->{URL} . "/webcheck/\n";
     }
 
 #     my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
