@@ -203,6 +203,8 @@ sub produce_email_text
 	$status_message .= "The full contents is available here: " . $configuration->{URL} . "/contents.html\n";
 
 	$status_message .= "The webcheck output may be available here: " . $configuration->{URL} . "/webcheck/\n";
+
+	$status_message .= "The statistics output may be available here: " . $configuration->{URL} . "/../../awstats/awstats.pl\n";
     }
 
 #     my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
@@ -610,6 +612,9 @@ For the home page please click <a
 <br>
 For the webcheck directory please click <a
  href=\"webcheck/\">here.</a>
+<br>
+For the statistics output please click <a
+ href=\"../../awstats/awstats.pl\">here.</a>
 <br>
 <br>
 This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
