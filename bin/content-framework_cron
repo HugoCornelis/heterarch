@@ -360,7 +360,7 @@ sub report_error
 
     my $message = "$0: $command returned $error_code";
 
-    if($descriptor_check ne "")
+    if ($descriptor_check ne "")
     {
       $message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
     }
@@ -531,7 +531,7 @@ sub rotate_logs
     {
 	$logdir = $configuration->{LOGDIR};
 
-	if(! -d $logdir)
+	if (! -d $logdir)
 	{
 	    mkdir $logdir
 	}
@@ -547,13 +547,13 @@ sub rotate_logs
 
     for ($i = $numlogs - 1 ; $i > -1 ; $i--)
     {
-	my $log = $logdir . $logname .'.' . $i;
+	my $log = $logdir . $logname . '.' . $i;
 
 	if (-e $log)
 	{
 	    # mv should preserve permissions.
 
-	    my $nextlog = $logdir . $logname . '.' . ($i+1);
+	    my $nextlog = $logdir . $logname . '.' . ($i + 1);
 
 	    system "mv -f $log $nextlog";
 	}
@@ -694,12 +694,11 @@ sub copy_htacces_file
 {
   my $target_htaccess_file = $option_html_output_directory . "/${documentation_set_name}/.htaccess";
 
-  if(-e $htaccess_file)
+  if (-e $htaccess_file)
   {
     system "cp $htaccess_file $target_htaccess_file";
   }
 }
-
 
 
 #
