@@ -183,13 +183,14 @@ sub main
 
 sub produce_email_text
 {
-    my $status_message = "";
-
     my $outputfile = $option_output_directory . "/" . $output_filename;
 
     my $status_message = "";
+
     my $errorcounts = `cat $outputfile | grep 'error_count'`;
+
     my $revisions = `cat $outputfile | grep "base_revision_id"`;
+
     my $die_messages = `grep -B 15 -F '*** die:' $outputfile`;
 
     $status_message
