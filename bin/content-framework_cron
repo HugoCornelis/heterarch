@@ -551,7 +551,7 @@ sub rotate_logs
 
 	if (-e $log)
 	{
-	    # mv should preserve permissions.
+	    # note that mv preserves permissions.
 
 	    my $nextlog = $logdir . $logname . '.' . ($i + 1);
 
