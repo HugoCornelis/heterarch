@@ -536,7 +536,7 @@ sub rotate_logs
 	$numlogs = $configuration->{LOGROTATE};
     }
 
-    my $logdir = $output_dir;
+    my $logdir = "";
 
     if (defined $configuration->{LOGDIR})
     {
