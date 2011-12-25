@@ -179,13 +179,18 @@ sub main
 }
 
 
+# also look at the developer package cron script.
+
 sub produce_email_text
 {
     my $status_message = "";
 
     my $outputfile = $option_output_directory . "/" . $output_filename;
 
-    my $die_messages = `grep die $outputfile`;
+    my $status_message = "";
+    my $errorcounts = `cat $outputfile | grep 'error_count'`;
+    my $revisions = `cat $outputfile | grep "base_revision_id"`;
+    my $die_messages = `grep -v 't/died\.\.\.\.' $outputfile | grep -v 't/dont_overwrite_die_handler' | grep -v 't/subtest/die' | grep -v 't/Tester/tbt_03die' | grep -B 15 die`;
 
     $status_message
 	.= (
@@ -274,6 +279,10 @@ sub produce_email_text
 	}
     }
 
+    $status_message .= "\nRevisions:\n" . $revisions . "\n";
+    $status_message .= "\nError Counts:\n" . $errorcounts . "\n";
+    $status_message .= "\nDie Messages:\n" . $die_messages . "\n";
+	
     return $status_message;
 }
 
