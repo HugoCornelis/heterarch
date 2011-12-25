@@ -282,7 +282,13 @@ sub produce_email_text
     $status_message .= "\nRevisions:\n" . $revisions . "\n";
     $status_message .= "\nError Counts:\n" . $errorcounts . "\n";
     $status_message .= "\nDie Messages:\n" . $die_messages . "\n";
-	
+
+    $status_message
+	.=
+	    "\n"
+		. "Your configuration:\n\n"
+		    . YAML::Dump($configuration);
+
     return $status_message;
 }
 
@@ -295,17 +301,24 @@ sub try_to_mail
     if (!$configuration->{MAILTO})
     {
 	print "No addressee indicated in configuration\n";
+
 	return;
     }
 
     my $sendto = $configuration->{MAILTO};
+
     my $replyto = $configuration->{MAILFROM};
 
     open(MAIL, "|/usr/sbin/sendmail -oi -t");
+
     print MAIL "From: $replyto\n";
+
     print MAIL "To: $sendto\n";
+
     print MAIL "Subject: $subject\n\n";
+
     print MAIL "$message\n";
+
     close(MAIL);
 }
 
@@ -397,9 +410,6 @@ sub copy_html_data
 }
 
 
-#
-# ($config_file) a file with a configuration in it.
-#
 sub parse_config_file
 {
     my $config_file = shift;
