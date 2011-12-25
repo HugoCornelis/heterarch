@@ -405,9 +405,9 @@ sub copy_html_data
     try_to("mkdir --parents $option_html_output_directory");
 
     try_to("rm -rf $html_data_directory");
-    try_to("cp -rf $html_build_directory $html_data_directory",1);
-    try_to("rm -f $html_symlink",1);
-    try_to("ln -s $html_data_directory $html_symlink",1);
+    try_to("cp -rf $html_build_directory $html_data_directory");
+    try_to("rm -f $html_symlink");
+    try_to("ln -s $html_data_directory $html_symlink");
 }
 
 
