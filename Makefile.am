@@ -58,8 +58,9 @@ EXTRA_DIST = \
 am__tar = ${AMTAR} chf - --format=posix "$$tardir"
 
 
-clean-local:
-	rm -rf $(TMP_DIR)
+clean-local: website-clean
+	$(RM) -rf $(top_srcdir)/*/output/*
+	$(RM) -f $(top_srcdir)/*/*.log
 	$(RM) -rf $(top_srcdir)/*.deb
 	$(RM) -f $(top_srcdir)/*.changes
 	$(RM) -f $(top_srcdir)/*.dsc
