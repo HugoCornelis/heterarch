@@ -68,7 +68,6 @@ my $home_page_document = "${documentation_set_name}-homepage";
 my $output_filename = "${documentation_set_name}_cron.out";
 my $descriptor_check = "";
 my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
-my $htaccess_file = "";
 
 #
 # options
@@ -152,14 +151,7 @@ sub main
 
     try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
 
-    # do a link check.
-
-    my $webcheck_path = `which webcheck`;
-
-    if ($webcheck_path ne "")
-    {
-	try_to("make webcheck -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
-    }
+    # copy the website to its final destination
 
     copy_html_data();
 
@@ -167,9 +159,13 @@ sub main
 
     index_page_generate();
 
-    if ($htaccess_file ne "")
+    # do a link check.
+
+    my $webcheck_path = `which webcheck`;
+
+    if ($webcheck_path ne "")
     {
-	copy_htacces_file();
+	try_to("make webcheck -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
     }
 
     my $text = produce_email_text();
@@ -385,28 +381,54 @@ sub report_error
 }
 
 
-#
-# copies the resulting html data to a directory specified in
-# the config file and then sets up a sym link for it.
-#
-# It copies over the html data into a directory, then symlinks
-# to that directory.
-#
-# operations are similar to:
-#   cp userdocs_data html_dir/userdocs_data
-#   ln -s html_dir/userdocs_data html_dir/userdocs
-#
 sub copy_html_data
 {
-    my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
-    my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+    # define the build directory
+
     my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+
+    # first make sure the website is protected at all time by protecting the build directory with access restriction files
+
+    if ($configuration->{HTACCESS} ne "")
+    {
+# 	copy_htacces_file();
+
+# 	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+
+	my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
+
+	if (-e $configuration->{HTACCESS})
+	{
+	    system "cp $configuration->{HTACCESS} $target_htaccess_file";
+	}
+    }
+
+    # start defining the website location
 
     try_to("mkdir --parents $option_html_output_directory");
 
+    my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+
+    # clean the old website temporary location
+
     try_to("rm -rf $html_data_directory");
-    try_to("cp -rf $html_build_directory $html_data_directory");
+
+    # copy the new website to its temporary location
+
+    try_to("cp -af $html_build_directory $html_data_directory");
+
+    # single shot replace the old website with the new one
+
+    # \todo does this work correctly as a single shot?  It should just do a single ln -sf
+
+    my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
+
+    # \todo this makes the website unavailable for a split second?
+
     try_to("rm -f $html_symlink");
+
+    # \todo and this leaves the new website at its temporary location?
+
     try_to("ln -s $html_data_directory $html_symlink");
 }
 
@@ -501,9 +523,7 @@ sub parse_config_file
     {
 	chomp($configuration->{HTACCESS});
 
-	$htaccess_file = $configuration->{HTACCESS};
-
-	print "\tThe htaccess file to use is $htaccess_file\n";
+	print "\tThe htaccess file to use is $configuration->{HTACCESS}\n";
     }
 
     print "Done Parsing $config_file:\n";
@@ -698,22 +718,18 @@ This is a listing of all published documents in the ${documentation_set_name} do
 }
 
 
-#
-# This sub routine just copies an .htaccess file to the root web directory.
-#
 sub copy_htacces_file
 {
-  my $target_htaccess_file = $option_html_output_directory . "/${documentation_set_name}/.htaccess";
+    my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
 
-  if (-e $htaccess_file)
-  {
-    system "cp $htaccess_file $target_htaccess_file";
-  }
+    my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
+
+    if (-e $configuration->{HTACCESS})
+    {
+	system "cp $configuration->{HTACCESS} $target_htaccess_file";
+    }
 }
 
 
-#
-# run the main program.
-#
 main();
 
