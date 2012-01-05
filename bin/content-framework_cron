@@ -367,11 +367,6 @@ sub report_error
 
     my $message = "$0: $command returned $error_code";
 
-    if ($descriptor_check ne "")
-    {
-	$message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
-    }
-
     try_to_mail("${0}_cron error", $message);
 
 #     die "$0: $command returned $error_code";
