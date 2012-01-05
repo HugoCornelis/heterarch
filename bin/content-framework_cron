@@ -359,9 +359,6 @@ sub try_to
 }
 
 
-
-
-
 sub report_error
 {
     my $command = shift;
@@ -372,12 +369,12 @@ sub report_error
 
     if ($descriptor_check ne "")
     {
-      $message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
+	$message .= "\nDescriptor file check:\n" .$descriptor_check . "\n\n";
     }
 
     try_to_mail("${0}_cron error", $message);
 
-    die "$0: $command returned $error_code";
+#     die "$0: $command returned $error_code";
 }
 
 
