@@ -166,6 +166,22 @@ sub main
     if ($webcheck_path ne "")
     {
 	try_to("make webcheck -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path",1);
+
+	# define the build directory
+
+	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+
+	my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+
+	# clean the old webcheck website report
+
+	try_to("rm -rf $html_data_directory/webcheck");
+
+	# copy the new webcheck website report to its temporary / correct location
+
+	# \todo read the comments in copy_html_data() to understand what has happened.
+
+	try_to("cp -af $html_build_directory/webcheck $html_data_directory/webcheck");
     }
 
     my $text = produce_email_text();
@@ -419,7 +435,7 @@ sub copy_html_data
 
     try_to("rm -f $html_symlink");
 
-    # \todo and this leaves the new website at its temporary location?
+    # \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
 
     try_to("ln -s $html_data_directory $html_symlink");
 }
