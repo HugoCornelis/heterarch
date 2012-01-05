@@ -389,7 +389,7 @@ sub copy_html_data
 
     # first make sure the website is protected at all time by protecting the build directory with access restriction files
 
-    if ($configuration->{HTACCESS} ne "")
+    if ($configuration->{HTACCESS})
     {
 # 	copy_htacces_file();
 
