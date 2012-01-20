@@ -26,9 +26,9 @@ BEGIN
 }
 
 
-use Neurospaces::Documentation;
-
 use Getopt::Long;
+
+use Neurospaces::Documentation;
 
 use YAML;
 
