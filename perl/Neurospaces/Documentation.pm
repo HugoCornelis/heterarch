@@ -763,7 +763,7 @@ sub compile_2_ps
 # ($directory, $filetype)
 #
 # Takes a particular file type to use an as extension for copying
-# data to an output folder.
+# data to an output directory.
 
 sub compile_file_copy
 {
