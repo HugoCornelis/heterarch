@@ -837,7 +837,14 @@ sub compile_html
 		 filename => "$directory.html",
 		);
 
-	$template->param(HOME => $ENV{HOME});
+	my $variables = $self->{descriptor}->{modules}->{'HTML::Template'}->{var};
+
+	foreach my $variable_name (keys %$variables)
+	{
+	    my $variable_value = $variables->{$variable_name};
+
+	    $template->param($variable_name => $variable_value);
+	}
 
 	$html_output = $template->output();
     }
