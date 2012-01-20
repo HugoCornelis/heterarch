@@ -825,7 +825,90 @@ sub compile_html
 
     my $directory = $self->{name};
 
-    my $result = $self->compile_file_copy('html');
+    my $html_output;
+
+    if ($self->{descriptor}->{modules}->{'HTML::Template'})
+    {
+	use HTML::Template;
+
+	my $template
+	    = HTML::Template->new
+		(
+		 filename => "$directory.html",
+		);
+
+	$template->param(HOME => $ENV{HOME});
+
+	$html_output = $template->output();
+    }
+    else
+    {
+	my $input_file = IO::File->new("<$directory.html");
+
+	undef $/;
+
+	$html_output = <$input_file>;
+
+	$input_file->close();
+    }
+
+#     my $result = $self->compile_file_copy('html');
+
+    my $result = "";
+
+    my $filetype = 'html';
+
+    system "rm -fr output";
+
+    system "mkdir -p output/ps";
+
+#     if ($?)
+#     {
+# 	$result = "mkdir -p output/ps";
+#     }
+
+#     system "mkdir -p output/pdf";
+
+#     if ($?)
+#     {
+# 	$result = "mkdir -p output/pdf";
+#     }
+
+    system "mkdir -p output/html";
+
+    if ($?)
+    {
+	$result = "mkdir -p output/html";
+    }
+
+    my $output_file = IO::File->new(">output/html/$directory.html");
+
+#     system "cp *.$filetype output/html";
+
+    print $output_file $html_output;
+
+    if ($?)
+    {
+	$result = "generating $filetype files to the html output directory (template *.$filetype output/html, $?)";
+    }
+    else
+    {
+	$output_file->close();
+    }
+
+#     system "cp *.$filetype output/ps";
+
+#     if ($?)
+#     {
+# 	$result = "copying $filetype files to the postscript output directory (cp *.$filetype output/ps, $?)";
+#     }
+
+#     system "cp *.$filetype output/pdf";
+
+#     if ($?)
+#     {
+# 	$result = "copying $filetype files to the pdf output directory (cp *.$filetype output/pdf, $?)";
+#     }
 
     if (not $result)
     {
