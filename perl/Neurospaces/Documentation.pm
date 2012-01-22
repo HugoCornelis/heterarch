@@ -97,6 +97,158 @@ sub unique
 }
 
 
+sub contents_page_generate
+{
+#     mkdir "html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory";
+
+    my $configuration = shift;
+
+    my $html_output_directory = shift;
+
+    my $home_page_document = shift;
+
+    my $contents_file = $html_output_directory . "/${documentation_set_name}/contents.html";
+
+#     my $contents_file = $html_output_directory . "/html/contents.html";
+
+    open(CONTENTS,">$contents_file") or die "cannot open file for writing: $!";
+
+    my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
+<html>
+<head>
+  <meta
+ content=\"text/html; charset=ISO-8859-1\"
+ http-equiv=\"content-type\">
+  <title>Neurospaces Content Management System</title>
+</head>
+<body>
+For the home page please click <a
+ href=\"${home_page_document}/${home_page_document}.html\">here.</a>
+<br>
+For the webcheck directory please click <a
+ href=\"webcheck/\">here.</a>
+<br>
+For the statistics output please click <a
+ href=\"../../awstats/awstats.pl\">here.</a>
+<br>
+<br>
+This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
+<br>
+<br>
+<ul>
+";
+
+    print CONTENTS $html_starter;
+
+    #t this needs to be replaced with the same loop as in the main build script.
+    #t likely saying that contents generation should be part of the main build script.
+
+    my $documentlist = `${documentation_set_name}-tag-filter published`;
+
+    my $tmp = YAML::Load($documentlist);
+
+    my @published_documents = sort @$tmp;
+
+    foreach (@published_documents)
+    {
+	my $descriptor_file = $_ . "/descriptor.yml";
+
+	my $descriptor = YAML::LoadFile($descriptor_file);
+
+	my @dirs = split(/\//,$_);
+
+	my $documentname = $dirs[-1];
+
+	print CONTENTS "<li><a href=\"";
+
+	my $document
+	    = Neurospaces::Documentation::Document->new
+		(
+		 {
+		  name => $documentname,
+		 },
+		);
+
+	my $suffix = ".html";
+
+	if ($document->is_pdf())
+	{
+	    $suffix = ".pdf";
+	}
+
+	print CONTENTS $documentname . "/" . $documentname . $suffix;
+
+	print CONTENTS "\">";
+
+	print CONTENTS $descriptor->{'document name'};
+
+	print CONTENTS "</a></li>\n";
+    }
+
+    print CONTENTS "</ul>\n</body>\n</html>\n";
+
+    close CONTENTS;
+
+    print "Constructed the contents page\n";
+}
+
+
+# sub copy_html_data
+# {
+#     my $configuration = shift;
+
+#     my $html_output_directory = shift;
+
+#     # define the build directory
+
+#     my $html_build_directory = "$html_output_directory/${documentation_set_name}/";
+
+#     # first make sure the website is protected at all time by protecting the build directory with access restriction files
+
+#     if ($configuration->{HTACCESS})
+#     {
+# # 	copy_htacces_file();
+
+# # 	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+
+# 	my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
+
+# 	if (-e $configuration->{HTACCESS})
+# 	{
+# 	    system "cp $configuration->{HTACCESS} $target_htaccess_file";
+# 	}
+#     }
+
+#     # start defining the website location
+
+#     system("mkdir --parents $option_html_output_directory");
+
+#     my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+
+#     # clean the old website temporary location
+
+#     system("rm -rf $html_data_directory");
+
+#     # copy the new website to its temporary location
+
+#     system("cp -af $html_build_directory $html_data_directory");
+
+#     # single shot replace the old website with the new one
+
+#     # \todo does this work correctly as a single shot?  It should just do a single ln -sf
+
+#     my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
+
+#     # \todo this makes the website unavailable for a split second?
+
+#     system("rm -f $html_symlink");
+
+#     # \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
+
+#     system("ln -s $html_data_directory $html_symlink");
+# }
+
+
 sub extract_processed_tags
 {
     #! note the syntax to force perl to build an intermediate array result
@@ -2340,9 +2492,9 @@ sub update_hyperlinks
 
     $source_text =~ s(\\begin\{itemize\}\s+\\end\{itemize\})( )g;
 
-    # convert eps links to png links
+#     # convert eps links to png links
 
-    $source_text =~ s(\\includegraphics\{figures/([^}]*)\.eps)(\\href\{figures/$1.png)g;
+#     $source_text =~ s(\\includegraphics\{figures/([^}]*)\.eps)(\\includegraphics\{figures/$1.png)g;
 
     # here we handle special cases for pdf files. Since several files in the
     # documentation can be pdf we need to check all of the published docs

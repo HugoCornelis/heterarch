@@ -73,7 +73,7 @@ my $option_report_tags;
 my $option_set_name = $documentation_set_name || "userdocs";
 my $option_tags = [];
 my $option_verbose;
-
+my $option_web_prepare;
 
 
 sub main
@@ -235,6 +235,21 @@ sub main
 
 	}
 
+# 	if ($option_web_prepare)
+	{
+	    my $configuration = {};
+
+	    my $html_ouput_directory = "$ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project";
+
+# 	    my $html_ouput_directory = "html/htdocs/neurospaces_project";
+
+# 	    Neurospaces::Documentation::Publications::copy_html_data($configuration, $html_ouput_directory);
+
+	    my $home_page_document = "${documentation_set_name}-homepage";
+
+	    Neurospaces::Documentation::Publications::contents_page_generate($configuration, $html_ouput_directory, $home_page_document);
+	}
+
 	if (!$option_report_tags)
 	{
 	    # process other output options
@@ -276,6 +291,7 @@ sub read_cmd_line
 	     "tags=s" => $option_tags,
 	     "verbose+" => \$option_verbose,
 	     "version" => \$option_version,
+	     "web-prepare" => \$option_web_prepare,
 	    );
 
     if (!$result)
@@ -316,6 +332,7 @@ options:
     --tags            process the documents with these tags, multiple tags options may be given.
     --version         give version information.
     --v|verbose       tell what is being done, specify multiple times to get more feedback.
+    --web-prepare     prepare the website.
 
 example usage:
     $0 documentation-homepage
