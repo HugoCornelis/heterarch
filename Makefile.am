@@ -28,8 +28,8 @@ dist_bin_SCRIPTS = \
 	bin/content-framework-rename \
 	bin/content-framework-snippet \
 	bin/content-framework-sync \
-	bin/content-framework-tag-filter \
-	bin/content-framework-tag-replace-items \
+	bin/content-framework-tagfilter \
+	bin/content-framework-tagreplaceitems \
 	bin/content-framework-version \
 	bin/content-framework_cron
 

@@ -1,20 +1,20 @@
 $files = {
-           '_<bin/userdocs-tag-replace-items' => [
+           '_<bin/userdocs-tagreplaceitems' => [
                                                    {
                                                      'expr' => undef,
                                                      'value' => '1',
                                                      'text' => '	if ($content)
 ',
-                                                     'fname' => 'bin/userdocs-tag-replace-items',
+                                                     'fname' => 'bin/userdocs-tagreplaceitems',
                                                      'type' => 'user',
                                                      'line' => '364'
                                                    },
                                                    {
                                                      'expr' => undef,
                                                      'value' => '1',
-                                                     'text' => '	    $tagged_documents = YAML::Load(`userdocs-tag-filter \'$tag\'`);
+                                                     'text' => '	    $tagged_documents = YAML::Load(`userdocs-tagfilter \'$tag\'`);
 ',
-                                                     'fname' => 'bin/userdocs-tag-replace-items',
+                                                     'fname' => 'bin/userdocs-tagreplaceitems',
                                                      'type' => 'user',
                                                      'line' => 270
                                                    }

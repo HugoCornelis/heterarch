@@ -16,7 +16,7 @@ $0 =~ m(.*/(.*));
 
 my $program_name = $1;
 
-$program_name =~ m((.*?)[_-](.*));
+$program_name =~ m((.*)[_-](.*));
 
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
@@ -43,7 +43,7 @@ sub find_documentation
 	   (
 	    @$names
 	    ? @$names
-	    : @{ local $/ ; @{$args->{tags}} ? [] : Load(`${documentation_set_name}-tag-filter 2>&1 "published"`) },
+	    : @{ local $/ ; @{$args->{tags}} ? [] : Load(`${documentation_set_name}-tagfilter 2>&1 "published"`) },
 	   ),
 	  };
 
@@ -53,7 +53,7 @@ sub find_documentation
     {
 	local $/;
 
-	my $documents_tag = Load(`${documentation_set_name}-tag-filter 2>&1 "$tag"`);
+	my $documents_tag = Load(`${documentation_set_name}-tagfilter 2>&1 "$tag"`);
 
 	if (!scalar @$documents_tag)
 	{
@@ -143,7 +143,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
     #t this needs to be replaced with the same loop as in the main build script.
     #t likely saying that contents generation should be part of the main build script.
 
-    my $documentlist = `${documentation_set_name}-tag-filter published`;
+    my $documentlist = `${documentation_set_name}-tagfilter published`;
 
     my $tmp = YAML::Load($documentlist);
 
@@ -1954,7 +1954,7 @@ sub expand
 
     if ($contents_documents->{$document_name})
     {
-	my $command = "${documentation_set_name}-tag-replace-items '$document_name' '$document_name' --verbose";
+	my $command = "${documentation_set_name}-tagreplaceitems '$document_name' '$document_name' --verbose";
 
 	print "$0: executing \"$command\"\n";
 
@@ -1985,7 +1985,7 @@ sub expand
 	{
 	    # expand the document
 
-	    my $command = "${documentation_set_name}-tag-replace-items $related_tag '$document_name' --verbose --exclude '$document_name'";
+	    my $command = "${documentation_set_name}-tagreplaceitems $related_tag '$document_name' --verbose --exclude '$document_name'";
 
 	    print "$0: executing \"$command\"\n";
 
@@ -2499,9 +2499,9 @@ sub update_hyperlinks
     # here we handle special cases for pdf files. Since several files in the
     # documentation can be pdf we need to check all of the published docs
     # for the pdf tag. Operation is a bit expensive.
-    # NOTE: Duplicates code from ${documentation_set_name}-tag-replace-items
+    # NOTE: Duplicates code from ${documentation_set_name}-tagreplaceitems
 
-    my $published_pdfs_yaml = `${documentation_set_name}-tag-filter 2>&1 pdf published`;
+    my $published_pdfs_yaml = `${documentation_set_name}-tagfilter 2>&1 pdf published`;
 
     my $published_pdfs = YAML::Load($published_pdfs_yaml);
 

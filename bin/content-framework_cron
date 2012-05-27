@@ -58,7 +58,7 @@ $0 =~ m(.*/(.*));
 
 my $program_name = $1;
 
-$program_name =~ m((.*?)[_-](.*));
+$program_name =~ m((.*)[_-](.*));
 
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
@@ -676,7 +676,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
     #t this needs to be replaced with the same loop as in the main build script.
     #t likely saying that contents generation should be part of the main build script.
 
-    my $documentlist = `${documentation_set_name}-tag-filter published`;
+    my $documentlist = `${documentation_set_name}-tagfilter published`;
 
     my $tmp = YAML::Load($documentlist);
 

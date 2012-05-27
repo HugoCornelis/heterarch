@@ -37,7 +37,7 @@ $0 =~ m(.*/(.*));
 
 my $program_name = $1;
 
-$program_name =~ m((.*?)-(.*));
+$program_name =~ m((.*)[_-](.*));
 
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
@@ -342,7 +342,7 @@ sub main
 	{
 	    undef $/;
 
-	    $tagged_documents = YAML::Load(`${documentation_set_name}-tag-filter '$tag'`);
+	    $tagged_documents = YAML::Load(`${documentation_set_name}-tagfilter '$tag'`);
 	}
 
 	# generate a latex snippet for each of the tagged documents
