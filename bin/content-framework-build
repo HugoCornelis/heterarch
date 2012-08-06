@@ -336,7 +336,7 @@ options:
 
 example usage:
     $0 documentation-homepage
-    firefox html/htdocs/neurospaces_project/$option_set_name/documentation-homepage/documentation-homepage.html
+    firefox -new-window html/htdocs/neurospaces_project/$option_set_name/documentation-homepage/documentation-homepage.html
 
 ";
 
