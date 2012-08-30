@@ -649,7 +649,7 @@ options :
 			$read =~ s/&/&amp;/g;
 		    }
 
-		    $source->{"$entries. Expected output "} = $read;
+		    $source->{"$entries. Part of expected output "} = $read;
 
 		    $entries++;
 
