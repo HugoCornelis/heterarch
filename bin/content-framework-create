@@ -161,7 +161,7 @@ that need to be given a blank template.
 
 options:
     --help            print usage information.
-    --set-name        select a document set (builtin default is userdocs).
+    --set-name        select a document set (builtin default is $documentation_set_name).
     --version         give version information.
     --v|verbose       tell what is being done, specify multiple times to get more feedback.
 
