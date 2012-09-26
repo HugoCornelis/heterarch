@@ -154,9 +154,9 @@ sub read_cmd_line
 	print
 	    "
 
-$program_name: Creates a new blank document for editing using the hardcoded 
-template file.  Arguments on the command line are taken as documents
-that need to be given a blank template.
+$program_name: Creates a new blank document using NewDocument as a
+template file.  Arguments on the command line are the names of the
+documents to be created.
 
 
 options:
