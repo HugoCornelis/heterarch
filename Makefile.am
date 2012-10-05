@@ -80,6 +80,12 @@ dist-hook:
 #	( cd cpan ; ./cpan_install *.gz )
 #	touch $(top_srcdir)/neurospaces_cpan_modules
 
+install-exec-local:
+	( cd $(bindir) ; for script in `ls neurospaces-manager-gui | grep -v version | grep -v sync | grep -v pull | grep -v push` ; do ln -vsf {neurospaces-manager,content-framework}-`echo $$script | cut -f3- -d-` ; done )
+
+uninstall-local:
+	( cd $(bindir) ; echo content-framework-* ; $(RM) content-framework-* )
+
 html-upload-prepare:
 	rm -fr html/htdocs/neurospaces_project/$(PACKAGE)
 	mkdir -p html/htdocs/neurospaces_project/$(PACKAGE)
