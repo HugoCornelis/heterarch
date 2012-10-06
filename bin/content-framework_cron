@@ -111,35 +111,35 @@ sub main
 
     # upgrade the developer package
 
-    try_to("neurospaces_pull developer",1);
+    try_to("neurospaces_upgrade developer",1);
 
-    try_to("neurospaces_update developer",1);
+#     try_to("neurospaces_update developer",1);
 
-    try_to("neurospaces_configure developer",1);
+#     try_to("neurospaces_configure developer",1);
 
-    try_to("neurospaces_install developer",1);
+#     try_to("neurospaces_install developer",1);
 
     # upgrade the content-framework package
 
-    try_to("neurospaces_pull content-framework",1);
+    try_to("neurospaces_upgrade content-framework",1);
 
-    try_to("neurospaces_update content-framework",1);
+#     try_to("neurospaces_update content-framework",1);
 
-    try_to("neurospaces_configure content-framework",1);
+#     try_to("neurospaces_configure content-framework",1);
 
-    try_to("neurospaces_install content-framework",1);
+#     try_to("neurospaces_install content-framework",1);
 
     try_to("neurospaces_clean content-framework",1);
 
     # upgrade the content itself
 
-    try_to("neurospaces_pull ${documentation_set_name}",1);
+    try_to("neurospaces_upgrade ${documentation_set_name}",1);
 
-    try_to("neurospaces_update ${documentation_set_name}",1);
+#     try_to("neurospaces_update ${documentation_set_name}",1);
 
-    try_to("neurospaces_configure ${documentation_set_name}",1);
+#     try_to("neurospaces_configure ${documentation_set_name}",1);
 
-    try_to("neurospaces_install ${documentation_set_name}",1);
+#     try_to("neurospaces_install ${documentation_set_name}",1);
 
     try_to("neurospaces_clean ${documentation_set_name}",1);
 
