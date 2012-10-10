@@ -1,0 +1,58 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim}
+\usepackage[dvips]{epsfig}
+\usepackage{color}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+
+\begin{document}
+
+\section*{Neurospaces: Documentation}
+
+{\bf Related Documentation:}
+% start: content-framework-tagreplaceitems related-do-nothing
+% end: content-framework-tagreplaceitems related-do-nothing
+
+\section*{Content framework cron jobs}
+
+The Neurospaces content framework supports the automated construction
+of websites using cron jobs (see also
+\href{http://www.genesis-sim.org/userdocs/neurospaces-cron/neurospaces-cron.html}{the
+  Genesis-3 cron job manual}).  Cron jobs can be associated with
+specific packages that have previously been instantiated with the
+command {\tt neurospaces\_new\_component --content-framework}.
+
+\subsection{To create a new cron job}
+
+\begin{enumerate}
+\item Create a new user specific for the cron job with the {\tt
+    adduser} unix shell command.
+\item 
+\end{enumerate}
+
+
+%\subsubsection*{Figures}
+
+%Figures can easily be added with the following code:
+
+%\begin{verbatim}
+%\begin{figure}[h]
+%   \centering
+%   \includegraphics[scale=0.6]{figures/dummyfig.eps}
+%   \caption{{\bf A Dummy Figure:} Example of Latex code to incorporate
+%      a figure into documentation.}
+%   \label{fig:df-1}
+%\end{figure}
+%\end{verbatim}
+
+%\begin{figure}[h]
+%  \centering
+%   \includegraphics[scale=0.5]{figures/dummyfig.eps}
+%\caption{{\bf A Dummy Figure:} Example of \LaTeX\,\,\,code to incorporate a figure into documentation.}
+%  \label{fig:df-2}
+%\end{figure}
+
+\bibliographystyle{plain}
+\bibliography{../tex/bib/g3-refs.bib}
+
+\end{document}
