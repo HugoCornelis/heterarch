@@ -18,16 +18,55 @@
 The Neurospaces content framework supports the automated construction
 of websites using cron jobs (see also
 \href{http://www.genesis-sim.org/userdocs/neurospaces-cron/neurospaces-cron.html}{the
-  Genesis-3 cron job manual}).  Cron jobs can be associated with
-specific packages that have previously been instantiated with the
-command {\tt neurospaces\_new\_component --content-framework}.
+  Genesis-3 cron job manual} and
+\href{http://www.genesis-sim.org/userdocs/userdocs-cron/userdocs-cron.html}{the
+  Genesis-3 Documentation System cron job manual}).  Cron jobs can be
+associated with specific packages that have previously been
+instantiated with the command {\tt neurospaces\_new\_component
+  --content-framework}.
 
-\subsection{To create a new cron job}
+
+\subsection*{To create a new cron job}
 
 \begin{enumerate}
 \item Create a new user specific for the cron job with the {\tt
     adduser} unix shell command.
-\item 
+
+  Note that the repository of new packages can be served from their
+  own account.  If that is the case, make sure that the cron job does
+  not use this same account as that may lead to monotone database lock
+  problems.
+
+\item Give the new user passwordless {\tt sudo} access: {\tt echo
+    'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers}
+
+\item Put the new user into the {\tt content-framework} group to make
+  sure it has write access to the html output directory.
+\item Create a suitable configuration file for the cron job.  Sample
+  contents:
+\begin{verbatim}
+---
+MAILTO: hugo.cornelis@gmail.com, allan.coop@gmail.com
+MAILFROM: hfof_cron
+HTMLDIR: /var/www/html
+OUTPUTDIR: /tmp
+URL: http://91.183.94.6/html/hfof
+LOGROTATE: 1000
+\end{verbatim}
+\item Change your role to the new user.
+\item {\tt neurospaces\_create\_directories <package-name>}
+\item {\tt neurospaces\_pull <package-name>} {\it note: this step should
+    become optional in the future}
+\item {\tt neurospaces\_upgrade <package-name>}
+
+  This gives you the {\tt <package-name>\_cron} command.  You can test it
+  in isolation by running it from the command line.
+\item Add {\tt <package-name>\_cron} to the {\tt /etc/crontab} file, for
+  instance for execution every hour:
+
+\begin{verbatim}
+1 *     * * *   <user-name>  ( cd /home/<user-name>/neurospaces_project/<package-name>/source/snapshots/0 && /usr/local/bin/<package-name>_cron --config /home/<username>/<package-name>_cron.yml )
+\end{verbatim}
 \end{enumerate}
 
 
