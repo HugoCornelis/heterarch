@@ -38,22 +38,13 @@ Provides:		perl(Neurospaces::Utilities)
 Requires:		perl >= 5.8.8
 
 %description
-The Neurospaces developer package contains essential tools for Neurospaces development. 
- The Neurospaces project develops software components of neuronal
- simulator that integrate in a just-in-time manner for the
- exploration, simulation and validation of accurate neuronal models.
- Neurospaces spans the range from single molecules to subcellular
- networks, over single cells to neuronal networks.  Neurospaces is
- backwards-compatible with the GENESIS simulator, integrates with
- Python and Perl, separates models from experimental protocols, and
- reads model definitions from declarative specifications in a variety
- of formats.
- This package contains utilities requires for Neurospaces development.
+The Neurospaces content production framework.
+ This package contains utilities required for Neurospaces content development.
 
 
 # %package developer
 # Requires: perl
-# Summary: Neurospaces Developer Package
+# Summary: Neurospaces Content Framework
 # Group: Science
 # Provides: developer
 
