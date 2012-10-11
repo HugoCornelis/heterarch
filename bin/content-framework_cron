@@ -125,23 +125,30 @@ sub main
 	try_to("neurospaces_clean content-framework", 1);
     }
 
-    # pull and update the content itself
+    # loop over all the configured content packages, including self
 
-    try_to("neurospaces_pull ${documentation_set_name}", 1);
+    my $packages = $configuration->{packages};
 
-    try_to("neurospaces_update ${documentation_set_name}", 1);
+    foreach my $package_name ($documentation_set_name, keys %$packages)
+    {
+	# pull and update the content itself
 
-    # clean the content after it has been installed
+	try_to("neurospaces_pull '$package_name'", 1);
 
-    try_to("neurospaces_clean ${documentation_set_name}", 1);
+	try_to("neurospaces_update '$package_name'", 1);
 
-    #   try_to("${documentation_set_name}-check > $output_path", 1);
+	# clean the content after it has been installed
 
-    # collect the descriptor check info for the email
+	try_to("neurospaces_clean '$package_name'", 1);
 
-    $descriptor_check = `${documentation_set_name}-check 2>&1 --directory $build_directory`;
+	#   try_to("${documentation_set_name}-check > $output_path", 1);
 
-    try_to("neurospaces_website_prepare ${documentation_set_name} >>$output_path", 1);
+	# collect the descriptor check info for the email
+
+	$descriptor_check = `'$package_name'-check 2>&1 --directory $build_directory`;
+
+	try_to("neurospaces_website_prepare '$package_name' >>$output_path", 1);
+    }
 
 #     try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
 
