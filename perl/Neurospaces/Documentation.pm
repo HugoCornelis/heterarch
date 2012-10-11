@@ -292,6 +292,8 @@ sub insert_publication_production_result
 
 sub publish_production_results
 {
+    my $prefix = shift;
+
     my $selectors = shift;
 
     use YAML;
@@ -315,7 +317,7 @@ sub publish_production_results
 
     use IO::File;
 
-    my $results_file = IO::File->new(">/tmp/all_publication_results");
+    my $results_file = IO::File->new(">/tmp/${prefix}_all_publication_results");
 
     if ($results_file)
     {
@@ -323,9 +325,9 @@ sub publish_production_results
     }
     else
     {
-	print "$0: *** Error: cannot all_publication_results write to /tmp/all_publication_results\n";
+	print "$0: *** Error: cannot all_publication_results write to /tmp/${prefix}_all_publication_results\n";
 
-	$result = "cannot write all_publication_results to /tmp/all_publication_results";
+	$result = "cannot write all_publication_results to /tmp/${prefix}_all_publication_results";
     }
 
     return $result;
@@ -346,23 +348,6 @@ sub report_all_output
 	   }
 	   keys %$all_publication_results,
 	  };
-
-#     print Dump( { all_output => $all_output, }, );
-
-#     use IO::File;
-
-#     my $results_file = IO::File->new(">/tmp/all_publication_results");
-
-#     if ($results_file)
-#     {
-# 	print $results_file Dump( { all_publication_results => $all_results, }, );
-#     }
-#     else
-#     {
-# 	print "$0: *** Error: cannot all_publication_results write to /tmp/all_publication_results\n";
-
-# 	$result = "cannot write all_publication_results to /tmp/all_publication_results";
-#     }
 
     return $result;
 }
