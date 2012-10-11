@@ -33,6 +33,22 @@ use Neurospaces::Documentation;
 use YAML;
 
 
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*)[_-](.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+my $home_page_document = "${documentation_set_name}-homepage";
+
+my $output_filename = "${documentation_set_name}_cron.out";
+my $descriptor_check = "";
+my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+
+
 $SIG{__DIE__}
     = sub {
 
@@ -54,31 +70,21 @@ $SIG{INT}
     };
 
 
-$0 =~ m(.*/(.*));
-
-my $program_name = $1;
-
-$program_name =~ m((.*)[_-](.*));
-
-my $documentation_set_name = $1;
-my $root_operation_name = $2;
-
-my $home_page_document = "${documentation_set_name}-homepage";
-
-my $output_filename = "${documentation_set_name}_cron.out";
-my $descriptor_check = "";
-my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
-
-#
-# options
-#
-
 my $option_output_directory = "/tmp";
 my $option_config = "";
 my $option_html_output_directory = "$ENV{HOME}/public_html";
 
+
 my $configuration
     = {
+       packages => {
+		    developer => {
+				  upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
+				 },
+		    'content-framework' => {
+					    upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
+					   },
+		   },
       };
 
 
@@ -109,21 +115,29 @@ sub main
 
     $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
 
-    # upgrade the developer package
+    if ($configuration->{packages}->{developer}->{upgrade})
+    {
+	# upgrade the developer package
 
-    try_to("neurospaces_upgrade developer", 1);
+	try_to("neurospaces_upgrade developer", 1);
+    }
 
-    # upgrade the content-framework package
+    if ($configuration->{packages}->{'content-framework'}->{upgrade})
+    {
+	# upgrade the content-framework package
 
-    try_to("neurospaces_upgrade content-framework", 1);
+	try_to("neurospaces_upgrade content-framework", 1);
 
-    # clean the content-framework after it has been installed
+	# clean the content-framework after it has been installed
 
-    try_to("neurospaces_clean content-framework", 1);
+	try_to("neurospaces_clean content-framework", 1);
+    }
 
-    # upgrade the content itself
+    # pull and update the content itself
 
-    try_to("neurospaces_upgrade ${documentation_set_name}", 1);
+    try_to("neurospaces_pull ${documentation_set_name}", 1);
+
+    try_to("neurospaces_update ${documentation_set_name}", 1);
 
     # clean the content after it has been installed
 

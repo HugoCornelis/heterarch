@@ -41,6 +41,14 @@ instantiated with the command {\tt neurospaces\_new\_component
   the new user passwordless {\tt sudo} access: {\tt echo 'joeuser
     ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers}
 
+  {\it For most configurations only the content-framework should be
+    given permission to upgrade the developer package and the
+    content-framework.  However, the new package should have
+    permissions for its own installation, making available the
+    commands for synchronization and build of the website.  These
+    commands can be installed manually when following the procedure
+    outlined here.}
+
 \item Put the new user into the {\tt content-framework} group to make
   sure it has write access to the html output directory.
 \item Create a suitable configuration file for the cron job.  Sample
