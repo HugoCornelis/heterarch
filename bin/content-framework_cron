@@ -129,7 +129,7 @@ sub main
 
     my $packages = $configuration->{packages};
 
-    foreach my $package_name ($documentation_set_name, keys %$packages)
+    foreach my $package_name (keys %$packages)
     {
 	# pull and update the content itself
 
@@ -472,6 +472,9 @@ sub parse_config_file
 	   developer => {
 			 upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
 			},
+	   $documentation_set_name => {
+				       upgrade => 'builtin default action',
+				      },
 	  };
 
     my $merged_packages = Data::Merger::merger($configuration->{packages}, $packages);
