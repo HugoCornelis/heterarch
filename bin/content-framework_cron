@@ -139,7 +139,9 @@ sub main
 
     $descriptor_check = `${documentation_set_name}-check 2>&1 --directory $build_directory`;
 
-    try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
+    try_to("neurospaces_website_prepare ${documentation_set_name} >>$output_path", 1);
+
+#     try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
 
     # copy the website to its final destination
 
@@ -446,7 +448,14 @@ sub parse_config_file
 
     $configuration = YAML::LoadFile($config_file);
 
-    $configuration->{packages}
+    if (!$configuration->{packages})
+    {
+	$configuration->{packages} = {};
+    }
+
+    # define the packages that require special attention
+
+    my $packages
 	= {
 	   'content-framework' => {
 				   upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
@@ -455,6 +464,8 @@ sub parse_config_file
 			 upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
 			},
 	  };
+
+    my $merged_packages = Data::Merger::merger($configuration->{packages}, $packages);
 
     if (!defined $configuration)
     {
