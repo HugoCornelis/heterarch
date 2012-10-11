@@ -75,17 +75,7 @@ my $option_config = "";
 my $option_html_output_directory = "$ENV{HOME}/public_html";
 
 
-my $configuration
-    = {
-       packages => {
-		    developer => {
-				  upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
-				 },
-		    'content-framework' => {
-					    upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
-					   },
-		   },
-      };
+my $configuration;
 
 
 sub main
@@ -455,6 +445,16 @@ sub parse_config_file
     print "\nParsing configuration in $config_file\n\n";
 
     $configuration = YAML::LoadFile($config_file);
+
+    $configuration->{packages}
+	= {
+	   'content-framework' => {
+				   upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
+				  },
+	   developer => {
+			 upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
+			},
+	  };
 
     if (!defined $configuration)
     {
