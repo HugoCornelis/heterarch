@@ -644,7 +644,7 @@ sub contents_page_generate
 
 #     my $contents_file = $option_html_output_directory . "/html/contents.html";
 
-    open(CONTENTS,">$contents_file") or die "cannot open file for writing: $!";
+    open(CONTENTS, ">$contents_file") or die "cannot open file for writing: $!";
 
     my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
 <html>

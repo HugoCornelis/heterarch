@@ -58,7 +58,7 @@ EXTRA_DIST = \
 am__tar = ${AMTAR} chf - --format=posix "$$tardir"
 
 
-clean-local: # website-clean
+clean-local: website-clean
 	$(RM) -rf $(top_srcdir)/*/output/*
 	$(RM) -f $(top_srcdir)/*/*.log
 	$(RM) -rf $(top_srcdir)/*.deb
@@ -86,6 +86,10 @@ install-exec-local:
 uninstall-local:
 	( cd $(bindir) ; echo content-framework-* ; $(RM) content-framework-* )
 
+test: check
+
+#TESTS = $(srcdir)/tests/neurospaces_harness
+
 html-upload-prepare:
 	rm -fr html/htdocs/neurospaces_project/$(PACKAGE)
 	mkdir -p html/htdocs/neurospaces_project/$(PACKAGE)
@@ -97,9 +101,21 @@ html-upload-prepare:
 html-upload: html-upload-prepare
 	scp -pr html/htdocs/* hcornelis,neurospaces@web.sourceforge.net:/home/groups/n/ne/neurospaces/htdocs/
 
-test: check
+website-clean:
+	$(RM) -fr html/htdocs/neurospaces_project/content-framework/
 
-#TESTS = $(srcdir)/tests/neurospaces_harness
+website-prepare:
+	content-framework-build --tags published
+
+website-prepare-local:
+	content-framework-build --tags local --tags published
+
+website-upload: website-clean website-prepare html-upload
+
+webcheck:
+	rm -rf html/htdocs/neurospaces_project/content-framework/webcheck
+	mkdir html/htdocs/neurospaces_project/content-framework/webcheck
+	webcheck -o html/htdocs/neurospaces_project/content-framework/webcheck html/htdocs/neurospaces_project/content-framework --redirects=3
 
 docs-level1:
 
