@@ -26,6 +26,8 @@ BEGIN
 }
 
 
+use Data::Utilities;
+
 use Getopt::Long;
 
 use Neurospaces::Documentation;
