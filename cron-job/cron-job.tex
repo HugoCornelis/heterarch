@@ -63,13 +63,21 @@ URL: http://91.183.94.6/html/hfof
 LOGROTATE: 1000
 \end{verbatim}
 \item Change your role to the new user.
-\item {\tt neurospaces\_create\_directories <package-name>}
-\item {\tt neurospaces\_pull <package-name>} {\it note: this step should
-    become optional in the future}
-\item {\tt neurospaces\_upgrade <package-name>}
+\item For each package that should be published run the following
+  commands:
+  \begin{enumerate}
+  \item Run the command '{\tt neurospaces\_create\_directories
+      <package-name>}' for each package that should be published.
+  \item {\tt neurospaces\_pull <package-name>} {\it note: this step should
+      become optional in the future}
+  \item {\tt neurospaces\_upgrade <package-name>}
 
-  This gives you the {\tt <package-name>\_cron} command.  You can test it
-  in isolation by running it from the command line.
+    This gives you a {\tt <package-name>\_cron} command for each
+    package installed.  You can test it in isolation by running it
+    from the command line.  For reasons of performance and to avoid
+    race conditions, it is recommended to configure one such command
+    to build all the packages.
+  \end{enumerate}
 \item Add {\tt <package-name>\_cron} to the {\tt /etc/crontab} file, for
   instance for execution every hour:
 
