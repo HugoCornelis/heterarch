@@ -37,8 +37,9 @@ instantiated with the command {\tt neurospaces\_new\_component
   not use this same account as that may lead to monotone database lock
   problems.
 
-\item Give the new user passwordless {\tt sudo} access: {\tt echo
-    'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers}
+\item If the cron job is going to reinstall any of the packages, give
+  the new user passwordless {\tt sudo} access: {\tt echo 'joeuser
+    ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers}
 
 \item Put the new user into the {\tt content-framework} group to make
   sure it has write access to the html output directory.
