@@ -2003,6 +2003,51 @@ sub expand
 	}
     }
 
+    # resolve external cross references
+
+    if (-f "$document_name/output/$document_name.tex")
+    {
+	# expand the document
+
+	my $contents;
+
+	{
+	    # slurp contents
+
+	    local $/;
+
+	    open my $descriptor, "$document_name/output/$document_name.tex"
+		or print "****************ERRORS\n"; # die $!;
+	    undef $/;
+	    $contents = <$descriptor>;
+	    close $descriptor;
+	}
+
+	if ($contents)
+	{
+	    my $old_contents = $contents;
+
+	    if ($contents =~ s(([^\\])\\cmfxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
+	    {
+		print "replacing\n";
+	    }
+
+	    print "Replaced '$2...$3'\n";
+
+	    # if something has changed
+
+	    if ($old_contents ne $contents)
+	    {
+		# replace the file
+
+		open my $descriptor, ">" . "$document_name/output/$document_name.tex"
+		    or die $!;
+		print $descriptor $contents;
+		close $descriptor;
+	    }
+	}
+    }
+
     # return result
 
     return $result;
