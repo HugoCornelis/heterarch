@@ -268,6 +268,8 @@ sub produce_email_text
     {
 	my $latexerrors = `cat $logfile | grep ^!`;
 
+	$latexerrors .= `cat $logfile | grep 'LaTeX Error:'`;
+
 	if ($latexerrors eq "")
 	{
 	    next;
