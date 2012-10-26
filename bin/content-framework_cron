@@ -258,7 +258,7 @@ sub produce_email_text
 
     my $errors = "";
 
-    my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep html | grep \.log`;
+    my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep \.log`;
 
     my @logfiles = split(/\n/, $logfiletext);
 
