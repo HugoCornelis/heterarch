@@ -234,7 +234,7 @@ sub produce_email_text
 
     use IO::File;
 
-    my $publication_report_file = IO::File->new("</tmp/all_publication_results");
+    my $publication_report_file = IO::File->new("</tmp/${documentation_set_name}_all_publication_results");
 
     if ($publication_report_file)
     {
@@ -246,7 +246,7 @@ sub produce_email_text
     }
     else
     {
-	$status_message .= "\nunable to read a publication report (error opening /tmp/all_publication_results\n\n";
+	$status_message .= "\nunable to read a publication report (error opening /tmp/${documentation_set_name}_all_publication_results\n\n";
     }
 
     if ($descriptor_check ne "")
@@ -261,6 +261,8 @@ sub produce_email_text
     my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep \.log`;
 
     my @logfiles = split(/\n/, $logfiletext);
+
+    $status_message .= "\nProcessing " . (scalar @logfiles) . " log files\n";
 
     my $logfile;
 
