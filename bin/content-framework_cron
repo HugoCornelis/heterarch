@@ -161,9 +161,14 @@ sub main
 
 	copy_html_data($package_name);
 
-	contents_page_generate($package_name);
+	my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
-	index_page_generate($package_name);
+	if (-d $html_build_directory)
+	{
+	    contents_page_generate($package_name);
+
+	    index_page_generate($package_name);
+	}
     }
 
     # do a link check.
