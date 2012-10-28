@@ -446,7 +446,7 @@ sub copy_html_data
 
 #     my $contents_directory = $option_html_output_directory . "/${package_name}_data";
 
-    try_to("mkdir --parents $html_data_directory");
+#     try_to("mkdir --parents $html_data_directory");
 
     # copy the new website to its temporary location
 
