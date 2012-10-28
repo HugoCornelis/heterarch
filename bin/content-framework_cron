@@ -148,17 +148,17 @@ sub main
 	$descriptor_check = `'$package_name'-check 2>&1 --directory $build_directory`;
 
 	try_to("neurospaces_website_prepare '$package_name' >>$output_path", 1);
+
+#       try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
+
+	# copy the website to its final destination
+
+	copy_html_data($package_name);
+
+	contents_page_generate($package_name);
+
+	index_page_generate($package_name);
     }
-
-#     try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
-
-    # copy the website to its final destination
-
-    copy_html_data();
-
-    contents_page_generate();
-
-    index_page_generate();
 
     # do a link check.
 
@@ -396,9 +396,11 @@ sub report_error
 
 sub copy_html_data
 {
+    my $package_name = shift;
+
     # define the build directory
 
-    my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+    my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
     # first make sure the website is protected at all time by protecting the build directory with access restriction files
 
@@ -406,9 +408,7 @@ sub copy_html_data
     {
 # 	copy_htacces_file();
 
-# 	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
-
-	my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
+	my $target_htaccess_file = $html_build_directory . "/${package_name}/.htaccess";
 
 	if (-e $configuration->{HTACCESS})
 	{
@@ -420,7 +420,7 @@ sub copy_html_data
 
     try_to("mkdir --parents $option_html_output_directory");
 
-    my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+    my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
 
     # clean the old website temporary location
 
@@ -434,7 +434,7 @@ sub copy_html_data
 
     # \todo does this work correctly as a single shot?  It should just do a single ln -sf
 
-    my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
+    my $html_symlink = $option_html_output_directory . "/" . "${package_name}";
 
     # \todo this makes the website unavailable for a split second?
 
@@ -643,7 +643,9 @@ sub rotate_logs
 
 sub index_page_generate
 {
-    my $index_file = $option_html_output_directory . "/${documentation_set_name}/index.html";
+    my $package_name = shift;
+
+    my $index_file = $option_html_output_directory . "/${package_name}/index.html";
 
     my $html_document = $index_file;
 
@@ -667,7 +669,9 @@ sub index_page_generate
 
 sub contents_page_generate
 {
-    my $contents_file = $option_html_output_directory . "/${documentation_set_name}/contents.html";
+    my $package_name = shift;
+
+    my $contents_file = $option_html_output_directory . "/${package_name}/contents.html";
 
 #     my $contents_file = $option_html_output_directory . "/html/contents.html";
 
@@ -692,7 +696,7 @@ For the statistics output please click <a
  href=\"../../awstats/awstats.pl\">here.</a>
 <br>
 <br>
-This is a listing of all published documents in the ${documentation_set_name} documentation. <br>
+This is a listing of all published documents in the ${package_name} documentation. <br>
 <br>
 <br>
 <ul>
@@ -703,7 +707,7 @@ This is a listing of all published documents in the ${documentation_set_name} do
     #t this needs to be replaced with the same loop as in the main build script.
     #t likely saying that contents generation should be part of the main build script.
 
-    my $documentlist = `${documentation_set_name}-tagfilter published`;
+    my $documentlist = `${package_name}-tagfilter published`;
 
     my $tmp = YAML::Load($documentlist);
 
