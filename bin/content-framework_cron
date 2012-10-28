@@ -442,21 +442,24 @@ sub copy_html_data
 
     # copy the new website to its temporary location
 
-    try_to("cp -af $html_build_directory $html_data_directory");
+    if (-d $html_build_directory)
+    {
+	try_to("cp -af $html_build_directory $html_data_directory");
 
-    # single shot replace the old website with the new one
+	# single shot replace the old website with the new one
 
-    # \todo does this work correctly as a single shot?  It should just do a single ln -sf
+	# \todo does this work correctly as a single shot?  It should just do a single ln -sf
 
-    my $html_symlink = $option_html_output_directory . "/" . "${package_name}";
+	my $html_symlink = $option_html_output_directory . "/" . "${package_name}";
 
-    # \todo this makes the website unavailable for a split second?
+	# \todo this makes the website unavailable for a split second?
 
-    try_to("rm -f $html_symlink");
+	try_to("rm -f $html_symlink");
 
-    # \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
+	# \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
 
-    try_to("ln -s $html_data_directory $html_symlink");
+	try_to("ln -s $html_data_directory $html_symlink");
+    }
 }
 
 
