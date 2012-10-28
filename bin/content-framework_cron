@@ -155,10 +155,6 @@ sub main
 
 	try_to("mkdir --parents $option_html_output_directory");
 
-	my $contents_directory = $option_html_output_directory . "/${package_name}_data";
-
-	try_to("mkdir --parents ${contents_directory}");
-
 	copy_html_data($package_name);
 
 	my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
@@ -444,6 +440,10 @@ sub copy_html_data
     # clean the old website temporary location
 
     try_to("rm -rf $html_data_directory");
+
+#     my $contents_directory = $option_html_output_directory . "/${package_name}_data";
+
+    try_to("mkdir --parents $html_data_directory");
 
     # copy the new website to its temporary location
 
