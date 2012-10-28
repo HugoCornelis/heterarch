@@ -685,7 +685,7 @@ sub contents_page_generate
 
     try_to("mkdir --parents $contents_directory");
 
-    my $contents_file = "/${contents_directory}/contents.html";
+    my $contents_file = "${contents_directory}/contents.html";
 
 #     my $contents_file = $option_html_output_directory . "/html/contents.html";
 
