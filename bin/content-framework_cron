@@ -149,7 +149,7 @@ sub main
 
 	try_to("neurospaces_website_prepare '$package_name' >>$output_path", 1);
 
-#       try_to("make website-prepare -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
+#       try_to("make website-prepare -C $ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
 
 	# copy the website to its final destination
 
@@ -157,7 +157,7 @@ sub main
 
 	copy_html_data($package_name);
 
-	my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
+	my $html_build_directory = "$ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
 	if (-d $html_build_directory)
 	{
@@ -175,11 +175,11 @@ sub main
     {
 	foreach my $package_name (keys %$packages)
 	{
-	    try_to("make webcheck -C ~/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path", 1);
+	    try_to("make webcheck -C $ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path", 1);
 
 	    # define the build directory
 
-	    my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
+	    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
 	    my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
 
@@ -278,7 +278,7 @@ sub produce_email_text
 
     my $errors = "";
 
-    my $logfiletext = `find ~/neurospaces_project/${package_name}/source/snapshots/0 | grep output | grep \.log`;
+    my $logfiletext = `find $ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0 | grep output | grep \.log`;
 
     my @logfiles = split(/\n/, $logfiletext);
 
@@ -420,7 +420,7 @@ sub copy_html_data
 
     # define the build directory
 
-    my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
+    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
     # first make sure the website is protected at all time by protecting the build directory with access restriction files
 
@@ -786,7 +786,7 @@ This is a listing of all published documents in the ${package_name} documentatio
 
 sub copy_htacces_file
 {
-    my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
 
     my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
 
