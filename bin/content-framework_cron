@@ -54,7 +54,7 @@ my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/
 $SIG{__DIE__}
     = sub {
 
-	Neurospaces::Documentation::Publications::publish_production_results();
+	Neurospaces::Documentation::Publications::publish_production_results($documentation_set_name);
 
 	use Carp;
 
@@ -236,7 +236,7 @@ sub produce_email_text
 	$status_message .= "The statistics output may be available here: " . $configuration->{URL} . "/../../awstats/awstats.pl\n";
     }
 
-#     my $url = $option_html_output_directory . "/${documentation_set_name}/contents.html";
+#     my $url = $option_html_output_directory . "/${package_name}/contents.html";
 
 #     $status_message .= "Check the output over the web via this link " . $url . "\n";
 
