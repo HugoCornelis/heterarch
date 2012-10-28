@@ -189,9 +189,12 @@ sub main
 
 	    # copy the new webcheck website report to its temporary / correct location
 
-	    # \todo read the comments in copy_html_data() to understand what has happened.
+	    if (-d $html_build_directory/webcheck)
+	    {
+		# \todo read the comments in copy_html_data() to understand what has happened.
 
-	    try_to("cp -af $html_build_directory/webcheck $html_data_directory/webcheck");
+		try_to("cp -af $html_build_directory/webcheck $html_data_directory/webcheck");
+	    }
 	}
     }
 
