@@ -153,6 +153,12 @@ sub main
 
 	# copy the website to its final destination
 
+	try_to("mkdir --parents $option_html_output_directory");
+
+	my $contents_directory = $option_html_output_directory . "/${package_name}_data";
+
+	try_to("mkdir --parents ${contents_directory}");
+
 	copy_html_data($package_name);
 
 	contents_page_generate($package_name);
@@ -428,8 +434,6 @@ sub copy_html_data
 
     # start defining the website location
 
-    try_to("mkdir --parents $option_html_output_directory");
-
     my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
 
     # clean the old website temporary location
@@ -682,8 +686,6 @@ sub contents_page_generate
     my $package_name = shift;
 
     my $contents_directory = $option_html_output_directory . "/${package_name}";
-
-    try_to("mkdir --parents $contents_directory");
 
     my $contents_file = "${contents_directory}/contents.html";
 
