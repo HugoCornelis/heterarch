@@ -166,26 +166,34 @@ sub main
 
     if ($webcheck_path ne "")
     {
-	try_to("make webcheck -C ~/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
+	foreach my $package_name (keys %$packages)
+	{
+	    try_to("make webcheck -C ~/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path", 1);
 
-	# define the build directory
+	    # define the build directory
 
-	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+	    my $html_build_directory = "~/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
 
-	my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
+	    my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
 
-	# clean the old webcheck website report
+	    # clean the old webcheck website report
 
-	try_to("rm -rf $html_data_directory/webcheck");
+	    try_to("rm -rf $html_data_directory/webcheck");
 
-	# copy the new webcheck website report to its temporary / correct location
+	    # copy the new webcheck website report to its temporary / correct location
 
-	# \todo read the comments in copy_html_data() to understand what has happened.
+	    # \todo read the comments in copy_html_data() to understand what has happened.
 
-	try_to("cp -af $html_build_directory/webcheck $html_data_directory/webcheck");
+	    try_to("cp -af $html_build_directory/webcheck $html_data_directory/webcheck");
+	}
     }
 
-    my $text = produce_email_text();
+    my $text = '';
+
+    foreach my $package_name (keys %$packages)
+    {
+	$text .= produce_email_text($package_name);
+    }
 
     try_to_mail("${documentation_set_name} cron has finished.",
 		"${documentation_set_name} has finished building.\n\n" . $text);
@@ -196,6 +204,8 @@ sub main
 
 sub produce_email_text
 {
+    my $package_name = shift;
+
     my $outputfile = $option_output_directory . "/" . $output_filename;
 
     my $status_message = "";
@@ -234,7 +244,7 @@ sub produce_email_text
 
     use IO::File;
 
-    my $publication_report_file = IO::File->new("</tmp/${documentation_set_name}_all_publication_results");
+    my $publication_report_file = IO::File->new("</tmp/${package_name}_all_publication_results");
 
     if ($publication_report_file)
     {
@@ -246,7 +256,7 @@ sub produce_email_text
     }
     else
     {
-	$status_message .= "\nunable to read a publication report (error opening /tmp/${documentation_set_name}_all_publication_results\n\n";
+	$status_message .= "\nunable to read a publication report (error opening /tmp/${package_name}_all_publication_results\n\n";
     }
 
     if ($descriptor_check ne "")
@@ -258,7 +268,7 @@ sub produce_email_text
 
     my $errors = "";
 
-    my $logfiletext = `find ~/neurospaces_project/${documentation_set_name}/source/snapshots/0 | grep output | grep \.log`;
+    my $logfiletext = `find ~/neurospaces_project/${package_name}/source/snapshots/0 | grep output | grep \.log`;
 
     my @logfiles = split(/\n/, $logfiletext);
 
