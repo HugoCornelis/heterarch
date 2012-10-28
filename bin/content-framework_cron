@@ -189,7 +189,7 @@ sub main
 
 	    # copy the new webcheck website report to its temporary / correct location
 
-	    if (-d $html_build_directory/webcheck)
+	    if (-d "$html_build_directory/webcheck)
 	    {
 		# \todo read the comments in copy_html_data() to understand what has happened.
 
