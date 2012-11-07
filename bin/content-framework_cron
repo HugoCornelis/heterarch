@@ -135,6 +135,8 @@ sub main
 	#t is hardcoded for certain packages and used above for the
 	#t upgrade action, and here for content generation.
 
+	#t see also the loop below.
+
 	if (not $packages->{$package_name}->{upgrade})
 	{
 	    next;
@@ -184,6 +186,17 @@ sub main
     {
 	foreach my $package_name (keys %$packages)
 	{
+	    #t this clearly needs additional development: the upgrade key
+	    #t is hardcoded for certain packages and used above for the
+	    #t upgrade action, and here for content generation.
+
+	    #t see also the loop above.
+
+	    if (not $packages->{$package_name}->{upgrade})
+	    {
+		next;
+	    }
+
 	    try_to("make webcheck -C $ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path", 1);
 
 	    # define the build directory
