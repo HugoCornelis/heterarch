@@ -131,6 +131,15 @@ sub main
 
     foreach my $package_name (keys %$packages)
     {
+	#t this clearly needs additional development: the upgrade key
+	#t is hardcoded for certain packages and used above for the
+	#t upgrade action, and here for content generation.
+
+	if (not $packages->{$package_name}->{upgrade})
+	{
+	    next;
+	}
+
 	# pull and update the content itself
 
 	try_to("neurospaces_pull '$package_name'", 1);
