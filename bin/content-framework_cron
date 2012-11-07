@@ -486,6 +486,13 @@ sub parse_config_file
 
     $configuration = YAML::LoadFile($config_file);
 
+    if (!defined $configuration)
+    {
+	print "This YAML file is invalid\n";
+
+	return;
+    }
+
     if (!$configuration->{packages})
     {
 	$configuration->{packages} = {};
@@ -495,25 +502,27 @@ sub parse_config_file
 
     my $packages
 	= {
+	   # the content-framework is forced to upgrade the developer package and the content-framework
+
 	   'content-framework' => {
 				   upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
 				  },
 	   developer => {
 			 upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
 			},
+
+	   # and a documentation_set is supposed to upgrade its own contents
+
 	   $documentation_set_name => {
 				       upgrade => 'builtin default action',
 				      },
 	  };
 
+    # and the configuration can add other documentation_sets for upgrade
+
     my $merged_packages = Data::Merger::merger($configuration->{packages}, $packages);
 
-    if (!defined $configuration)
-    {
-	print "This YAML file is invalid\n";
-
-	return;
-    }
+    # process special options
 
     if (defined $configuration->{MAILTO})
     {
