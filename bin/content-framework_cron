@@ -224,6 +224,17 @@ sub main
 
     foreach my $package_name (keys %$packages)
     {
+	#t this clearly needs additional development: the upgrade key
+	#t is hardcoded for certain packages and used above for the
+	#t upgrade action, and here for content generation.
+
+	#t see also the loop above.
+
+	if (not $packages->{$package_name}->{upgrade})
+	{
+	    next;
+	}
+
 	$text .= produce_email_text($package_name);
     }
 
