@@ -72,30 +72,407 @@ $SIG{INT}
     };
 
 
-my $option_output_directory = "/tmp";
-my $option_config = "";
 my $option_html_output_directory = "$ENV{HOME}/public_html";
+my $option_output_directory = "/tmp";
+my $option_verbose = 0;
 
 
 my $configuration;
 
 
-sub main
+sub copy_html_data
 {
+    my $package_name = shift;
+
+    # define the build directory
+
+    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
+
+    # first make sure the website is protected at all time by protecting the build directory with access restriction files
+
+    if ($configuration->{HTACCESS})
     {
-	my $result
-	    = GetOptions
+# 	copy_htacces_file();
+
+	my $target_htaccess_file = $html_build_directory . "/${package_name}/.htaccess";
+
+	if (-e $configuration->{HTACCESS})
+	{
+	    system "cp $configuration->{HTACCESS} $target_htaccess_file";
+	}
+    }
+
+    # start defining the website location
+
+    my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
+
+    # clean the old website temporary location
+
+    try_to("rm -rf $html_data_directory");
+
+#     my $contents_directory = $option_html_output_directory . "/${package_name}_data";
+
+#     try_to("mkdir --parents $html_data_directory");
+
+    # copy the new website to its temporary location
+
+    if (-d $html_build_directory)
+    {
+	try_to("cp -af $html_build_directory $html_data_directory");
+
+	# single shot replace the old website with the new one
+
+	# \todo does this work correctly as a single shot?  It should just do a single ln -sf
+
+	my $html_symlink = $option_html_output_directory . "/" . "${package_name}";
+
+	# \todo this makes the website unavailable for a split second?
+
+	try_to("rm -f $html_symlink");
+
+	# \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
+
+	try_to("ln -s $html_data_directory $html_symlink");
+    }
+}
+
+
+sub parse_config_file
+{
+    my $config_file = shift;
+
+    if (!-e $config_file)
+    {
+	print "\n$config_file is an invalid filename\n";
+
+	return;
+    }
+
+    print "\nParsing configuration in $config_file\n\n";
+
+    $configuration = YAML::LoadFile($config_file);
+
+    if (!defined $configuration)
+    {
+	print "This YAML file is invalid\n";
+
+	return;
+    }
+
+    if (!$configuration->{packages})
+    {
+	$configuration->{packages} = {};
+    }
+
+    # define the packages that require special attention
+
+    my $packages
+	= {
+	   # heterarch is forced to upgrade the developer package and heterarch
+
+	   'heterarch' => {
+			   upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
+			  },
+	   developer => {
+			 upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
+			},
+
+	   # and a documentation_set is supposed to upgrade its own contents
+
+	   $documentation_set_name => {
+				       upgrade => 'builtin default action',
+				      },
+	  };
+
+    # and the configuration can add other documentation_sets for upgrade
+
+    my $merged_packages = Data::Merger::merger($configuration->{packages}, $packages);
+
+    # process special options
+
+    if (defined $configuration->{MAILTO})
+    {
+	chomp($configuration->{MAILTO});
+
+	print "\tSend to email: $configuration->{MAILTO}\n";
+    }
+
+    if (defined $configuration->{MAILFROM})
+    {
+	chomp($configuration->{MAILFROM});
+
+	print "\tSend from email: $configuration->{MAILFROM}\n";
+    }
+
+    if (defined $configuration->{HTMLDIR})
+    {
+	$option_html_output_directory = $configuration->{HTMLDIR};
+
+	chomp($configuration->{HTMLDIR});
+
+	print "\tThe directory for html output is: $configuration->{HTMLDIR}\n";
+    }
+
+    if (defined $configuration->{OUTPUTDIR})
+    {
+	#! note that this overrides an option from set by the command line
+
+	$option_output_directory = $configuration->{OUTPUTDIR};
+
+	chomp($option_output_directory);
+
+	print "\tOutput directory is $option_output_directory\n";
+    }
+
+    if (defined $configuration->{URL})
+    {
+	chomp($configuration->{URL});
+
+	print "\tThe link for accessing the content is $configuration->{URL}\n";
+    }
+
+    if (defined $configuration->{LOGROTATE})
+    {
+	chomp($configuration->{LOGROTATE});
+
+	print "\tNumber of logs to rotate $configuration->{LOGROTATE}\n";
+    }
+
+    if (defined $configuration->{LOGDIR})
+    {
+	chomp($configuration->{LOGDIR});
+
+	print "\tDirectory to store past logs is $configuration->{LOGDIR}\n";
+    }
+
+    if (defined $configuration->{DOCUMENTROOT})
+    {
+	chomp($configuration->{DOCUMENTROOT});
+
+	$build_directory = $configuration->{DOCUMENTROOT};
+
+	print "\tThe root directory for all documents is $build_directory\n";
+    }
+
+    if (defined $configuration->{HTACCESS})
+    {
+	chomp($configuration->{HTACCESS});
+
+	print "\tThe htaccess file to use is $configuration->{HTACCESS}\n";
+    }
+
+    print "Done Parsing $config_file:\n";
+}
+
+
+sub contents_page_generate
+{
+    my $package_name = shift;
+
+    my $contents_directory = $option_html_output_directory . "/${package_name}";
+
+    my $contents_file = "${contents_directory}/contents.html";
+
+#     my $contents_file = $option_html_output_directory . "/html/contents.html";
+
+    open(CONTENTS, ">$contents_file") or die "cannot open file $contents_file for writing: $!";
+
+    my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
+<html>
+<head>
+  <meta
+ content=\"text/html; charset=ISO-8859-1\"
+ http-equiv=\"content-type\">
+  <title>Neurospaces Content Management System</title>
+</head>
+<body>
+For the home page please click <a
+ href=\"${home_page_document}/${home_page_document}.html\">here.</a>
+<br>
+For the webcheck directory please click <a
+ href=\"webcheck/\">here.</a>
+<br>
+For the statistics output please click <a
+ href=\"../../awstats/awstats.pl\">here.</a>
+<br>
+<br>
+This is a listing of all published documents in the ${package_name} documentation. <br>
+<br>
+<br>
+<ul>
+";
+
+    print CONTENTS $html_starter;
+
+    #t this needs to be replaced with the same loop as in the main build script.
+    #t likely saying that contents generation should be part of the main build script.
+
+    my $documentlist = `${package_name}-tagfilter published`;
+
+    my $published_documents = YAML::Load($documentlist);
+
+    foreach my $published_document (sort @$published_documents)
+    {
+	my $document
+	    = Neurospaces::Documentation::Document->new
 		(
-		 "config=s" => \$option_config,
-		 "outputdir=s" => \$option_output_directory,
+		 {
+		  directory_name => $published_document,
+		 },
 		);
 
+	# all documents are converted to html
+
+	my $suffix = ".html";
+
+	# except pdf documents
+
+	if ($document->is_pdf())
+	{
+	    # they keep their original format
+
+	    $suffix = ".pdf";
+	}
+
+	$document->read_descriptor();
+
+	print CONTENTS "<li><a href=\"";
+
+	print CONTENTS $published_document . "/" . $document->{name} . $suffix;
+
+	print CONTENTS "\">";
+
+	print CONTENTS $document->{descriptor}->{'document name'};
+
+	print CONTENTS "</a></li>\n";
+    }
+
+    print CONTENTS "</ul>\n</body>\n</html>\n";
+
+    close CONTENTS;
+
+    print "Constructed the contents page\n";
+}
+
+
+sub copy_htacces_file
+{
+    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+
+    my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
+
+    if (-e $configuration->{HTACCESS})
+    {
+	system "cp $configuration->{HTACCESS} $target_htaccess_file";
+    }
+}
+
+
+sub index_page_generate
+{
+    my $package_name = shift;
+
+    my $index_file = $option_html_output_directory . "/${package_name}/index.html";
+
+    my $html_document = $index_file;
+
+    open(OUTPUT,">$html_document");
+
+    print OUTPUT "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n  <head>\n    <title>";
+
+    print OUTPUT $html_document . " (http redirect)";
+
+    print OUTPUT "</title>\n  </head>\n  <body><meta http-equiv=\"refresh\" content=\"0;URL=";
+
+    my $redirect_url = "$home_page_document/$home_page_document.html";
+
+    print OUTPUT $redirect_url;
+
+    print OUTPUT "\">\n  </body>\n</html>\n\n";
+
+    close(OUTPUT);
+}
+
+
+sub read_cmd_line
+{
+    my $option_config = "";
+    my $option_help = 0;
+    my $option_version;
+
+    my $result
+	= GetOptions
+	    (
+	     "config=s" => \$option_config,
+	     "help!" => \$option_help,
+	     "html-output-directory=s" => \$option_html_output_directory,
+	     "outputdir=s" => \$option_output_directory,
+	     "version" => \$option_version,
+	    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+	my $version = version();
+
+	print $version . "\n";
+
+	exit 1;
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	$0 =~ m(.*/(.*));
+
+	my $program_name = $1;
+
+	print
+	    "
+
+$program_name: configure, compile, check, install, tag and build
+releases of packages selected from a set of packages.
+
+regular options:
+    --config                 followed by the configuration filename.
+    --help                   print usage information.
+    --version                give version information.
+    --v|verbose              tell what is being done, specify multiple times to get more feedback.
+
+options overwritten by te configuration file:
+    --outputdir              directory where to put log files.
+    --html-output-directory  directory where the html output files go.
+";
+
+	exit 1;
     }
 
     if ($option_config)
     {
 	parse_config_file($option_config);
     }
+    else
+    {
+	$configuration
+	    = {
+	       packages => {
+			    $documentation_set_name => {
+							upgrade => 'default action when there is no config',
+						       },
+			   },
+	      };
+    }
+}
+
+
+sub main
+{
+    read_cmd_line();
 
     my $output_path = $option_output_directory . "/" . $output_filename;
 
@@ -364,75 +741,6 @@ sub produce_email_text
 }
 
 
-sub try_to_mail
-{
-    my $subject = shift;
-    my $message = shift;
-
-    if (!$configuration->{MAILTO})
-    {
-	print "No addressee indicated in configuration\n";
-
-	return;
-    }
-
-    my $sendto = $configuration->{MAILTO};
-
-    my $replyto = $configuration->{MAILFROM};
-
-    open(MAIL, "|/usr/sbin/sendmail -oi -t");
-
-    print MAIL "From: $replyto\n";
-
-    print MAIL "To: $sendto\n";
-
-    print MAIL "Subject: $subject\n\n";
-
-    print MAIL "$message\n";
-
-    close(MAIL);
-}
-
-
-#
-# ("command", verbosity_level)
-#
-
-sub try_to
-{
-    my $command = shift;
-
-    my $no_verbose = shift;
-
-    my $allow_fail = shift;
-
-    if (!$no_verbose)
-    {
-	print "---\n";
-	print "$0: trying to $command\n";
-    }
-
-    my $output_path = $option_output_directory . "/" . $output_filename;
-
-    #! $command executed in a subshell such that redirection applies
-    #! to all commands.
-
-    system "( $command ) >>$output_path 2>&1";
-
-    if ($?)
-    {
-	if ($allow_fail)
-	{
-	    system "echo >>$output_path 2>&1 failed with $?: $command\n";
-	}
-	else
-	{
-	    report_error($command, $?);
-	}
-    }
-}
-
-
 sub report_error
 {
     my $command = shift;
@@ -444,191 +752,6 @@ sub report_error
     try_to_mail("${0}_cron error", $message);
 
 #     die "$0: $command returned $error_code";
-}
-
-
-sub copy_html_data
-{
-    my $package_name = shift;
-
-    # define the build directory
-
-    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/html/htdocs/neurospaces_project/${package_name}/";
-
-    # first make sure the website is protected at all time by protecting the build directory with access restriction files
-
-    if ($configuration->{HTACCESS})
-    {
-# 	copy_htacces_file();
-
-	my $target_htaccess_file = $html_build_directory . "/${package_name}/.htaccess";
-
-	if (-e $configuration->{HTACCESS})
-	{
-	    system "cp $configuration->{HTACCESS} $target_htaccess_file";
-	}
-    }
-
-    # start defining the website location
-
-    my $html_data_directory = $option_html_output_directory . "/" . "${package_name}_data";
-
-    # clean the old website temporary location
-
-    try_to("rm -rf $html_data_directory");
-
-#     my $contents_directory = $option_html_output_directory . "/${package_name}_data";
-
-#     try_to("mkdir --parents $html_data_directory");
-
-    # copy the new website to its temporary location
-
-    if (-d $html_build_directory)
-    {
-	try_to("cp -af $html_build_directory $html_data_directory");
-
-	# single shot replace the old website with the new one
-
-	# \todo does this work correctly as a single shot?  It should just do a single ln -sf
-
-	my $html_symlink = $option_html_output_directory . "/" . "${package_name}";
-
-	# \todo this makes the website unavailable for a split second?
-
-	try_to("rm -f $html_symlink");
-
-	# \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
-
-	try_to("ln -s $html_data_directory $html_symlink");
-    }
-}
-
-
-sub parse_config_file
-{
-    my $config_file = shift;
-
-    if (!-e $config_file)
-    {
-	print "\n$config_file is an invalid filename\n";
-
-	return;
-    }
-
-    print "\nParsing configuration in $config_file\n\n";
-
-    $configuration = YAML::LoadFile($config_file);
-
-    if (!defined $configuration)
-    {
-	print "This YAML file is invalid\n";
-
-	return;
-    }
-
-    if (!$configuration->{packages})
-    {
-	$configuration->{packages} = {};
-    }
-
-    # define the packages that require special attention
-
-    my $packages
-	= {
-	   # heterarch is forced to upgrade the developer package and heterarch
-
-	   'heterarch' => {
-			   upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
-			  },
-	   developer => {
-			 upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
-			},
-
-	   # and a documentation_set is supposed to upgrade its own contents
-
-	   $documentation_set_name => {
-				       upgrade => 'builtin default action',
-				      },
-	  };
-
-    # and the configuration can add other documentation_sets for upgrade
-
-    my $merged_packages = Data::Merger::merger($configuration->{packages}, $packages);
-
-    # process special options
-
-    if (defined $configuration->{MAILTO})
-    {
-	chomp($configuration->{MAILTO});
-
-	print "\tSend to email: $configuration->{MAILTO}\n";
-    }
-
-    if (defined $configuration->{MAILFROM})
-    {
-	chomp($configuration->{MAILFROM});
-
-	print "\tSend from email: $configuration->{MAILFROM}\n";
-    }
-
-    if (defined $configuration->{HTMLDIR})
-    {
-	$option_html_output_directory = $configuration->{HTMLDIR};
-
-	chomp($configuration->{HTMLDIR});
-
-	print "\tThe directory for html output is: $configuration->{HTMLDIR}\n";
-    }
-
-    if (defined $configuration->{OUTPUTDIR})
-    {
-	#! note that this overrides an option from set by the command line
-
-	$option_output_directory = $configuration->{OUTPUTDIR};
-
-	chomp($option_output_directory);
-
-	print "\tOutput directory is $option_output_directory\n";
-    }
-
-    if (defined $configuration->{URL})
-    {
-	chomp($configuration->{URL});
-
-	print "\tThe link for accessing the content is $configuration->{URL}\n";
-    }
-
-    if (defined $configuration->{LOGROTATE})
-    {
-	chomp($configuration->{LOGROTATE});
-
-	print "\tNumber of logs to rotate $configuration->{LOGROTATE}\n";
-    }
-
-    if (defined $configuration->{LOGDIR})
-    {
-	chomp($configuration->{LOGDIR});
-
-	print "\tDirectory to store past logs is $configuration->{LOGDIR}\n";
-    }
-
-    if (defined $configuration->{DOCUMENTROOT})
-    {
-	chomp($configuration->{DOCUMENTROOT});
-
-	$build_directory = $configuration->{DOCUMENTROOT};
-
-	print "\tThe root directory for all documents is $build_directory\n";
-    }
-
-    if (defined $configuration->{HTACCESS})
-    {
-	chomp($configuration->{HTACCESS});
-
-	print "\tThe htaccess file to use is $configuration->{HTACCESS}\n";
-    }
-
-    print "Done Parsing $config_file:\n";
 }
 
 
@@ -708,134 +831,81 @@ sub rotate_logs
 }
 
 
-sub index_page_generate
+sub try_to_mail
 {
-    my $package_name = shift;
+    my $subject = shift;
+    my $message = shift;
 
-    my $index_file = $option_html_output_directory . "/${package_name}/index.html";
+    if (!$configuration->{MAILTO})
+    {
+	print "No addressee indicated in configuration\n";
 
-    my $html_document = $index_file;
+	return;
+    }
 
-    open(OUTPUT,">$html_document");
+    my $sendto = $configuration->{MAILTO};
 
-    print OUTPUT "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n<html>\n  <head>\n    <title>";
+    my $replyto = $configuration->{MAILFROM};
 
-    print OUTPUT $html_document . " (http redirect)";
+    open(MAIL, "|/usr/sbin/sendmail -oi -t");
 
-    print OUTPUT "</title>\n  </head>\n  <body><meta http-equiv=\"refresh\" content=\"0;URL=";
+    print MAIL "From: $replyto\n";
 
-    my $redirect_url = "$home_page_document/$home_page_document.html";
+    print MAIL "To: $sendto\n";
 
-    print OUTPUT $redirect_url;
+    print MAIL "Subject: $subject\n\n";
 
-    print OUTPUT "\">\n  </body>\n</html>\n\n";
+    print MAIL "$message\n";
 
-    close(OUTPUT);
+    close(MAIL);
 }
 
 
-sub contents_page_generate
+#
+# ("command", verbosity_level)
+#
+
+sub try_to
 {
-    my $package_name = shift;
+    my $command = shift;
 
-    my $contents_directory = $option_html_output_directory . "/${package_name}";
+    my $no_verbose = shift;
 
-    my $contents_file = "${contents_directory}/contents.html";
+    my $allow_fail = shift;
 
-#     my $contents_file = $option_html_output_directory . "/html/contents.html";
-
-    open(CONTENTS, ">$contents_file") or die "cannot open file $contents_file for writing: $!";
-
-    my $html_starter = "<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">
-<html>
-<head>
-  <meta
- content=\"text/html; charset=ISO-8859-1\"
- http-equiv=\"content-type\">
-  <title>Neurospaces Content Management System</title>
-</head>
-<body>
-For the home page please click <a
- href=\"${home_page_document}/${home_page_document}.html\">here.</a>
-<br>
-For the webcheck directory please click <a
- href=\"webcheck/\">here.</a>
-<br>
-For the statistics output please click <a
- href=\"../../awstats/awstats.pl\">here.</a>
-<br>
-<br>
-This is a listing of all published documents in the ${package_name} documentation. <br>
-<br>
-<br>
-<ul>
-";
-
-    print CONTENTS $html_starter;
-
-    #t this needs to be replaced with the same loop as in the main build script.
-    #t likely saying that contents generation should be part of the main build script.
-
-    my $documentlist = `${package_name}-tagfilter published`;
-
-    my $tmp = YAML::Load($documentlist);
-
-    my @published_documents = sort @$tmp;
-
-    foreach (@published_documents)
+    if (!$no_verbose)
     {
-	my $descriptor_file = $_ . "/descriptor.yml";
+	print "---\n";
+	print "$0: trying to $command\n";
+    }
 
-	my $descriptor = YAML::LoadFile($descriptor_file);
+    my $output_path = $option_output_directory . "/" . $output_filename;
 
-	my @dirs = split(/\//,$_);
+    #! $command executed in a subshell such that redirection applies
+    #! to all commands.
 
-	my $documentname = $dirs[-1];
+    system "( $command ) >>$output_path 2>&1";
 
-	print CONTENTS "<li><a href=\"";
-
-	my $document
-	    = Neurospaces::Documentation::Document->new
-		(
-		 {
-		  name => $documentname,
-		 },
-		);
-
-	my $suffix = ".html";
-
-	if ($document->is_pdf())
+    if ($?)
+    {
+	if ($allow_fail)
 	{
-	    $suffix = ".pdf";
+	    system "echo >>$output_path 2>&1 failed with $?: $command\n";
 	}
-
-	print CONTENTS $documentname . "/" . $documentname . $suffix;
-
-	print CONTENTS "\">";
-
-	print CONTENTS $descriptor->{'document name'};
-
-	print CONTENTS "</a></li>\n";
+	else
+	{
+	    report_error($command, $?);
+	}
     }
-
-    print CONTENTS "</ul>\n</body>\n</html>\n";
-
-    close CONTENTS;
-
-    print "Constructed the contents page\n";
 }
 
 
-sub copy_htacces_file
+sub version
 {
-    my $html_build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
+    # $Format: "    my $version=\"${package}-${label}\";"$
+    my $version="developer-alpha";
 
-    my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
-
-    if (-e $configuration->{HTACCESS})
-    {
-	system "cp $configuration->{HTACCESS} $target_htaccess_file";
-    }
+    return $version;
 }
 
 

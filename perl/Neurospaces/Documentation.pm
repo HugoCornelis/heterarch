@@ -2244,6 +2244,20 @@ sub new
 	   %$options,
 	  };
 
+    if (not exists $self->{name})
+    {
+	if (exists $self->{directory_name})
+	{
+	    my $directory_name = $self->{directory_name};
+
+	    my @dirs = split(/\//, $directory_name);
+
+	    my $name = $dirs[-1];
+
+	    $self->{name} = $name;
+	}
+    }
+
     bless $self, $package;
 
     return $self;
@@ -2422,7 +2436,16 @@ sub read_descriptor
 {
     my $self = shift;
 
-    my $filename = $self->{name} . "/descriptor.yml";
+    my $filename;
+
+    if (not exists $self->{directory_name})
+    {
+	$filename = $self->{name} . "/descriptor.yml";
+    }
+    else
+    {
+	$filename = $self->{directory_name} . "/descriptor.yml";
+    }
 
     if ($self->{descriptor})
     {
