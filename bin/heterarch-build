@@ -336,7 +336,7 @@ options:
     --web-prepare     prepare the website.
 
 example usage:
-    $0 documentation-homepage
+    $0 $option_set_name-homepage
     firefox -new-window $ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project/$option_set_name/$option_set_name-homepage/$option_set_name-homepage.html
 
 ";
