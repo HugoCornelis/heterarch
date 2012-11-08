@@ -84,7 +84,7 @@ sub read_cmd_line
     if (1 || $option_version)
     {
 	# $Format: "my $version = \"${package}-${label}\";"$
-my $version = "content-framework-alpha";
+my $version = "${package}-alpha";
 
 	print $version . "\n";
 

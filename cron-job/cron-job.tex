@@ -10,20 +10,20 @@
 \section*{Neurospaces: Documentation}
 
 {\bf Related Documentation:}
-% start: content-framework-tagreplaceitems related-do-nothing
-% end: content-framework-tagreplaceitems related-do-nothing
+% start: heterarch-tagreplaceitems related-do-nothing
+% end: heterarch-tagreplaceitems related-do-nothing
 
-\section*{Content framework cron jobs}
+\section*{Heterarch cron jobs}
 
-The Neurospaces content framework supports the automated construction
-of websites using cron jobs (see also
+The Neurospaces / TWS Heterarch supports the automated construction of
+websites using cron jobs (see also
 \href{http://www.genesis-sim.org/userdocs/neurospaces-cron/neurospaces-cron.html}{the
   Genesis-3 cron job manual} and
 \href{http://www.genesis-sim.org/userdocs/userdocs-cron/userdocs-cron.html}{the
   Genesis-3 Documentation System cron job manual}).  Cron jobs can be
 associated with specific packages that have previously been
 instantiated with the command {\tt neurospaces\_new\_component
-  --content-framework}.
+  --heterarch}.
 
 
 \subsection*{To create a new cron job}
@@ -41,16 +41,15 @@ instantiated with the command {\tt neurospaces\_new\_component
   the new user passwordless {\tt sudo} access: {\tt echo 'joeuser
     ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers}
 
-  {\it For most configurations only the content-framework should be
-    given permission to upgrade the developer package and the
-    content-framework.  However, the new package should have
-    permissions for its own installation, making available the
-    commands for synchronization and build of the website.  These
-    commands can be installed manually when following the procedure
-    outlined here.}
+  {\it For most configurations only the heterarch should be given
+    permission to upgrade the developer package and the heterarch.
+    However, the new package should have permissions for its own
+    installation, making available the commands for synchronization
+    and build of the website.  These commands can be installed
+    manually when following the procedure outlined here.}
 
-\item Put the new user into the {\tt content-framework} group to make
-  sure it has write access to the html output directory.
+\item Put the new user into the {\tt heterarch} group to make sure it
+  has write access to the html output directory.
 \item Create a suitable configuration file for the cron job.  Sample
   contents:
 \begin{verbatim}

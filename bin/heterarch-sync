@@ -1,0 +1,37 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#!
+
+
+use strict;
+
+
+use YAML;
+
+my $build_database_yaml = `neurospaces_build --help-all`;
+
+my $build_database = Load($build_database_yaml);
+
+my $all_packages = $build_database->{all_packages};
+
+my $directory = $all_packages->{'heterarch'}->{directory};
+
+system "cd \"$directory\" && heterarch-check";
+
+if ($?)
+{
+    die "$0: *** Error: heterarch-check concludes there is something wrong with your documentation workspace.";
+}
+
+system "neurospaces_sync --enable heterarch --regex heterarch --verbose";
+
+if ($?)
+{
+    die "$0: *** Error: $?";
+}
+else
+{
+    system "neurospaces_update --enable heterarch --regex heterarch --verbose";
+}
+
+

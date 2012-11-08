@@ -114,15 +114,15 @@ sub main
 	try_to("neurospaces_upgrade developer", 1);
     }
 
-    if ($configuration->{packages}->{'content-framework'}->{upgrade})
+    if ($configuration->{packages}->{'heterarch'}->{upgrade})
     {
-	# upgrade the content-framework package
+	# upgrade the heterarch package
 
-	try_to("neurospaces_upgrade content-framework", 1);
+	try_to("neurospaces_upgrade heterarch", 1);
 
-	# clean the content-framework after it has been installed
+	# clean the heterarch after it has been installed
 
-	try_to("neurospaces_clean content-framework", 1);
+	try_to("neurospaces_clean heterarch", 1);
     }
 
     # loop over all the configured content packages, including self
@@ -535,13 +535,13 @@ sub parse_config_file
 
     my $packages
 	= {
-	   # the content-framework is forced to upgrade the developer package and the content-framework
+	   # heterarch is forced to upgrade the developer package and heterarch
 
-	   'content-framework' => {
-				   upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
-				  },
+	   'heterarch' => {
+			   upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
+			  },
 	   developer => {
-			 upgrade => ($documentation_set_name eq 'content-framework' ? 'content-framework' : ''),
+			 upgrade => ($documentation_set_name eq 'heterarch' ? 'heterarch' : ''),
 			},
 
 	   # and a documentation_set is supposed to upgrade its own contents

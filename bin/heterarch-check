@@ -147,6 +147,6 @@ exit main();
 # my $tags_options = scalar @$option_tags ? (join "--tag ", @$option_tags) : '';
 # my $verbose_options = defined $option_verbose ? "--verbose " x $option_verbose : '';
 
-# system "content-framework-build --check $verbose_options $regex_options $tags_options";
+# system "heterarch-build --check $verbose_options $regex_options $tags_options";
 
 

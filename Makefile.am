@@ -20,18 +20,18 @@ SUBDIRS = \
 
 # fill in the scripts that should go with the distribution:
 dist_bin_SCRIPTS = \
-	bin/content-framework-build \
-	bin/content-framework-check \
-	bin/content-framework-create \
-	bin/content-framework-pull \
-	bin/content-framework-push \
-	bin/content-framework-rename \
-	bin/content-framework-snippet \
-	bin/content-framework-sync \
-	bin/content-framework-tagfilter \
-	bin/content-framework-tagreplaceitems \
-	bin/content-framework-version \
-	bin/content-framework_cron
+	bin/heterarch-build \
+	bin/heterarch-check \
+	bin/heterarch-create \
+	bin/heterarch-pull \
+	bin/heterarch-push \
+	bin/heterarch-rename \
+	bin/heterarch-snippet \
+	bin/heterarch-sync \
+	bin/heterarch-tagfilter \
+	bin/heterarch-tagreplaceitems \
+	bin/heterarch-version \
+	bin/heterarch_cron
 
 @PACKAGE@testdir=$(prefix)/neurospaces/$(PACKAGE)
 nobase_dist_@PACKAGE@test_DATA=@TEST_SPECIFICATION_FILES@
@@ -81,10 +81,10 @@ dist-hook:
 #	touch $(top_srcdir)/neurospaces_cpan_modules
 
 install-exec-local:
-	( cd $(bindir) ; for script in `ls neurospaces-manager-gui | grep -v version | grep -v sync | grep -v pull | grep -v push` ; do ln -vsf {neurospaces-manager,content-framework}-`echo $$script | cut -f3- -d-` ; done )
+	( cd $(bindir) ; for script in `ls neurospaces-manager-gui | grep -v version | grep -v sync | grep -v pull | grep -v push` ; do ln -vsf {neurospaces-manager,heterarch}-`echo $$script | cut -f3- -d-` ; done )
 
 uninstall-local:
-	( cd $(bindir) ; echo content-framework-* ; $(RM) content-framework-* )
+	( cd $(bindir) ; echo heterarch-* ; $(RM) heterarch-* )
 
 test: check
 
@@ -102,20 +102,20 @@ html-upload: html-upload-prepare
 	scp -pr html/htdocs/* hcornelis,neurospaces@web.sourceforge.net:/home/groups/n/ne/neurospaces/htdocs/
 
 website-clean:
-	$(RM) -fr html/htdocs/neurospaces_project/content-framework/
+	$(RM) -fr html/htdocs/neurospaces_project/heterarch/
 
 website-prepare:
-	content-framework-build --tags published
+	heterarch-build --tags published
 
 website-prepare-local:
-	content-framework-build --tags local --tags published
+	heterarch-build --tags local --tags published
 
 website-upload: website-clean website-prepare html-upload
 
 webcheck:
-	rm -rf html/htdocs/neurospaces_project/content-framework/webcheck
-	mkdir html/htdocs/neurospaces_project/content-framework/webcheck
-	webcheck -o html/htdocs/neurospaces_project/content-framework/webcheck html/htdocs/neurospaces_project/content-framework --redirects=3
+	rm -rf html/htdocs/neurospaces_project/heterarch/webcheck
+	mkdir html/htdocs/neurospaces_project/heterarch/webcheck
+	webcheck -o html/htdocs/neurospaces_project/heterarch/webcheck html/htdocs/neurospaces_project/heterarch --redirects=3
 
 docs-level1:
 

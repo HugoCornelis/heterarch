@@ -17,7 +17,7 @@ Makefile\.in$
 ^config.log$
 ^config.status$
 ^configure$
-^content-framework-.*tar.gz$
+^heterarch-.*tar.gz$
 ^install-sh$
 ^installed
 ^installer-.*.tar.gz$
