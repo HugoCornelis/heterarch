@@ -407,6 +407,7 @@ sub read_cmd_line
 	     "help!" => \$option_help,
 	     "html-output-directory=s" => \$option_html_output_directory,
 	     "outputdir=s" => \$option_output_directory,
+	     "verbose+" => \$option_verbose,
 	     "version" => \$option_version,
 	    );
 
@@ -480,7 +481,7 @@ sub main
 
     # create empty output file
 
-    try_to("echo > $output_path", 1);
+    try_to("echo > $output_path");
 
     $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
 
@@ -488,18 +489,18 @@ sub main
     {
 	# upgrade the developer package
 
-	try_to("neurospaces_upgrade developer", 1);
+	try_to("neurospaces_upgrade developer");
     }
 
     if ($configuration->{packages}->{'heterarch'}->{upgrade})
     {
 	# upgrade the heterarch package
 
-	try_to("neurospaces_upgrade heterarch", 1);
+	try_to("neurospaces_upgrade heterarch");
 
 	# clean the heterarch after it has been installed
 
-	try_to("neurospaces_clean heterarch", 1);
+	try_to("neurospaces_clean heterarch");
     }
 
     # loop over all the configured content packages, including self
@@ -521,13 +522,13 @@ sub main
 
 	# pull and update the content itself
 
-	try_to("neurospaces_pull '$package_name'", 1);
+	try_to("neurospaces_pull '$package_name'");
 
-	try_to("neurospaces_update '$package_name'", 1);
+	try_to("neurospaces_update '$package_name'");
 
 	# clean the content after it has been installed
 
-	try_to("neurospaces_clean '$package_name'", 1);
+	try_to("neurospaces_clean '$package_name'");
 
 	#   try_to("${documentation_set_name}-check > $output_path", 1);
 
@@ -535,9 +536,9 @@ sub main
 
 	$descriptor_check = `'$package_name'-check 2>&1 --directory $build_directory`;
 
-	try_to("neurospaces_website_prepare '$package_name' >>$output_path", 1);
+	try_to("neurospaces_website_prepare '$package_name' >>$output_path");
 
-#       try_to("make website-prepare -C $ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path", 1);
+#       try_to("make website-prepare -C $ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0/ >> $output_path");
 
 	# copy the website to its final destination
 
@@ -574,7 +575,7 @@ sub main
 		next;
 	    }
 
-	    try_to("make webcheck -C $ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path", 1);
+	    try_to("make webcheck -C $ENV{HOME}/neurospaces_project/${package_name}/source/snapshots/0/ >> $output_path");
 
 	    # define the build directory
 
@@ -869,13 +870,12 @@ sub try_to
 {
     my $command = shift;
 
-    my $no_verbose = shift;
+#     my $no_verbose = shift;
 
-    my $allow_fail = shift;
+#     my $allow_fail = shift;
 
-    if (!$no_verbose)
+    if ($option_verbose)
     {
-	print "---\n";
 	print "$0: trying to $command\n";
     }
 
@@ -888,11 +888,11 @@ sub try_to
 
     if ($?)
     {
-	if ($allow_fail)
-	{
-	    system "echo >>$output_path 2>&1 failed with $?: $command\n";
-	}
-	else
+# 	if ($allow_fail)
+# 	{
+# 	    system "echo >>$output_path 2>&1 failed with $?: $command\n";
+# 	}
+# 	else
 	{
 	    report_error($command, $?);
 	}
