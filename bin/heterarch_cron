@@ -283,7 +283,7 @@ sub contents_page_generate
   <meta
  content=\"text/html; charset=ISO-8859-1\"
  http-equiv=\"content-type\">
-  <title>Neurospaces Content Management System</title>
+  <title>Heterarchical Content Management System: $package_name</title>
 </head>
 <body>
 For the home page please click <a
