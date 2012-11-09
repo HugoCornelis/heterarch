@@ -485,6 +485,8 @@ sub main
 
     $ENV{PATH} .= ':/bin:/usr/bin:/usr/local/bin';
 
+    # enforce correct order on the updates of the developer package and heterarch
+
     if ($configuration->{packages}->{developer}->{upgrade})
     {
 	# upgrade the developer package
