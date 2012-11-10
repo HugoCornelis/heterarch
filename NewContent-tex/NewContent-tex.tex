@@ -1,0 +1,107 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim}
+\usepackage[dvips]{epsfig}
+\usepackage[dvipsnames,usenames]{color}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{enumitem} % [noitemsep,nolistsep] compact itemize/enumerate etc.
+\usepackage[compact]{titlesec}
+\usepackage[margin=2cm]{geometry}
+
+% Typeface
+\usepackage[condensed,math]{iwona}
+\usepackage[T1]{fontenc}
+
+% Remove spacing following headings, ie. implement \usepackage[compact]{titlesec}
+%\titlespacing{\section}{0pt}{*0}{*0}
+%\titlespacing{\subsection}{0pt}{*0}{*0}
+%\titlespacing{\subsubsection}{0pt}{*0}{*0}
+
+% Remove section numbering
+%\setcounter{secnumdepth}{0}
+
+% Inter-repository linking
+\newcommand{\heterarchxref}[2]{\href{#1}{#2}}
+
+ % Generate a nicely located tilde
+\newcommand{\mytilde}{\raise.17ex\hbox{$\scriptstyle\mathtt{\sim}$}}
+
+\begin{document}
+
+\section*{Heterarch: Documentation}
+
+{\bf Related Content:}
+% start: heterarch-tagreplaceitems related-do-nothing
+% end: heterarch-tagreplaceitems related-do-nothing
+
+\section*{New Content}
+
+The three above headings are included in all content by default.
+
+\begin{itemize}
+\item[]  {\bf The Content Identifier:} This may be replaced by a descriptor of the type of content you have developed, for example {\bf Introduction} , {\bf Documentation}, or {\bf Tutorial}, etc.
+\item[]{\bf Related Content Heading:} Followed by a hyperlink list of any related content.
+\item[] {\bf New Content Heading:} Should be replaced with the title of your content. {\bf Note:} In your content (the \LaTeX2e\,\,source content file--{\it NewContent.tex}) all text below the {\bf New Content} heading should be replaced with your own content. See \heterarchxref{../../../../../heterarch/source/snapshots/0/heterarch-overview/heterarch-overview.tex}{\bf Heterarch\,Overview} for an introduction. See \heterarchxref{../../../../../heterarch/source/snapshots/0/heterarch-developer-content/heterarch-developer-content.tex}{\bf Developer\,Content} for detailed information.
+\end{itemize}
+
+\subsection*{Help with \LaTeX2e\,Documentation}
+
+\subsubsection*{Text color}
+
+Text in your content can be colorized  with the command
+\begin{verbatim}
+    \textcolor{red}{text}
+\end{verbatim}
+for example \textcolor{red}{\bf This is IMPORTANT}, \textcolor{green}{green} and \textcolor{blue}{blue} are also recognized arguments.
+
+\subsubsection*{Hyperlinks}
+
+Three classes of hyperlink exist in the Heterarch Content Management System:
+
+\begin{itemize}[noitemsep,nolistsep] 
+\item[{\bf A.}]{\bf Content Cross Link} This is the default link construct. It is preferred as it will automatically link to content on the basis of content location, i.e. if found either in your local repository or otherwise in a remote repository (by default the content creators repository).
+
+\item[{\bf B.}]{\bf Static Hyperlink:} 
+   \begin{itemize}[noitemsep,nolistsep] 
+      \item{\bf Local links:} Produced with the command:
+\begin{verbatim}
+   \href{../NewContent/NewContent.tex}{NewContent}}
+\end{verbatim}
+for example \href{../NewContent/NewContent.tex}{\bf NewContent} references this template.
+Note that these links may not work in your \LaTeX2e\,{\tt pdf} file viewer, but should be testable with the \href{http://get.adobe.com/reader/}{\bf Acrobat\,Reader} or \href{http://www.adobe.com/products/acrobatpro/tryout.html}{\bf Acrobat\,Professional} packages.
+      \item {\bf Remote links:} These use the {\tt \textbackslash href} command in a slightly different way:
+\begin{verbatim}
+    \href{http://www.neurospaces.org/}{\bf Neurospaces\,Project\,Website}
+\end{verbatim}
+for example see \href{http://www.neurospaces.org/}{\bf Neurospaces\,Documentation}. Note that these links do not wrap automatically at the end of a line even outside of the {\tt verbatim} environment. Also, note the recommended formatting of the link text with the {\tt \textbackslash bf} command and the space remover {\tt \textbackslash ,}.
+\end{itemize}
+
+\item[{\bf C.}]{\bf Reference Hyperlink:} See \href{../heterarch-developer-content/heterarch-developer-content.tex}{\bf Content\,Creation} for further details on managing reference hyperlinks.
+
+\end{itemize}
+
+\subsubsection*{Figures}
+
+Figures can easily be added with the following code:
+
+\begin{verbatim}
+\begin{figure}[h]
+   \centering
+   \includegraphics[scale=0.6]{figures/dummyfig.eps}
+   \caption{{\bf A Dummy Figure:} Example of \LaTeX2e code that incorporates
+       a photograph, image, or figure into your content.}
+   \label{fig:df-1}
+\end{figure}
+\end{verbatim}
+
+\begin{figure}[h]
+  \centering
+   \includegraphics[scale=0.5]{figures/dummyfig.eps}
+\caption{{\bf A Dummy Figure:} Example of \LaTeX2e\,\,\,code that incorporates a photograph, image, or figure into your content.}
+  \label{fig:df-2}
+\end{figure}
+
+\bibliographystyle{plain}
+\bibliography{../tex/bib/g3-refs.bib}
+
+\end{document}

@@ -1,0 +1,9 @@
+---
+comment: Optional comment.
+description: Create new LaTeX2e content under the Heterarch Content Management System.
+document name: New Content
+tags:
+  - heterarch
+  - <domain>
+  - <format>
+  - draft
