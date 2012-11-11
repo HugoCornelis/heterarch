@@ -338,7 +338,7 @@ This is a listing of all published documents in the ${package_name} documentatio
 
 	print CONTENTS "<li><a href=\"";
 
-	print CONTENTS $published_document . "/" . $document->{name} . $suffix;
+	print CONTENTS $document->{name} . "/" . $document->{name} . $suffix;
 
 	print CONTENTS "\">";
 
