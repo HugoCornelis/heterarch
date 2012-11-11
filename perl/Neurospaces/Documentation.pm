@@ -1269,7 +1269,18 @@ sub compile_msword
     }
     else
     {
-	system "jodconverter $directory.doc $directory.pdf";
+	if ($self->has_tag("doc"))
+	{
+	    system "jodconverter $directory.doc $directory.pdf";
+	}
+	elsif ($self->has_tag("docx"))
+	{
+	    system "jodconverter $directory.docx $directory.pdf";
+	}
+	elsif ($self->has_tag("odt"))
+	{
+	    system "jodconverter $directory.odt $directory.pdf";
+	}
 
 	if ($?)
 	{
