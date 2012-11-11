@@ -2158,7 +2158,10 @@ sub is_msword
 {
     my $self = shift;
 
-    return $self->has_tag('doc');
+    return
+	($self->has_tag('doc')
+	 or $self->has_tag('docx')
+	 or $self->has_tag('odt'));
 }
 
 
