@@ -2030,9 +2030,9 @@ sub expand
 	    if ($contents =~ s(([^\\])\\cmfxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
 	    {
 		print "replacing\n";
-	    }
 
-	    print "Replaced '$2...$3'\n";
+		print "Replaced '$2...$3'\n";
+	    }
 
 	    # if something has changed
 
