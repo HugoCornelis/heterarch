@@ -313,7 +313,7 @@ sub publish_production_results
 	   keys %$all_publication_results,
 	  };
 
-    print Dump( { all_publication_results => $all_results, }, );
+    print Dump( { "${prefix}_all_publication_results" => $all_results, }, );
 
     use IO::File;
 
@@ -321,13 +321,13 @@ sub publish_production_results
 
     if ($results_file)
     {
-	print $results_file Dump( { all_publication_results => $all_results, }, );
+	print $results_file Dump( { "${prefix}_all_publication_results" => $all_results, }, );
     }
     else
     {
-	print "$0: *** Error: cannot all_publication_results write to /tmp/${prefix}_all_publication_results\n";
+	print "$0: *** Error: cannot ${prefix}_all_publication_results write to /tmp/${prefix}_all_publication_results\n";
 
-	$result = "cannot write all_publication_results to /tmp/${prefix}_all_publication_results";
+	$result = "cannot write ${prefix}_all_publication_results to /tmp/${prefix}_all_publication_results";
     }
 
     return $result;
