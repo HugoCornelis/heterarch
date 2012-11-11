@@ -339,8 +339,8 @@ example usage:
     $0 $option_set_name-homepage
 
 and then try one of the following alternatives:
-    firefox -new-window $ENV{HOME}/public_html/heterarch/contents.html
-    firefox -new-window $ENV{HOME}/public_html/heterarch/$option_set_name-homepage/$option_set_name-homepage.html
+    firefox -new-window $ENV{HOME}/public_html/$option_set_name/contents.html
+    firefox -new-window $ENV{HOME}/public_html/$option_set_name/$option_set_name-homepage/$option_set_name-homepage.html
     firefox -new-window $ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project/$option_set_name/$option_set_name-homepage/$option_set_name-homepage.html
 ";
 

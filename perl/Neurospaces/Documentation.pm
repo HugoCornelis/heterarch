@@ -1259,13 +1259,13 @@ sub compile_msword
 
     mkdir "output/pdf";
 
-    system "soffice -accept='socket,port=8100;urp;' -invisible &";
+    system "soffice -accept='socket,port=8100;urp;' --invisible &";
 
     sleep 1;
 
     if ($?)
     {
-	$result = "soffice -accept='socket,port=8100;urp;' -invisible &";
+	$result = "soffice -accept='socket,port=8100;urp;' --invisible &";
     }
     else
     {
@@ -1284,7 +1284,7 @@ sub compile_msword
 
 	if ($?)
 	{
-	    $result = "jodconverter $directory.doc $directory.pdf";
+	    $result = "jodconverter $directory.(doc|docx|odt) $directory.pdf";
 	}
 	else
 	{
@@ -1302,11 +1302,22 @@ sub compile_msword
 
 	    mkdir "output/html";
 
-	    system "jodconverter $directory.doc $directory.html";
+	    if ($self->has_tag("doc"))
+	    {
+		system "jodconverter $directory.doc $directory.html";
+	    }
+	    elsif ($self->has_tag("docx"))
+	    {
+		system "jodconverter $directory.docx $directory.html";
+	    }
+	    elsif ($self->has_tag("odt"))
+	    {
+		system "jodconverter $directory.odt $directory.html";
+	    }
 
 	    if ($?)
 	    {
-		$result = "jodconverter $directory.doc $directory.html";
+		$result = "jodconverter $directory.(doc|docx|odt) $directory.html";
 	    }
 	    else
 	    {
@@ -2038,7 +2049,7 @@ sub expand
 	{
 	    my $old_contents = $contents;
 
-	    if ($contents =~ s(([^\\])\\cmfxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
+	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
 	    {
 		print "replacing\n";
 
