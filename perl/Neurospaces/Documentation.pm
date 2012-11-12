@@ -313,7 +313,7 @@ sub publish_production_results
 	   keys %$all_publication_results,
 	  };
 
-    print Dump( { all_publication_results => $all_results, }, );
+    print Dump( { "${prefix}_all_publication_results" => $all_results, }, );
 
     use IO::File;
 
@@ -321,13 +321,13 @@ sub publish_production_results
 
     if ($results_file)
     {
-	print $results_file Dump( { all_publication_results => $all_results, }, );
+	print $results_file Dump( { "${prefix}_all_publication_results" => $all_results, }, );
     }
     else
     {
-	print "$0: *** Error: cannot all_publication_results write to /tmp/${prefix}_all_publication_results\n";
+	print "$0: *** Error: cannot ${prefix}_all_publication_results write to /tmp/${prefix}_all_publication_results\n";
 
-	$result = "cannot write all_publication_results to /tmp/${prefix}_all_publication_results";
+	$result = "cannot write ${prefix}_all_publication_results to /tmp/${prefix}_all_publication_results";
     }
 
     return $result;
@@ -1259,21 +1259,32 @@ sub compile_msword
 
     mkdir "output/pdf";
 
-    system "soffice -accept='socket,port=8100;urp;' -invisible &";
+    system "soffice -accept='socket,port=8100;urp;' --invisible &";
 
     sleep 1;
 
     if ($?)
     {
-	$result = "soffice -accept='socket,port=8100;urp;' -invisible &";
+	$result = "soffice -accept='socket,port=8100;urp;' --invisible &";
     }
     else
     {
-	system "jodconverter $directory.doc $directory.pdf";
+	if ($self->has_tag("doc"))
+	{
+	    system "jodconverter $directory.doc $directory.pdf";
+	}
+	elsif ($self->has_tag("docx"))
+	{
+	    system "jodconverter $directory.docx $directory.pdf";
+	}
+	elsif ($self->has_tag("odt"))
+	{
+	    system "jodconverter $directory.odt $directory.pdf";
+	}
 
 	if ($?)
 	{
-	    $result = "jodconverter $directory.doc $directory.pdf";
+	    $result = "jodconverter $directory.(doc|docx|odt) $directory.pdf";
 	}
 	else
 	{
@@ -1291,11 +1302,22 @@ sub compile_msword
 
 	    mkdir "output/html";
 
-	    system "jodconverter $directory.doc $directory.html";
+	    if ($self->has_tag("doc"))
+	    {
+		system "jodconverter $directory.doc $directory.html";
+	    }
+	    elsif ($self->has_tag("docx"))
+	    {
+		system "jodconverter $directory.docx $directory.html";
+	    }
+	    elsif ($self->has_tag("odt"))
+	    {
+		system "jodconverter $directory.odt $directory.html";
+	    }
 
 	    if ($?)
 	    {
-		$result = "jodconverter $directory.doc $directory.html";
+		$result = "jodconverter $directory.(doc|docx|odt) $directory.html";
 	    }
 	    else
 	    {
@@ -2027,12 +2049,12 @@ sub expand
 	{
 	    my $old_contents = $contents;
 
-	    if ($contents =~ s(([^\\])\\cmfxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
+	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
 	    {
 		print "replacing\n";
-	    }
 
-	    print "Replaced '$2...$3'\n";
+		print "Replaced '$2...$3'\n";
+	    }
 
 	    # if something has changed
 
@@ -2158,7 +2180,10 @@ sub is_msword
 {
     my $self = shift;
 
-    return $self->has_tag('doc');
+    return
+	($self->has_tag('doc')
+	 or $self->has_tag('docx')
+	 or $self->has_tag('odt'));
 }
 
 
