@@ -2025,7 +2025,7 @@ sub expand
 	}
     }
 
-    # resolve external cross references
+    # resolve internal HCMS cross references
 
     if (-f "$document_name/output/$document_name.tex")
     {
