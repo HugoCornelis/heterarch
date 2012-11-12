@@ -2009,7 +2009,7 @@ sub expand
 
     # expand dynamically generated snippets
 
-    if (-f "$document_name/output/$document_name.tex")
+    if (0 and -f "$document_name/output/$document_name.tex")
     {
 	# expand the document
 
