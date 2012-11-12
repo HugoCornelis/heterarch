@@ -502,6 +502,8 @@ sub main
 
 	# clean the heterarch after it has been installed
 
+	#t why again?
+
 	try_to("neurospaces_clean heterarch");
     }
 
@@ -523,6 +525,12 @@ sub main
 	}
 
 	# pull and update the content itself
+
+	# note: the idea is that you have to do a
+	# neurospaces_create_directories '$package_name' manually
+	# before a cron job can do the job
+
+	try_to("neurospaces_init '$package_name'");
 
 	try_to("neurospaces_pull '$package_name'");
 
