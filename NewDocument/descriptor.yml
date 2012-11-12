@@ -1,7 +1,10 @@
 ---
 comment: Optional comment.
-description: Create a new document under the Neurospaces Documentation System.
+description: Create new content under the Heterarch Content Management System.
 document name: New Document
 tags:
-  - neurospaces
-  - published
+  - heterarch
+  - locked
+  - <domain>
+  - <format>
+  - draft
