@@ -384,7 +384,7 @@ sub index_page_generate
 
     print OUTPUT "</title>\n  </head>\n  <body><meta http-equiv=\"refresh\" content=\"0;URL=";
 
-    my $redirect_url = "$home_page_document/$home_page_document.html";
+    my $redirect_url = "${package_name}-homepage/${package_name}-homepage.html";
 
     print OUTPUT $redirect_url;
 
@@ -529,6 +529,10 @@ sub main
 	# note: the idea is that you have to do a
 	# neurospaces_create_directories '$package_name' manually
 	# before a cron job can do the job
+
+	# note: but that cannot work because this script assumes it is
+	# called from the package it upgrades, for instance as
+	# /usr/local/bin/tws_cron.
 
 	try_to("neurospaces_init '$package_name'");
 
