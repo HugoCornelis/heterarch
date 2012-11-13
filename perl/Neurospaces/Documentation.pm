@@ -2056,7 +2056,7 @@ sub expand
 
 	    print "resolving internal HCMS cross references\n";
 
-	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../$2/$3}{$4})g)
+	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
 	    {
 		print "Replaced ($1\\heterarchxref\{../../../../../$2/source/snapshots/0/$3\}\{$4\}) with ($1\\href{../../$2/$3}{$4})\n";
 	    }
