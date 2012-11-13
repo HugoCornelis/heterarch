@@ -2049,11 +2049,16 @@ sub expand
 	{
 	    my $old_contents = $contents;
 
-	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
-	    {
-		print "replacing\n";
+	    # $1: a prefix
+	    # $2: component name
+	    # $3: full document, with leading directory
+	    # $4: link text
 
-		print "Replaced '$2...$3'\n";
+	    print "resolving internal HCMS cross references\n";
+
+	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../$2/$3}{$4})g)
+	    {
+		print "Replaced ($1\\heterarchxref\{../../../../../$2/source/snapshots/0/$3\}\{$4\}) with ($1\\href{../../$2/$3}{$4})\n";
 	    }
 
 	    # if something has changed
