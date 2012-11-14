@@ -2056,6 +2056,8 @@ sub expand
 
 	    print "resolving internal HCMS cross references\n";
 
+	    #t note that latex commands embedded in the curly braces will not work properly.
+
 	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
 	    {
 		print "Replaced ($1\\heterarchxref\{../../../../../$2/source/snapshots/0/$3\}\{$4\}) with ($1\\href{../../$2/$3}{$4})\n";
