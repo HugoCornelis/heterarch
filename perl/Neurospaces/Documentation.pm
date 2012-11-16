@@ -193,62 +193,6 @@ This is a listing of all published documents in the ${documentation_set_name} do
 }
 
 
-# sub copy_html_data
-# {
-#     my $configuration = shift;
-
-#     my $html_output_directory = shift;
-
-#     # define the build directory
-
-#     my $html_build_directory = "$html_output_directory/${documentation_set_name}/";
-
-#     # first make sure the website is protected at all time by protecting the build directory with access restriction files
-
-#     if ($configuration->{HTACCESS})
-#     {
-# # 	copy_htacces_file();
-
-# # 	my $html_build_directory = "~/neurospaces_project/${documentation_set_name}/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}/";
-
-# 	my $target_htaccess_file = $html_build_directory . "/${documentation_set_name}/.htaccess";
-
-# 	if (-e $configuration->{HTACCESS})
-# 	{
-# 	    system "cp $configuration->{HTACCESS} $target_htaccess_file";
-# 	}
-#     }
-
-#     # start defining the website location
-
-#     system("mkdir --parents $option_html_output_directory");
-
-#     my $html_data_directory = $option_html_output_directory . "/" . "${documentation_set_name}_data";
-
-#     # clean the old website temporary location
-
-#     system("rm -rf $html_data_directory");
-
-#     # copy the new website to its temporary location
-
-#     system("cp -af $html_build_directory $html_data_directory");
-
-#     # single shot replace the old website with the new one
-
-#     # \todo does this work correctly as a single shot?  It should just do a single ln -sf
-
-#     my $html_symlink = $option_html_output_directory . "/" . "${documentation_set_name}";
-
-#     # \todo this makes the website unavailable for a split second?
-
-#     system("rm -f $html_symlink");
-
-#     # \todo and this leaves the new website at its temporary location?  Meaning on the next removal it will be gone for a couple of seconds?
-
-#     system("ln -s $html_data_directory $html_symlink");
-# }
-
-
 sub extract_processed_tags
 {
     #! note the syntax to force perl to build an intermediate array result
@@ -630,7 +574,7 @@ sub compile_2_dvi
 }
 
 
-sub compile_2_html
+sub compile_2_htlatex
 {
     my $self = shift;
 
@@ -652,18 +596,18 @@ sub compile_2_html
 	}
     }
 
-    mkdir 'html';
+    mkdir 'htlatex';
 
-    mkdir 'html/figures';
+    mkdir 'htlatex/figures';
 
     if ($options->{verbose})
     {
-	print "$0: entering html\n";
+	print "$0: entering htlatex\n";
     }
 
-    chdir "html";
+    chdir "htlatex";
 
-    # generate html output
+    # generate htlatex output
 
     if (!$options->{parse_only})
     {
@@ -691,15 +635,15 @@ sub compile_2_html
 
 	$source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
 
-	# update html links to their proper file types.
+	# update htlatex links to their proper file types.
 
-	my $source_html = update_hyperlinks($self->{descriptor}, $source_text);
+	my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
 
 	# write converted source
 
 	$source_file = IO::File->new(">$filename");
 
-	print $source_file $source_html;
+	print $source_file $source_htlatex;
 
 	$source_file->close();
 
@@ -746,22 +690,32 @@ sub compile_2_html
 	{
 	    $result = "compiling $filename (htlatex '$filename', $?)";
 	}
-
     }
 
     if ($options->{verbose})
     {
-	print "$0: leaving html\n";
+	print "$0: leaving htlatex\n";
     }
 
     chdir "..";
+
+    # now select which of the conversions we will use for the website
+
+    my $source_format = 'htlatex';
+
+    system "cp -a $source_format html";
+
+    if ($?)
+    {
+	$result = "cp -a htlatex html";
+    }
 
     if (not $result)
     {
 	$self->output_register
 	    (
 	     {
-	      html => "output/html/$filename_base.html",
+	      htlatex => "output/htlatex/$filename_base.html",
 	     },
 	    );
     }
@@ -924,18 +878,18 @@ sub compile_file_copy
 	return "mkdir -p output/pdf";
     }
 
-    system "mkdir -p output/html";
+    system "mkdir -p output/htlatex";
 
     if ($?)
     {
-	return "mkdir -p output/html";
+	return "mkdir -p output/htlatex";
     }
 
-    system "cp *.$filetype output/html";
+    system "cp *.$filetype output/htlatex";
 
     if ($?)
     {
-	return "copying $filetype files to the html output directory (cp *.$filetype output/html, $?)";
+	return "copying $filetype files to the htlatex output directory (cp *.$filetype output/htlatex, $?)";
     }
 
     system "cp *.$filetype output/ps";
@@ -1139,9 +1093,9 @@ sub compile_latex
 
 		$result = $result or $self->compile_2_pdf($filename, $filename_base, $options);
 
-		# generate html output
+		# generate htlatex output
 
-		$result = $result or $self->compile_2_html($filename, $filename_base, $options);
+		$result = $result or $self->compile_2_htlatex($filename, $filename_base, $options);
 	    }
 
 	    chdir "..";
@@ -1295,7 +1249,7 @@ sub compile_msword
 		$self->output_register
 		    (
 		     {
-		      pdf => "output/html/$directory.pdf",
+		      pdf => "output/pdf/$directory.pdf",
 		     },
 		    );
 	    }
