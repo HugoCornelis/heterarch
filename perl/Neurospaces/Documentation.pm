@@ -609,7 +609,7 @@ sub compile_2_htlatex
 
     # generate htlatex output
 
-    if (!$options->{parse_only})
+    if (not $options->{parse_only})
     {
 # 	system "cp ../$filename_base.aux .";
 # 	system "cp ../$filename_base.bbl .";
