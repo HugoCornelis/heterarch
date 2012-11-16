@@ -1042,15 +1042,45 @@ sub compile_latex
     {
 	# for latex sources
 
-	if ($filename =~ /\.tex$/)
+	if ($filename =~ /(.*)\.tex$/)
 	{
+	    #t build a model of how output is generated
+
+	    $filename_base = $1;
+
+	    my $latex_compilation_model
+		= {
+		   build_date => 0,
+		   output => [
+			      {
+			       name => "output/$filename_base.dvi",
+			       build_date => 0,
+			       output => [
+					  {
+					   name => "output/htlatex/$filename_base.html",
+					   build_date => 0,
+					  },
+					  {
+					   name => "output/pdf/$filename_base.pdf",
+					   build_date => 0,
+					  },
+					  {
+					   name => "output/ps/$filename_base.ps",
+					   build_date => 0,
+					  },
+					 ],
+			      },
+			     ],
+		   name => "$filename_base.tex",
+		  };
+
 	    chdir "output";
 
 	    # prepare output: general latex processing
 
-	    $filename =~ m((.*)\.tex$);
+# 	    $filename =~ m((.*)\.tex$);
 
-	    my $filename_base = $1;
+# 	    my $filename_base = $1;
 
 	    # Remove references to self, as well as any empty itemize blocks
 	    # since the itemize blocks kill the cron job. After we remove
@@ -1077,7 +1107,7 @@ sub compile_latex
 		$source_text =~ s(\\begin\{itemize\}\s+\\end\{itemize\})( )g;
 
 		open(OUTPUT,">$filename");
-		
+
 		print OUTPUT $source_text;
 
 		close(OUTPUT);
