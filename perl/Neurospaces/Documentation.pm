@@ -755,7 +755,7 @@ sub compile_2_pdf
 
     chdir "pdf";
 
-    if (!$options->{parse_only})
+    if (not $options->{parse_only})
     {
 	system "ps2pdf '../ps/$filename_base.ps' '$filename_base.pdf'";
 
@@ -818,7 +818,7 @@ sub compile_2_ps
 
 #     chdir "ps";
 
-    if (!$options->{parse_only})
+    if (not $options->{parse_only})
     {
 	system "dvips '$filename_base.dvi' -o '$filename_base.ps'";
 
@@ -1083,7 +1083,7 @@ sub compile_latex
 		close(OUTPUT);
 	    }
 
-	    if (!$options->{parse_only})
+	    if (not $options->{parse_only})
 	    {
 		# generate ps output
 
@@ -1406,7 +1406,7 @@ sub compile_restructured_text
 
 	    my $filename_base = $1;
 
-# 	    if (!$options->{parse_only})
+# 	    if (not $options->{parse_only})
 	    {
 		# generate pdf output
 
@@ -1420,7 +1420,7 @@ sub compile_restructured_text
 
 # 		    chdir "pdf";
 
-# # 		    if (!$options->{parse_only})
+# # 		    if (not $options->{parse_only})
 # 		    {
 # 			system "rst2pdf '../$filename_base.rst' -o '$filename_base.pdf'";
 
@@ -1480,7 +1480,7 @@ sub compile_restructured_text
 
 		    # generate html output
 
-# 		    if (!$options->{parse_only})
+# 		    if (not $options->{parse_only})
 		    {
 			system "rst2html '../$filename' '$filename_base.html'";
 
@@ -1557,7 +1557,7 @@ sub compile_rich_text_format
 
 	    my $filename_base = $1;
 
-# 	    if (!$options->{parse_only})
+# 	    if (not $options->{parse_only})
 	    {
 		# generate latex output
 
@@ -1612,7 +1612,7 @@ sub compile_rich_text_format
 
 		    # generate html output
 
-# 		    if (!$options->{parse_only})
+# 		    if (not $options->{parse_only})
 		    {
 			system "unrtf '../$filename' --html >'$filename_base.html'";
 
