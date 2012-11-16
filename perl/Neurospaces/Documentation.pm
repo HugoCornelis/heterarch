@@ -1046,7 +1046,7 @@ sub compile_latex
 	{
 	    #t build a model of how output is generated
 
-	    $filename_base = $1;
+	    my $filename_base = $1;
 
 	    my $latex_compilation_model
 		= {
