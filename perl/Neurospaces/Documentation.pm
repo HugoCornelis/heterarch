@@ -1213,13 +1213,13 @@ sub compile_msword
 
     mkdir "output/pdf";
 
-    system "soffice -accept='socket,port=8100;urp;' --invisible &";
+    system "soffice --accept='socket,port=8100;urp;' --invisible &";
 
     sleep 1;
 
     if ($?)
     {
-	$result = "soffice -accept='socket,port=8100;urp;' --invisible &";
+	$result = "soffice --accept='socket,port=8100;urp;' --invisible &";
     }
     else
     {
