@@ -602,6 +602,10 @@ sub compile_2_htlatex
     # text4ht: produces gibberish
     # hevea: produces relatively good html, but no figure support?
     # tth: produces relatively good html, but no figure support?
+    #
+    # itex2mml: did not try yet.
+    # latexml: should be most flexible, but did not get it to work yet.
+    #
     # via rtf:
     #   latex2rtf: did not get that to work...
 
