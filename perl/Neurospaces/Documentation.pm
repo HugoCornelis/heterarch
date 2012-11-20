@@ -596,108 +596,126 @@ sub compile_2_htlatex
 	}
     }
 
-    mkdir 'htlatex';
+    # htlatex: table support is weak
+    # latex2html: always generates contents and index tables for accessing the main content
+    # hyperlatex: old
+    # text4ht: produces gibberish
+    # hevea: produces relatively good html, but no figure support?
+    # tth: produces relatively good html, but no figure support?
+    # via rtf:
+    #   latex2rtf: did not get that to work...
 
-    mkdir 'htlatex/figures';
+# 				     latex2html
+# 				     tex4ht
 
-    if ($options->{verbose})
+    foreach my $output_format (qw(
+				     htlatex
+				)
+			      )
     {
-	print "$0: entering htlatex\n";
-    }
+	mkdir $output_format;
 
-    chdir "htlatex";
+	mkdir $output_format . '/figures';
 
-    # generate htlatex output
-
-    if (not $options->{parse_only})
-    {
-# 	system "cp ../$filename_base.aux .";
-# 	system "cp ../$filename_base.bbl .";
-# 	system "cp ../$filename_base.blg .";
-# 	system "cp ../$filename_base.dvi .";
-# 	system "cp ../$filename_base.log .";
-# 	system "cp ../$filename_base.out .";
-# 	system "cp ../$filename_base.tex .";
-
-# 	system "cp ../$filename_base.{aux,bbl,blg,dvi,log,out,tex} .";
-
-	# read latex source
-
-	use IO::File;
-
-	my $source_file = IO::File->new("<../$filename");
-
-	my $source_text = join "", <$source_file>;
-
-	$source_file->close();
-
-	# update the bibliographic reference
-
-	$source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
-
-	# update htlatex links to their proper file types.
-
-	my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
-
-	# write converted source
-
-	$source_file = IO::File->new(">$filename");
-
-	print $source_file $source_htlatex;
-
-	$source_file->close();
-
-	# copy external files
-
-	system "cp -rp ../plos2009.bst .";
-
-	# copy figures
-
-	system "cp -rp ../figures/* figures/";
-
-	#t some of these were already done by ->compile_2_dvi()
-
-	system "latex -halt-on-error '$filename'";
-	system "latex -halt-on-error '$filename'";
-	system "latex -halt-on-error '$filename'";
-
-	if ($?)
+	if ($options->{verbose})
 	{
-	    $result = "compiling $filename (latex '$filename': $?)";
+	    print "$0: entering $output_format\n";
 	}
 
-	#! note: both makeindex and bibtex produce error returns when
-	#! there is no correct configuration for them in the latex file, we
-	#! ignore these error returns
+	chdir $output_format;
 
-	system "makeindex -c '$filename_base'";
+	# generate htlatex or other output
 
-# 	if ($?)
-# 	{
-# 	    $result = "makeindex -c '$filename_base'";
-# 	}
-
-	system "bibtex '$filename_base'";
-
-# 	if ($?)
-# 	{
-# 	    $result = "bibtex '$filename_base'";
-# 	}
-
-	system "htlatex '$filename'";
-
-	if ($?)
+	if (not $options->{parse_only})
 	{
-	    $result = "compiling $filename (htlatex '$filename', $?)";
+	    # 	system "cp ../$filename_base.aux .";
+	    # 	system "cp ../$filename_base.bbl .";
+	    # 	system "cp ../$filename_base.blg .";
+	    # 	system "cp ../$filename_base.dvi .";
+	    # 	system "cp ../$filename_base.log .";
+	    # 	system "cp ../$filename_base.out .";
+	    # 	system "cp ../$filename_base.tex .";
+
+	    # 	system "cp ../$filename_base.{aux,bbl,blg,dvi,log,out,tex} .";
+
+	    # read latex source
+
+	    use IO::File;
+
+	    my $source_file = IO::File->new("<../$filename");
+
+	    my $source_text = join "", <$source_file>;
+
+	    $source_file->close();
+
+	    # update the bibliographic reference
+
+	    $source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
+
+	    # update latex links to their proper file types.
+
+	    my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
+
+	    # write converted source
+
+	    $source_file = IO::File->new(">$filename");
+
+	    print $source_file $source_htlatex;
+
+	    $source_file->close();
+
+	    # copy external files
+
+	    system "cp -rp ../plos2009.bst .";
+
+	    # copy figures
+
+	    system "cp -rp ../figures/* figures/";
+
+	    #t some of these were already done by ->compile_2_dvi()
+
+	    system "latex -halt-on-error '$filename'";
+	    system "latex -halt-on-error '$filename'";
+	    system "latex -halt-on-error '$filename'";
+
+	    if ($?)
+	    {
+		$result = "compiling $filename (latex '$filename': $?)";
+	    }
+
+	    #! note: both makeindex and bibtex produce error returns when
+	    #! there is no correct configuration for them in the latex file, we
+	    #! ignore these error returns
+
+	    system "makeindex -c '$filename_base'";
+
+	    # 	if ($?)
+	    # 	{
+	    # 	    $result = "makeindex -c '$filename_base'";
+	    # 	}
+
+	    system "bibtex '$filename_base'";
+
+	    # 	if ($?)
+	    # 	{
+	    # 	    $result = "bibtex '$filename_base'";
+	    # 	}
+
+	    system "$output_format '$filename'";
+
+	    if ($?)
+	    {
+		$result = "compiling $filename ($output_format '$filename', $?)";
+	    }
 	}
-    }
 
-    if ($options->{verbose})
-    {
-	print "$0: leaving htlatex\n";
-    }
+	if ($options->{verbose})
+	{
+	    print "$0: leaving $output_format\n";
+	}
 
-    chdir "..";
+	chdir "..";
+    }
 
     # now select which of the conversions we will use for the website
 
