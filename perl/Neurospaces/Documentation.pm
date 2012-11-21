@@ -900,18 +900,18 @@ sub compile_file_copy
 	return "mkdir -p output/pdf";
     }
 
-    system "mkdir -p output/htlatex";
+    system "mkdir -p output/html";
 
     if ($?)
     {
-	return "mkdir -p output/htlatex";
+	return "mkdir -p output/html";
     }
 
-    system "cp *.$filetype output/htlatex";
+    system "cp *.$filetype output/html";
 
     if ($?)
     {
-	return "copying $filetype files to the htlatex output directory (cp *.$filetype output/htlatex, $?)";
+	return "copying $filetype files to the html output directory (cp *.$filetype output/html, $?)";
     }
 
     system "cp *.$filetype output/ps";
