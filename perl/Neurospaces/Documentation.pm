@@ -612,21 +612,35 @@ sub compile_2_htlatex
 # 				     latex2html
 # 				     tex4ht
 
-    foreach my $output_format (qw(
-				     htlatex
-				)
-			      )
-    {
-	mkdir $output_format;
+# 			       'hevea -fix',
 
-	mkdir $output_format . '/figures';
+    my $output_formats
+	= {
+	   htlatex => 1,
+	   hevea => {
+		     command => 'hevea -fix',
+		    }
+	  };
+
+    foreach my $output_format_name (keys %$output_formats)
+    {
+	my $output_format = $output_formats->{$output_format_name};
+
+	if (not $output_format)
+	{
+	    next;
+	}
+
+	mkdir $output_format_name;
+
+	mkdir $output_format_name . '/figures';
 
 	if ($options->{verbose})
 	{
-	    print "$0: entering $output_format\n";
+	    print "$0: entering $output_format_name\n";
 	}
 
-	chdir $output_format;
+	chdir $output_format_name;
 
 	# generate htlatex or other output
 
@@ -705,17 +719,30 @@ sub compile_2_htlatex
 	    # 	    $result = "bibtex '$filename_base'";
 	    # 	}
 
-	    system "$output_format '$filename'";
+	    my $command;
+
+	    if ($output_format =~ /HASH/)
+	    {
+		$command = $output_format->{command};
+	    }
+	    else
+	    {
+		$command = $output_format_name;
+	    }
+
+	    print "$command '$filename'\n";
+
+	    system "$command '$filename'";
 
 	    if ($?)
 	    {
-		$result = "compiling $filename ($output_format '$filename', $?)";
+		$result = "compiling $filename ($output_format_name '$filename', $?)";
 	    }
 	}
 
 	if ($options->{verbose})
 	{
-	    print "$0: leaving $output_format\n";
+	    print "$0: leaving $output_format_name\n";
 	}
 
 	chdir "..";
