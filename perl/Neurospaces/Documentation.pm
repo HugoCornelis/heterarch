@@ -750,23 +750,9 @@ sub compile_2_htlatex
 
     # now select which of the conversions we will use for the website
 
-    my $source_format = 'htlatex';
-
-    system "cp -a $source_format html";
-
-    if ($?)
-    {
-	$result = "cp -a htlatex html";
-    }
-
     if (not $result)
     {
-	$self->output_register
-	    (
-	     {
-	      htlatex => "output/htlatex/$filename_base.html",
-	     },
-	    );
+	$self->select_compiled_html();
     }
 
     return $result;
@@ -1071,6 +1057,99 @@ sub compile_html
 }
 
 
+sub build_targets
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $filename = shift;
+
+    my $filedate = shift;
+
+    my $compilation_model = shift;
+
+    # if this filetype needs to be built
+
+    my $needs_rebuild = 1;
+
+    my $target_filename = $compilation_model->{filename};
+
+    if (defined $filedate
+	and -e $target_filename)
+    {
+	my ($target_dev, $target_ino, $target_mode, $target_nlink, $target_uid, $target_gid, $target_rdev, $target_size, $target_atime, $target_mtime, $target_ctime, $target_blksize, $target_blocks)
+	    = stat($target_filename);
+
+	if ($filedate < $target_mtime)
+	{
+	    $needs_rebuild = 1;
+	}
+	else
+	{
+	    $needs_rebuild = 0;
+	}
+
+	$compilation_model->{filedate} = $target_mtime;
+    }
+
+    if ($needs_rebuild)
+    {
+	# execute the commands to build the target file
+
+	my $build_commands = $compilation_model->{build_commands} || [];
+
+	foreach my $build_command (@$build_commands)
+	{
+	    my $command = $build_command->{command};
+
+	    if ($options->{verbose})
+	    {
+		print "$0: " . "build_targets($command)\n";
+	    }
+
+	    system "$command";
+
+	    if ($?)
+	    {
+		print "$0: *** Error: ($command) failed, $?\n";
+
+		return "($command) failed";
+	    }
+
+	}
+    }
+
+    # loop over all targets
+
+    my $targets = $compilation_model->{targets} || [];
+
+    if ($targets)
+    {
+	foreach my $target (@$targets)
+	{
+	    if (defined $filedate)
+	    {
+		# we are still in the directory of the previous target, so
+		# go to the parent directory
+
+		chdir '..';
+	    }
+
+	    # create the directory for this target
+
+	    mkdir $target->{filetype};
+
+	    chdir $target->{filetype};
+
+	    # build the target in this directory
+
+	    $self->build_targets($options, $compilation_model->{filename}, $compilation_model->{filedate}, $target);
+	}
+    }
+}
+
+
 sub compile_latex
 {
     my $self = shift;
@@ -1097,31 +1176,203 @@ sub compile_latex
 
 	    my $filename_base = $1;
 
-	    my $latex_compilation_model
+	    my $latex_2_html_compilation_model
 		= {
-		   build_date => 0,
-		   output => [
-			      {
-			       name => "output/$filename_base.dvi",
-			       build_date => 0,
-			       output => [
-					  {
-					   name => "output/htlatex/$filename_base.html",
-					   build_date => 0,
-					  },
-					  {
-					   name => "output/pdf/$filename_base.pdf",
-					   build_date => 0,
-					  },
-					  {
-					   name => "output/ps/$filename_base.ps",
-					   build_date => 0,
-					  },
-					 ],
-			      },
-			     ],
-		   name => "$filename_base.tex",
+		   filedate => 0,
+		   filename => "$filename_base.tex",
+		   filetype => 'latex',
+		   targets => [
+			       {
+				build_commands => [
+# 						   {
+# 						    command => "cp -rp ../../plos2009.bst .",
+# 						   },
+						   {
+						    command => "cp -rp '../$filename' .",
+						   },
+						   {
+						    command => "mkdir -p figures/",
+						   },
+						   {
+						    command => "cp -rp ../../figures/* figures/",
+						   },
+						   {
+						    command => "latex -halt-on-error '$filename'",
+						   },
+						   {
+						    command => "makeindex -c '$filename_base' || true",
+						   },
+						   {
+						    command => "bibtex '$filename_base' || true",
+						   },
+						   {
+						    command => "latex -halt-on-error '$filename'",
+						   },
+						   {
+						    command => "latex -halt-on-error '$filename'",
+						   },
+						  ],
+				filedate => 0,
+				filename => "$filename_base.dvi",
+				filetype => 'dvi',
+				targets => [
+					    {
+					     build_commands => [
+# 								{
+# 								 command => "cp -rp ../../plos2009.bst .",
+# 								},
+								{
+								 command => "cp -rp '../$filename' .",
+								},
+								{
+								 command => "mkdir -p figures/",
+								},
+								{
+								 command => "cp -rp ../../figures/* figures/",
+								},
+								{
+								 command => "latex -halt-on-error '$filename'",
+								},
+								{
+								 command => "makeindex -c '$filename_base' || true",
+								},
+								{
+								 command => "bibtex '$filename_base' || true",
+								},
+								{
+								 command => "latex -halt-on-error '$filename'",
+								},
+								{
+								 command => "latex -halt-on-error '$filename'",
+								},
+								{
+								 command => "htlatex '$filename'",
+								},
+							       ],
+					     filedate => 0,
+					     filename => "$filename_base.html",
+					     filetype => 'htlatex',
+					    },
+					    {
+					     build_commands => [
+								{
+								 command => "dvips '../dvi/$filename_base.dvi' -o '$filename_base.ps'",
+								},
+							       ],
+					     filedate => 0,
+					     filename => "$filename_base.ps",
+					     filetype => 'ps',
+					     targets => [
+							 {
+							  build_commands => [
+									     {
+									      command => "ps2pdf '../ps/$filename_base.ps' '$filename_base.pdf'",
+									     },
+									    ],
+							  filedate => 0,
+							  filename => "$filename_base.pdf",
+							  filetype => 'pdf',
+							 },
+							],
+					    },
+					   ],
+			       },
+			      ],
 		  };
+
+	    chdir "output";
+
+	    # prepare output: general latex processing
+
+# 	    $filename =~ m((.*)\.tex$);
+
+# 	    my $filename_base = $1;
+
+	    # Remove references to self, as well as any empty itemize blocks
+	    # since the itemize blocks kill the cron job. After we remove
+	    # the references and resave the file.
+
+	    if ($filename =~ m/contents-level[1234567]/)
+	    {
+		# read latex source
+
+		use IO::File;
+
+		my $source_file = IO::File->new("<../$filename");
+
+		my $source_text = join "", <$source_file>;
+
+		$source_file->close();
+
+		my @name = split(/\./,$filename);
+
+		$source_text =~ s(\\item \\href\{\.\.\/$name[0]\/$name[0]\.\w+\}\{\\bf \\underline\{.*\}\})( )g;
+
+		# remove empty itemize environments (otherwise latex complains)
+
+		$source_text =~ s(\\begin\{itemize\}\s+\\end\{itemize\})( )g;
+
+		open(OUTPUT,">$filename");
+
+		print OUTPUT $source_text;
+
+		close(OUTPUT);
+	    }
+
+	    $self->build_targets($options, undef, undef, $latex_2_html_compilation_model);
+
+	    # that the build leaves us in one of the build target directories
+
+	    chdir '..';
+
+	    chdir '..';
+
+	    # now select which of the conversions we will use for the website
+
+	    if (not $result)
+	    {
+		$self->select_compiled_html();
+	    }
+
+	}
+
+	# else unknown source file type
+
+	else
+	{
+	    print "$0: unknown file type for $filename (ignored)\n";
+	}
+    }
+
+    return $result;
+}
+
+
+sub compile_latex1
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $result;
+
+    my $directory = $self->{name};
+
+    # find relevant source files
+
+    my $filenames = $self->source_filenames();
+
+    # loop over source files
+
+    foreach my $filename (@$filenames)
+    {
+	# for latex sources
+
+	if ($filename =~ /(.*)\.tex$/)
+	{
+	    #t build a model of how output is generated
+
+	    my $filename_base = $1;
 
 	    chdir "output";
 
@@ -2566,6 +2817,51 @@ sub related_tags
 }
 	
 
+sub select_compiled_html
+{
+    my $self = shift;
+
+    my $result;
+
+    # create the target directory
+
+    system "mkdir -p output/html";
+
+    if ($?)
+    {
+	$result = "mkdir -p output/html";
+    }
+
+    if (not $result)
+    {
+	# now select which of the conversions we will use for the website
+
+	my $source_format = 'htlatex';
+
+	system "cp -a output/$source_format/* output/html";
+
+	if ($?)
+	{
+	    $result = "cp -a output/$source_format/* output/html";
+	}
+
+	if (not $result)
+	{
+	    my $filename_base = $self->{name};
+
+	    $self->output_register
+		(
+		 {
+		  htlatex => "output/$source_format/$filename_base.html",
+		 },
+		);
+	}
+    }
+
+    return $result;
+}
+
+
 sub source_filenames
 {
     my $self = shift;
@@ -2577,9 +2873,9 @@ sub source_filenames
 	   {
 	       chomp; $_
 	   }
-	   `ls *.tex`,
-	   `ls *.rst`,
-	   `ls *.rtf`,
+	   `ls *.tex 2>/dev/null`,
+	   `ls *.rst 2>/dev/null`,
+	   `ls *.rtf 2>/dev/null`,
 	  ];
 
     return $result;

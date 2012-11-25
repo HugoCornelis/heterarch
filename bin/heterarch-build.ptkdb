@@ -1,0 +1,25 @@
+$files = {
+           '_<bin/heterarch-build' => [
+                                        {
+                                          'expr' => undef,
+                                          'value' => '1',
+                                          'text' => '		    my $error
+',
+                                          'fname' => 'bin/heterarch-build',
+                                          'type' => 'user',
+                                          'line' => 195
+                                        }
+                                      ]
+         };
+$expr_list = [
+               {
+                 'expr' => '$operation',
+                 'depth' => -1
+               },
+               {
+                 'expr' => '`pwd`',
+                 'depth' => -1
+               }
+             ];
+$eval_saved_text = undef;
+$main_win_geometry = '1594x820+0+0';
