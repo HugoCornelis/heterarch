@@ -1150,7 +1150,7 @@ sub build_targets
 }
 
 
-sub compile_latex1
+sub compile_latex
 {
     my $self = shift;
 
@@ -1348,7 +1348,7 @@ sub compile_latex1
 }
 
 
-sub compile_latex
+sub compile_latex1
 {
     my $self = shift;
 
@@ -2825,11 +2825,11 @@ sub select_compiled_html
 
     # create the target directory
 
-    system "mkdir -p html";
+    system "mkdir -p output/html";
 
     if ($?)
     {
-	$result = "mkdir -p html";
+	$result = "mkdir -p output/html";
     }
 
     if (not $result)
@@ -2838,11 +2838,13 @@ sub select_compiled_html
 
 	my $source_format = 'htlatex';
 
-	system "cp -a $source_format/* html";
+	print `pwd`;
+
+	system "cp -a output/$source_format/* output/html";
 
 	if ($?)
 	{
-	    $result = "cp -a $source_format/* html";
+	    $result = "cp -a output/$source_format/* output/html";
 	}
 
 	if (not $result)
