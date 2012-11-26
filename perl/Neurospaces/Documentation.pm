@@ -2367,6 +2367,7 @@ sub expand
 
     # correct bibliography references
 
+    if (-f "$document_name/output/$document_name.tex")
     {
 	# read latex source
 
