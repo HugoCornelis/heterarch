@@ -1292,61 +1292,6 @@ sub compile_latex
 	    # since the itemize blocks kill the cron job. After we remove
 	    # the references and resave the file.
 
-	    if ($filename =~ m/contents-level[1234567]/)
-	    {
-		# read latex source
-
-		use IO::File;
-
-		my $source_file = IO::File->new("<../$filename");
-
-		my $source_text = join "", <$source_file>;
-
-		$source_file->close();
-
-		my @name = split(/\./,$filename);
-
-		$source_text =~ s(\\item \\href\{\.\.\/$name[0]\/$name[0]\.\w+\}\{\\bf \\underline\{.*\}\})( )g;
-
-		# remove empty itemize environments (otherwise latex complains)
-
-		$source_text =~ s(\\begin\{itemize\}\s+\\end\{itemize\})( )g;
-
-		open(OUTPUT,">$filename");
-
-		print OUTPUT $source_text;
-
-		close(OUTPUT);
-	    }
-
-	    {
-		# read latex source
-
-		use IO::File;
-
-		my $source_file = IO::File->new("<../$filename");
-
-		my $source_text = join "", <$source_file>;
-
-		$source_file->close();
-
-		# update the bibliographic reference
-
-		$source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
-
-		# update latex links to their proper file types.
-
-		my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
-
-		# write converted source
-
-		$source_file = IO::File->new(">$filename");
-
-		print $source_file $source_htlatex;
-
-		$source_file->close();
-	    }
-
 	    $self->build_targets($options, undef, undef, $latex_2_html_compilation_model);
 
 	    # that the build leaves us in one of the build target directories
@@ -2387,6 +2332,67 @@ sub expand
 		close $descriptor;
 	    }
 	}
+    }
+
+    # generate the contents pages
+
+    if ($document_name =~ m/contents-level[1234567]/)
+    {
+	# read latex source
+
+	use IO::File;
+
+	my $source_file = IO::File->new("<$document_name/output/$document_name.tex");
+
+	my $source_text = join "", <$source_file>;
+
+	$source_file->close();
+
+	#! this is not necessary anymore, correct?
+
+	my @name = split(/\./, $document_name);
+
+	$source_text =~ s(\\item \\href\{\.\.\/$name[0]\/$name[0]\.\w+\}\{\\bf \\underline\{.*\}\})( )g;
+
+	# remove empty itemize environments (otherwise latex complains)
+
+	$source_text =~ s(\\begin\{itemize\}\s+\\end\{itemize\})( )g;
+
+	open(OUTPUT,">$document_name/output/$document_name.tex");
+
+	print OUTPUT $source_text;
+
+	close(OUTPUT);
+    }
+
+    # correct bibliography references
+
+    {
+	# read latex source
+
+	use IO::File;
+
+	my $source_file = IO::File->new("<$document_name/output/$document_name.tex");
+
+	my $source_text = join "", <$source_file>;
+
+	$source_file->close();
+
+	# update the bibliographic reference
+
+	$source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
+
+	# update latex links to their proper file types.
+
+	my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
+
+	# write converted source
+
+	$source_file = IO::File->new(">$document_name/output/$document_name.tex");
+
+	print $source_file $source_htlatex;
+
+	$source_file->close();
     }
 
     # return result
