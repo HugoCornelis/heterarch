@@ -1194,7 +1194,7 @@ sub compile_latex
 						    command => "mkdir -p figures/",
 						   },
 						   {
-						    command => "cp -rp ../../figures/* figures/",
+						    command => "cp -rp ../../figures/* figures/ || true",
 						   },
 						   {
 						    command => "latex -halt-on-error '$filename'",
@@ -1228,7 +1228,7 @@ sub compile_latex
 								 command => "mkdir -p figures/",
 								},
 								{
-								 command => "cp -rp ../../figures/* figures/",
+								 command => "cp -rp ../../figures/* figures/ || true",
 								},
 								{
 								 command => "latex -halt-on-error '$filename'",
