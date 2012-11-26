@@ -1319,6 +1319,34 @@ sub compile_latex
 		close(OUTPUT);
 	    }
 
+	    {
+		# read latex source
+
+		use IO::File;
+
+		my $source_file = IO::File->new("<../$filename");
+
+		my $source_text = join "", <$source_file>;
+
+		$source_file->close();
+
+		# update the bibliographic reference
+
+		$source_text =~ s(\\bibliography\{\.\./\.\./tex/bib/)(\\bibliography\{\.\./\.\./\.\./tex/bib/)g;
+
+		# update latex links to their proper file types.
+
+		my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
+
+		# write converted source
+
+		$source_file = IO::File->new(">$filename");
+
+		print $source_file $source_htlatex;
+
+		$source_file->close();
+	    }
+
 	    $self->build_targets($options, undef, undef, $latex_2_html_compilation_model);
 
 	    # that the build leaves us in one of the build target directories
