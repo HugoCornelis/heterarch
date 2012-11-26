@@ -2384,6 +2384,10 @@ sub expand
 
 	# update latex links to their proper file types.
 
+	#t For clarity of the code: this should be done in a separate
+	#t block, or all the latex ! source modifiers should be
+	#t integrated.  One or the other.
+
 	my $source_htlatex = update_hyperlinks($self->{descriptor}, $source_text);
 
 	# write converted source
