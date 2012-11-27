@@ -1,0 +1,275 @@
+\documentclass[12pt]{article}
+\usepackage[dvips]{epsfig}
+\usepackage{color}
+%e.g.  \textcolor{red,green,blue}{text}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{enumitem} % [noitemsep,nolistsep] compact itemize/enumerate etc.
+\usepackage{scrtime}
+ 
+\begin{document}
+
+{\bf Related Documentation:}
+% start: userdocs-tag-replace-items related-todo
+% end: userdocs-tag-replace-items related-todo
+
+\section*{TWS: Documentation}
+
+\section{The TODO and the DONE List}
+
+This document contains a list of functions and descriptions that need
+to be implemented or incorporated in the software or software
+infrastructure.  The level of detail of the descriptions can vary
+between items.  After an item is described, it can be followed by a
+checklist with information of the level of implementation.  For
+example, subitems in the checklist can be marked with the word `DONE'.
+
+This document can grow when people add new functions that await
+implementation, and it can be consolidated by moving items that have
+been completed from the TODO list to the top of the DONE list.  Items
+are never removed from the DONE list.
+%  Some functions
+%are related to maintenance and they never disappear (such as Packaging
+%and Distribution).  They can be marked with 'WORKING'.
+
+This document becomes a repository of subtle technical knowledge of
+how this system is maintained and expanded over time.
+
+This TODO list was built on \today, \thistime.
+
+
+\section{TODO List}
+
+\subsection{Configurator}
+
+\begin{enumerate}
+\item On initial installation of the {\it Neurospaces Tool Chain} the
+  developer package installs a scripts {\tt neurospaces\_profile}.
+  This script allows to set the profile of the target machine.  The
+  target machine's profile is a configuration that is installed by the
+  {\tt Configurator} package.  Different version control branches of
+  the {\tt Configurator} package can install different profiles.
+\item The {\tt neurospaces\_profile} scripts pulls and installs a
+  user-selected branch of the {\tt Configurator} package.
+\item During the installation of a new configuration profile, the {\tt
+    Configurator} package, if necessary, uninstalls the old
+  configuration and then installs the new configuration.  This may
+  include compilation of sources as necessary.
+\item Every invocation of the {\tt heterarch-sync} scripts first syncs
+  the installed {\tt Configurator} package and installs its updates
+  since the last sync.  An update of the installation of the {\tt
+    Configurator} package and the target PC's profile may require a
+  recompilation of selected source files and reinstallation of
+  selected packages.  After this has been finished, the {\tt
+    heterarch-sync} script then continues with a regular sync of the
+  client HCMS implementation according to the locally installed {\tt
+    Configurator} configuration profile.
+\end{enumerate}
+
+\subsection{eps images}
+
+To reduce bandwidth requirements, it must be possible to import images
+in compressable formats such as PNG and GIF.  During compilation
+heterarch should convert these images on the fly where necessary.
+
+
+\subsection{neurospaces\_new\_component}
+
+Implement support for automatic detection of the IP address in the
+command {\tt neurospaces\_new\_component}, the assumption is that new
+content repositories are often created on the machine that will
+eventually serve their content to the internet.
+
+
+\subsection{Correct translation of page layouts from tex to html}
+eg. hfof-pg-6. I have emailed you a pdf made locally from the tex file . . .
+
+I tried to simplify and correct the latex.  Problem still unresolved.
+
+
+\subsection{Implement URL's in location bar}
+
+Not sure if the following are what you need:\\
+
+\noindent {\bf three-way-street.com}\\
+Hostmonster's Name Servers:\\
+Please change your name servers to the correct Hostmonster name servers.\\
+{\bf ns1.hostmonster.com \\
+ns2.hostmonster.com} \\
+
+\noindent Nameservers for a domain name are specialized servers that translate the domain name into an IP Address that is understood by computers on the internet. Each domain name registration includes a listing of nameservers that can answer for that domain name. Normally you should not need to change these from the default nameservers setup by HostMonster. If your domain name is not currently pointing to our nameservers, in order for your domain name to work with this hosting account, you will need to either:\\
+(a) transfer your domain name to use our registrar, or\\
+(b) configure the nameserver settings at the domain's current registrar to point to our nameservers:\\
+{\bf ns1.hostmonster.com  74.220.195.131\\
+ns2.hostmonster.com  69.89.16.8}\\
+
+\noindent {\bf allan-coop.com}\\
+Modify DNS Servers:\\
+If you select "Our Nameservers" the correct values will be set automatically.\\
+Specify Nameservers:	Custom Nameservers\\	
+Add More NS\\
+1.	{\bf NS7.IXWEBHOSTING.COM}	2.	{\bf NS8.IXWEBHOSTING.COM}
+
+
+\subsection{Reimplement build of allan-coop repository}
+
+
+\subsection{Homepages}
+
+Create home pages for the repositories:
+\begin{itemize}
+\item HFoF (DONE).
+\item overflow-design (DONE).
+\item allan-coop
+\end{itemize}
+
+
+\subsection{heterarch-gui}
+
+In the {\tt heterarch-gui} (otherwise known as the {\bf Neurospaces
+  Developer Management Console}) double click on a selected content
+item in a given repository to generate a local build of the content to
+check integrity of locally published item in a browser window.
+
+
+\section{DONE List}
+
+\subsection{heterach build output directory}
+
+It seems that iterative builds produce a wrong directory layout in the
+{\tt output/} directory.
+
+This has been solved as part of the implementation of the build
+procedure that uses a formal model of how to convert \LaTeX files to
+{\it html}..
+
+
+\subsection{It should be possible to link a single content item to multiple other content items}
+Maybe by repeating link format with multiple targets?
+
+After discussion, this was identified as partially overlapping with
+item~\ref{sec:gener-hyperl-betw}, and partially something to be
+implemented in a long time from now.
+
+\subsection{Generate hyperlinks between the contents of different repositories.}
+\label{sec:gener-hyperl-betw}
+Hyperlinks between different repositories are now supported through
+the \LaTeX command \textbackslash heterarchxref.  \textbackslash
+heterarchxref takes two arguments and is internally replaced with a
+\textbackslash href command where possible, or removed if necessary.
+
+
+\subsection{Correct problems with font substitutions translating from tex/pdf files to HTML.}
+\label{sec:corr-probl-with}
+I have emailed you the pdf file that is the build in my local repository for the front cover (pg. 1). 
+
+Likely this was a duplicate of item~\ref{sec:ensure-pdf-build}.
+
+
+\subsection{Ensure pdf build for website understands the LaTeX font style}
+\label{sec:ensure-pdf-build}
+\begin{verbatim}
+% Typeface
+\usepackage[condensed,math]{iwona}
+\usepackage[T1]{fontenc}
+There should be a sty file somewhere in the repository. If not let me know . . .
+\end{verbatim}
+
+The package texlive-fonts-extra needs to be installed on the server.
+
+
+\subsection{hfof-test-rtf}
+
+The test file for an rtf content build has the wrong name.
+
+
+\subsection{Repository Builds}
+
+Several repositories seem to be missing from the build process. They include
+\begin{description}[noitemsep,nolistsep] 
+\item {\bf nicola-moir}
+\item {\bf allan-coop}
+\item {\bf overflow-design}
+\item{\bf  tws}
+\end{description}
+Although, possibly there is no content listed as published in these repositories \ldots\\
+Assuming the listing from http://91.183.94.6/html/ describes what is being built \ldots
+
+\noindent	content-framework/	08-Nov-2012 06:01	 -	\\ 
+	content-framework\_data/	08-Nov-2012 06:01	 -	 \\
+	cough-cough/	28-Oct-2012 13:05	 -	 \\
+	cough-cough\_data/	28-Oct-2012 13:05	 -	\\ 
+	head-full-of-flames/	08-Nov-2012 05:04	 -	 \\
+	head-full-of-flames\_data/	08-Nov-2012 05:04	 -	 \\
+	occupy/	08-Nov-2012 05:08	 -	 \\
+	occupy\_data/	08-Nov-2012 05:08	 -	\\
+
+
+\subsection{Main index on the server.}
+
+Also not sure what is going on here at http://91.183.94.6/html/
+Index of /html
+
+\begin{verbatim}
+	Name					Last modified		Size	Description
+	Parent Directory	 	 	-	 
+	content-framework/			28-Oct-2012 02:01	 -	 
+	content-framework_data/		28-Oct-2012 02:01	 -	 
+	head-full-of-flames/			28-Oct-2012 02:05	 -	 
+	head-full-of-flames_data/		28-Oct-2012 02:05	 -	 
+	occupy/					28-Oct-2012 02:08	 -	 
+	occupy_data/				28-Oct-2012 02:08	 -	 
+\end{verbatim}
+Date of copy 5/11/12.
+\begin{verbatim}
+	content-framework/			07-Nov-2012 10:01	 -	 
+	content-framework_data/		07-Nov-2012 10:01	 -	 
+	cough-cough_data/			28-Oct-2012 13:05	 -	 
+	head-full-of-flames/			07-Nov-2012 10:04	 -	 
+	head-full-of-flames_data/		07-Nov-2012 10:04	 -	 
+	occupy/					07-Nov-2012 10:08	 -	 
+	occupy_data/				07-Nov-2012 10:08	 -	 
+\end{verbatim}
+
+
+\subsection{Cough-cough build.}
+As of 7/11/12, note cough-cough does not seem to be being built \ldots
+
+
+\subsection{Correct build errors in build email notifications.}
+
+
+\subsection{Implement doc$\rightarrow$HTML translation}
+
+This is a problem caused by debian switching to libre office.  See
+\href{http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=618750}{debian
+  bugs entry}.
+
+The solution provided there seems to correct the problem at first glance.
+
+\begin{verbatim}
+--- /usr/bin/jodconverter	2009-09-02 00:50:39.000000000 +0200
++++ /usr/bin/jodconverter	2011-03-16 14:23:17.213303999 +0100
+@@ -13,7 +13,7 @@
+ CLASSPATH="$CLASSPATH:$JAVACLASSES/commons-cli.jar:$JAVACLASSES/commons-io.jar:$JAVACLASSES/jodconverter.jar"
+ 
+ # libjodconverter-java deps
+-CLASSPATH="$CLASSPATH:$JAVACLASSES/openoffice/ridl.jar:$JAVACLASSES/openoffice/unoil.jar:$JAVACLASSES/openoffice/juh.jar:$JAVACLASSES/slf4j-api.jar:$JAVACLASSES/commons-io.jar:$JAVACLASSES/xstream.jar"
++CLASSPATH="$CLASSPATH:$JAVACLASSES/ridl.jar:/usr/share/libreoffice/basis3.3/program/classes/unoil.jar:$JAVACLASSES/juh.jar:$JAVACLASSES/slf4j-api.jar:$JAVACLASSES/commons-io.jar:$JAVACLASSES/xstream.jar"
+ 
+ # slf4j-api deps
+ CLASSPATH="$CLASSPATH:$JAVACLASSES/slf4j-jdk14.jar"
+\end{verbatim}
+\begin{verbatim}
+ends math mode in emacs: $
+\end{verbatim}
+
+
+\subsection{Implement odt$\rightarrow$HTML translation.}
+
+Added odt tag recognition and conversion.
+
+
+\end{document}
+
+
