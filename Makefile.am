@@ -15,6 +15,7 @@
 
 
 SUBDIRS = \
+	form_library \
 	perl
 #	python
 
