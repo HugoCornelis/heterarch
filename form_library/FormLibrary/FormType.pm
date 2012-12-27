@@ -400,9 +400,9 @@ sub formalize_content
 }
 
 
-my $sems_config = do "/var/sems/sems.config";
+# my $sems_config = do "/var/sems/sems.config";
 
-my $sesa_config = $sems_config->{sesa};
+# my $sesa_config = $sems_config->{sesa};
 
 
 sub formalize
@@ -456,32 +456,32 @@ sub formalize
 
 	    $header .= "</a>";
 
-	    # add module site specific header configuration
+# 	    # add module site specific header configuration
 
-	    my $module_name = "calibration";
+# 	    my $module_name = "calibration";
 
-	    my $module_config = $sesa_config->{module_config}->{$module_name};
+# 	    my $module_config = $sesa_config->{module_config}->{$module_name};
 
-	    my $site_headers = $module_config->{$self->{name}}->{header};
+# 	    my $site_headers = $module_config->{$self->{name}}->{header};
 
-	    if ($site_headers)
-	    {
-		foreach my $site_header (@$site_headers)
-		{
-		    my $ref = ref $site_header;
+# 	    if ($site_headers)
+# 	    {
+# 		foreach my $site_header (@$site_headers)
+# 		{
+# 		    my $ref = ref $site_header;
 
-		    if ($ref =~ /CODE/)
-		    {
-			#t calling conventions to be defined.
+# 		    if ($ref =~ /CODE/)
+# 		    {
+# 			#t calling conventions to be defined.
 
-			$header = &$site_header($self, $header);
-		    }
-		    else
-		    {
-			$header .= $site_header;
-		    }
-		}
-	    }
+# 			$header = &$site_header($self, $header);
+# 		    }
+# 		    else
+# 		    {
+# 			$header .= $site_header;
+# 		    }
+# 		}
+# 	    }
 
 	    $self->writer($header);
 	}
