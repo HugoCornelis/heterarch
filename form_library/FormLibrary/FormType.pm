@@ -503,15 +503,18 @@ sub formalize
 
 	my $validator = "return ($submit_logician(this) && $submit_validator(this))";
 
-	$self->writer
-	    (
-	     $query->start_form(
-				-action => $action,
-				-method => "post",
-				-name => $self->{name},
-				-onsubmit => $validator,
-			       )
-	    );
+	if ($self->{form} ne 'shared')
+	{
+	    $self->writer
+		(
+		 $query->start_form(
+				    -action => $action,
+				    -method => "post",
+				    -name => $self->{name},
+				    -onsubmit => $validator,
+				   )
+		);
+	}
     }
 
     if ($self->{output_mode} =~ /html/)
@@ -608,7 +611,10 @@ sub formalize
 
     if ($self->{output_mode} =~ /html/)
     {
-	$self->writer($query->end_form());
+	if ($self->{form} ne 'shared')
+	{
+	    $self->writer($query->end_form());
+	}
 
 	$self->writer('</center>');
 
