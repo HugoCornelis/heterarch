@@ -858,6 +858,8 @@ sub try_to_mail
 	return;
     }
 
+    print "Sending an email to $configuration->{MAILTO}\n";
+
     my $sendto = $configuration->{MAILTO};
 
     my $replyto = $configuration->{MAILFROM};
