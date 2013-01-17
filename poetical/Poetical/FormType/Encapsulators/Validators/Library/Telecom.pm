@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Validators::Library::Telecom;
+package Poetical::FormType::Encapsulators::Validators::Library::Telecom;
 
 
 use strict;
 
 
-use FormLibrary::FormType::Encapsulators::Validators::Library::Standard;
+use Poetical::FormType::Encapsulators::Validators::Library::Standard;
 
 
 sub _validate_rf_frequency
@@ -74,6 +74,6 @@ function $name(form_name,sesa_path)
 }
 
 
-FormLibrary::FormType::Encapsulators::Validators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Validators::Library::Standard::configure(__PACKAGE__);
 
 

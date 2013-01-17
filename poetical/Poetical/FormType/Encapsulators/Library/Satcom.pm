@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Library::Satcom;
+package Poetical::FormType::Encapsulators::Library::Satcom;
 
 
 use strict;
 
 
-use FormLibrary::FormType::Encapsulators::Library::Standard;
+use Poetical::FormType::Encapsulators::Library::Standard;
 
 
 sub _decapsulate_downlink_local_oscillator
@@ -141,6 +141,6 @@ sub _encapsulate_SA_y_axis_scale
 }
 
 
-FormLibrary::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
 
 

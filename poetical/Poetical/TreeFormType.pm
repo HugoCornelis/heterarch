@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::TreeFormType;
+package Poetical::TreeFormType;
 
 
 use strict;
@@ -10,10 +10,10 @@ use CGI qw(:cgi :html2 :html3 :form);
 use Data::Dumper;
 
 
-use FormLibrary::StaticFormType;
+use Poetical::StaticFormType;
 
 
-our @ISA = ("FormLibrary::StaticFormType");
+our @ISA = ("Poetical::StaticFormType");
 
 
 my $debug_enabled = 1;
@@ -403,8 +403,8 @@ sub _apply_user_formatting
 		    print STDERR "Format options are \n", Dumper($format_options);
 		}
 
-		#t synchronize with the types defined in FormLibrary::TableFormType.
-		#t probably and simply put in FormLibrary::FormType ?
+		#t synchronize with the types defined in Poetical::TableFormType.
+		#t probably and simply put in Poetical::FormType ?
 
 		my $encapsulator = "_encapsulate_$format_type";
 
@@ -2423,7 +2423,7 @@ sub parse_input
 }
 
 
-# test sub : test the functionality of FormLibrary::TreeFormType.
+# test sub : test the functionality of Poetical::TreeFormType.
 
 sub _main
 {
@@ -2539,7 +2539,7 @@ sub _main
     };
 
     my $document
-	= new FormLibrary::TreeFormType
+	= new Poetical::TreeFormType
 	    (
 	     CGI => $query,
 	     name => 'tree-tester',

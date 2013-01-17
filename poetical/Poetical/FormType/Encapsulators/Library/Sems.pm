@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Library::Sems;
+package Poetical::FormType::Encapsulators::Library::Sems;
 
 
 use strict;
@@ -9,7 +9,7 @@ use strict;
 
 use Data::Dumper;
 
-use FormLibrary::FormType::Encapsulators::Library::Standard;
+use Poetical::FormType::Encapsulators::Library::Standard;
 
 
 my $sems_config = do "/var/sems/sems.config";
@@ -309,6 +309,6 @@ sub _encapsulate_session_ucc
 }
 
 
-FormLibrary::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
 
 

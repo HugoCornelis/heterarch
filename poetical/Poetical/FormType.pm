@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType;
+package Poetical::FormType;
 
 
 use strict;
@@ -30,7 +30,7 @@ use Data::Dumper;
 # post.  This processing basically falls apart in a parse of the
 # input, a decapsulation (the opposite of encapsulation), a
 # detransformation if any (the opposite of a transformation, see
-# FormLibrary::Transform), and finally a merge of the resulting data
+# Poetical::Transform), and finally a merge of the resulting data
 # into the original data.
 #
 # 4. A set of miscellaneous method calls.  A the time of writing only the
@@ -47,7 +47,7 @@ sub AUTOLOAD
 
     my $method = $AUTOLOAD;
 
-    use FormLibrary::FormType::Encapsulators::Library::Standard;
+    use Poetical::FormType::Encapsulators::Library::Standard;
 
     local ($1,$2);
 
@@ -61,7 +61,7 @@ sub AUTOLOAD
 
     if ($method_name =~ /^(_encapsulate|_decapsulate)/)
     {
-	my $sub = "FormLibrary::FormType::Encapsulators::$method_name";
+	my $sub = "Poetical::FormType::Encapsulators::$method_name";
 
 	goto &$sub;
     }
@@ -82,7 +82,7 @@ sub add_client_side_encapsulator_logic
 
     my $path = $options->{path};
 
-    my $logic_generator = "FormLibrary::FormType::Encapsulators::Logic::$type";
+    my $logic_generator = "Poetical::FormType::Encapsulators::Logic::$type";
 
     my $logic;
 
@@ -115,7 +115,7 @@ sub add_client_side_encapsulator_validator
 
     my $path = $options->{path};
 
-    my $validator_generator = "FormLibrary::FormType::Encapsulators::Validators::$type";
+    my $validator_generator = "Poetical::FormType::Encapsulators::Validators::$type";
 
     my $validator;
 
@@ -413,7 +413,7 @@ sub formalize
 
     my $referer =  $ENV{HTTP_REFERER};
 
-#     #t counterpart of FormLibrary::Workflow processing, centralized abstraction needed.
+#     #t counterpart of Poetical::Workflow processing, centralized abstraction needed.
 
 #     $referer =~ s/;/\\;/g;
 
@@ -773,7 +773,7 @@ sub merge_data
 	# subs to merge two datastructures.
 	#
 
-	local $FormLibrary::FormType::data_merger_any
+	local $Poetical::FormType::data_merger_any
 	    = sub
 	      {
 		  my $contents = shift;
@@ -787,11 +787,11 @@ sub merge_data
 
 		  if ($type eq 'HASH')
 		  {
-		      &$FormLibrary::FormType::data_merger_hash($contents, $data);
+		      &$Poetical::FormType::data_merger_hash($contents, $data);
 		  }
 		  elsif ($type eq 'ARRAY')
 		  {
-		      &$FormLibrary::FormType::data_merger_array($contents, $data);
+		      &$Poetical::FormType::data_merger_array($contents, $data);
 		  }
 		  else
 		  {
@@ -801,7 +801,7 @@ sub merge_data
 		  }
 	      };
 
-	local $FormLibrary::FormType::data_merger_hash
+	local $Poetical::FormType::data_merger_hash
 	    = sub
 	      {
 		  my $contents = shift;
@@ -826,7 +826,7 @@ sub merge_data
 				  # two references of the same type, go one
 				  # level deeper.
 
-				  &$FormLibrary::FormType::data_merger_any($contents->{$section}, $value);
+				  &$Poetical::FormType::data_merger_any($contents->{$section}, $value);
 			      }
 			      else
 			      {
@@ -855,7 +855,7 @@ sub merge_data
 		  }
 	      };
 
-	local $FormLibrary::FormType::data_merger_array
+	local $Poetical::FormType::data_merger_array
 	    = sub
 	      {
 		  my $contents = shift;
@@ -882,7 +882,7 @@ sub merge_data
 				  # two references of the same type, go one
 				  # level deeper.
 
-				  &$FormLibrary::FormType::data_merger_any($contents->{$section}, $value);
+				  &$Poetical::FormType::data_merger_any($contents->{$section}, $value);
 			      }
 			      else
 			      {
@@ -917,12 +917,12 @@ sub merge_data
 	#t that keeps track of examined paths.  Then use the path to store
 	#t encountered value in the original data.
 
-	#t Note that the iterator is partly implemented in FormLibrary::Transform and
-	#t FormLibrary::TreeFormType.  A further abstraction could be useful.
+	#t Note that the iterator is partly implemented in Poetical::Transform and
+	#t Poetical::TreeFormType.  A further abstraction could be useful.
 
 	# first inductive step : merge all data.
 
-	&$FormLibrary::FormType::data_merger_hash($contents, $data->{detransformed});
+	&$Poetical::FormType::data_merger_hash($contents, $data->{detransformed});
     }
 
     # if a regular button has been pressed
@@ -1011,7 +1011,7 @@ sub merge_data
 #
 # parameter()
 #
-# Basically a FormLibrary::FormType specific frontend to CGI::param().
+# Basically a Poetical::FormType specific frontend to CGI::param().
 #
 
 sub parameter

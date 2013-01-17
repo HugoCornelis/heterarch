@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Logic::Library::Standard;
+package Poetical::FormType::Encapsulators::Logic::Library::Standard;
 
 
 use strict;
@@ -93,7 +93,7 @@ sub configure
 
 	    no strict "refs";
 
-	    *{"FormLibrary::FormType::Encapsulators::Logic::$exported_sub"} = \&{"${package}::$sub"};
+	    *{"Poetical::FormType::Encapsulators::Logic::$exported_sub"} = \&{"${package}::$sub"};
 	}
     }
 

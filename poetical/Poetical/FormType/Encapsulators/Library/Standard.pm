@@ -2,7 +2,7 @@
 #
 
 
-package FormLibrary::FormType::Encapsulators::Library::Standard;
+package Poetical::FormType::Encapsulators::Library::Standard;
 
 
 use strict;
@@ -10,14 +10,14 @@ use strict;
 
 use Data::Dumper;
 
-use FormLibrary::FormType::Encapsulators::Logic::Library::Standard;
-use FormLibrary::FormType::Encapsulators::Validators::Library::Standard;
+use Poetical::FormType::Encapsulators::Logic::Library::Standard;
+use Poetical::FormType::Encapsulators::Validators::Library::Standard;
 
-require FormLibrary::FormType::Encapsulators::Library::ACS;
-require FormLibrary::FormType::Encapsulators::Library::Satcom;
-require FormLibrary::FormType::Encapsulators::Library::Sems;
-require FormLibrary::FormType::Encapsulators::Library::Telecom;
-require FormLibrary::FormType::Encapsulators::Library::Webmin::Net;
+require Poetical::FormType::Encapsulators::Library::ACS;
+require Poetical::FormType::Encapsulators::Library::Satcom;
+require Poetical::FormType::Encapsulators::Library::Sems;
+require Poetical::FormType::Encapsulators::Library::Telecom;
+require Poetical::FormType::Encapsulators::Library::Webmin::Net;
 
 
 sub _decapsulate_boolean_on_off
@@ -516,7 +516,7 @@ sub configure
 	{
 	    no strict "refs";
 
-	    *{"FormLibrary::FormType::Encapsulators::$sub"} = \&{"${package}::$sub"};
+	    *{"Poetical::FormType::Encapsulators::$sub"} = \&{"${package}::$sub"};
 	}
     }
 

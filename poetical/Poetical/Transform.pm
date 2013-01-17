@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::Transform;
+package Poetical::Transform;
 
 
 use strict;
@@ -1201,7 +1201,7 @@ $result->{content}' . "${prefix}->[$result->{library}->{_lib_transform_hash_to_a
 }
 
 
-# test sub : test the functionality of FormLibrary::Transform.
+# test sub : test the functionality of Poetical::Transform.
 
 sub _main
 {
@@ -1277,7 +1277,7 @@ sub _main
     $devices = $config->{devices};
 
     my $transformation1
-	= new FormLibrary::Transform
+	= new Poetical::Transform
 	    (
 	     name => 'tree-tester',
 	     contents => $tree->{devices} ? $tree->{devices} : $tree,
@@ -1316,7 +1316,7 @@ sub _main
 #    print "c entries source $c_entries_source =? c entries result $c_entries_result\n";
 
     my $transformation2
-	= new FormLibrary::Transform
+	= new Poetical::Transform
 	    (
 	     name => 'devices',
 	     contents => $devices,

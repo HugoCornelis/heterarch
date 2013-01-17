@@ -15,7 +15,7 @@
 
 
 SUBDIRS = \
-	form_library \
+	poetical \
 	perl
 #	python
 

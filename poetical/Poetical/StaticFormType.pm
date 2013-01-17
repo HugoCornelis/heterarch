@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::StaticFormType;
+package Poetical::StaticFormType;
 
 
 use strict;
@@ -10,10 +10,10 @@ use CGI;
 
 use Data::Dumper;
 
-use FormLibrary::FormType;
+use Poetical::FormType;
 
 
-our @ISA = ("FormLibrary::FormType");
+our @ISA = ("Poetical::FormType");
 
 
 sub new

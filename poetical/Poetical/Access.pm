@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::Access;
+package Poetical::Access;
 
 
 use strict;
@@ -52,7 +52,7 @@ sub configure
 }
 
 
-print STDERR "In FormLibrary::Access\n";
+print STDERR "In Poetical::Access\n";
 
 sub import
 {
@@ -64,7 +64,7 @@ sub import
 
     shift;
 
-    $package->FormLibrary::Access::configure(@_);
+    $package->Poetical::Access::configure(@_);
 }
 
 
@@ -158,7 +158,7 @@ sub check_access
 
     $$level = $editable;
 
-    print STDERR "FormLibrary Access Levels : $editable, $$level, $::editable\n";
+    print STDERR "Poetical Access Levels : $editable, $$level, $::editable\n";
 
     return 1;
 }

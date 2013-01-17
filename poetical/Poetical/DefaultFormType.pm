@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::DefaultFormType;
+package Poetical::DefaultFormType;
 
 
 use Data::Dumper;
@@ -103,7 +103,7 @@ sub DefaultGuesser
 
     # set default class.
 
-    my $guessed_class = 'FormLibrary::DefaultFormType';
+    my $guessed_class = 'Poetical::DefaultFormType';
 
     my $guessed_format = GuessFormat($documented_hash);;
 

@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Library::Telecom;
+package Poetical::FormType::Encapsulators::Library::Telecom;
 
 
 use strict;
@@ -9,8 +9,8 @@ use strict;
 
 use Data::Dumper;
 
-use FormLibrary::FormType::Encapsulators::Library::Standard;
-use FormLibrary::FormType::Encapsulators::Validators::Library::Telecom;
+use Poetical::FormType::Encapsulators::Library::Standard;
+use Poetical::FormType::Encapsulators::Validators::Library::Telecom;
 
 
 sub _decapsulate_ip_address
@@ -181,6 +181,6 @@ sub _encapsulate_url
 }
 
 
-FormLibrary::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
 
 

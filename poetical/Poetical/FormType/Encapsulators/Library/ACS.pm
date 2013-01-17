@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Library::ACS;
+package Poetical::FormType::Encapsulators::Library::ACS;
 
 
 use strict;
 
 
-use FormLibrary::FormType::Encapsulators::Library::Standard;
+use Poetical::FormType::Encapsulators::Library::Standard;
 
 
 my $bands_database = do "/var/sems/acs/bands";
@@ -94,6 +94,6 @@ sub _encapsulate_present_satellite
 }
 
 
-FormLibrary::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
 
 

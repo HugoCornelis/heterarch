@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Validators::Library::Standard;
+package Poetical::FormType::Encapsulators::Validators::Library::Standard;
 
 
 use strict;
@@ -123,7 +123,7 @@ sub configure
 
 	    no strict "refs";
 
-	    *{"FormLibrary::FormType::Encapsulators::Validators::$exported_sub"} = \&{"${package}::$sub"};
+	    *{"Poetical::FormType::Encapsulators::Validators::$exported_sub"} = \&{"${package}::$sub"};
 	}
     }
 

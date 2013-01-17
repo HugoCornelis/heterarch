@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::LogFormType;
+package Poetical::LogFormType;
 
 
 use Data::Dumper;
@@ -9,10 +9,10 @@ use Data::Dumper;
 use IO::File;
 
 
-use FormLibrary::FormType;
+use Poetical::FormType;
 
 
-@ISA = ("FormLibrary::FormType");
+@ISA = ("Poetical::FormType");
 
 
 sub form_info_contents

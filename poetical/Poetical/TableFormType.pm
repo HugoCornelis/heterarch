@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::TableFormType;
+package Poetical::TableFormType;
 
 
 use strict;
@@ -9,10 +9,10 @@ use strict;
 
 use Data::Dumper;
 
-use FormLibrary::StaticFormType;
+use Poetical::StaticFormType;
 
 
-our @ISA = ("FormLibrary::StaticFormType");
+our @ISA = ("Poetical::StaticFormType");
 
 
 sub form_info_contents

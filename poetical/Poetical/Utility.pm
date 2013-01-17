@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::Utility;
+package Poetical::Utility;
 
 
 #
@@ -27,8 +27,8 @@ package FormLibrary::Utility;
 #
 # These subs are normally only frontends for the low-level subs they
 # should call.  Export only the high-level ones, i.e. the ones you
-# have defined.  Next, implement FormLibrary modules for the new
-# config file.
+# have defined.  Next, implement Poetical modules for the new config
+# file.
 #
 
 
@@ -42,7 +42,7 @@ our $stderr_logging = 0;
 
 BEGIN
 {
-#     use FormLibrary::Persistency;
+#     use Poetical::Persistency;
 
     # default : stderr_logging is disabled
 
@@ -171,7 +171,7 @@ BEGIN
 
 	# export specified symbols into the callers namespace
 
-	FormLibrary::Utility->export_to_level(1, @_);
+	Poetical::Utility->export_to_level(1, @_);
     }
 
     # only if we are root
@@ -181,11 +181,11 @@ BEGIN
 
     if ($< eq 0)
     {
-	my $logfile = create_backup_name('/var/log/formlibrary_error.log');
+	my $logfile = create_backup_name('/var/log/poetical_error.log');
 
-	# redirect STDERR FormLibrary one-shot log.
+	# redirect STDERR Poetical one-shot log.
 
-	`>$logfile ; ln -sf $logfile /var/log/formlibrary_error.log`;
+	`>$logfile ; ln -sf $logfile /var/log/poetical_error.log`;
 
 	use CGI::Carp qw(carpout);
 	use FileHandle;
@@ -296,7 +296,7 @@ sub cache_write
     my $header = <<EOH;
 #!/usr/bin/perl
 # -*- perl -*-
-# FormLibrary cache file.
+# Poetical cache file.
 # Date : (__DATE__)
 # Name : ($filename)
 #

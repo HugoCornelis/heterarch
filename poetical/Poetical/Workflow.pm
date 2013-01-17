@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::Workflow;
+package Poetical::Workflow;
 
 
 #
@@ -225,7 +225,7 @@ sub _generate_sequence
 
     my $history = $options->{history} || '';
 
-#     #t counterpart of FormLibrary::FormType processing, centralized abstraction needed.
+#     #t counterpart of Poetical::FormType processing, centralized abstraction needed.
 
 #     $history =~ s/\\;/;/g;
 

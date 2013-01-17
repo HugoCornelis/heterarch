@@ -240,7 +240,7 @@ AC_SUBST(TEST_SPECIFICATION_FILES)
 
 
 AC_CONFIG_FILES([Makefile
-		 form_library/Makefile
+		 poetical/Makefile
 		 perl/Makefile])
 dnl 		 python/Makefile])
 

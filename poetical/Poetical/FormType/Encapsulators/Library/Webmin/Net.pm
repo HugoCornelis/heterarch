@@ -1,13 +1,13 @@
 #!/usr/bin/perl -w
 #
 
-package FormLibrary::FormType::Encapsulators::Library::Satcom;
+package Poetical::FormType::Encapsulators::Library::Satcom;
 
 
 use strict;
 
 
-use FormLibrary::FormType::Encapsulators::Library::Standard;
+use Poetical::FormType::Encapsulators::Library::Standard;
 
 
 #t this breaks things inside web-lib.pl, do not know what exactly, do not know why.
@@ -88,6 +88,6 @@ sub _encapsulate_name_service_selector
 }
 
 
-FormLibrary::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
+Poetical::FormType::Encapsulators::Library::Standard::configure(__PACKAGE__);
 
 
