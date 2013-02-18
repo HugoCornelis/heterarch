@@ -363,11 +363,48 @@ options :
 
 	    $html .= $cgi->h1($content->{description});
 
-	    if ($content->{comment})
+	    if ($content->{comment}
+		|| $content->{overview})
 	    {
-		$html .= $cgi->font( { -size => 2, }, $content->{comment});
+		# give header
 
-		$html .= $cgi->br();
+		$html .= $cgi->h4("Overview, Comments, Preparation, Reparation");
+
+		# create table
+
+		my $count = 1;
+
+		my $source = {};
+
+		if ($content->{overview})
+		{
+		    $source->{$count . ". Overview"} = $content->{overview};
+
+		    $count++;
+		}
+
+		if ($content->{comment})
+		{
+		    $source->{$count . ". Comments"} = $content->{comment};
+
+		    $count++;
+		}
+
+		# render
+
+		$html
+		    .= html_table_code
+			(
+			 "${directory}_${file}_starter",
+			 $source,
+			);
+
+# 		if ($content->{comment})
+# 		{
+# 		    $html .= $cgi->font( { -size => 2, }, $content->{comment});
+
+# 		    $html .= $cgi->br();
+# 		}
 	    }
 
 	    # create index for this file
@@ -499,7 +536,7 @@ options :
 		    {
 			# output source code
 
-			#! guessing turned on when need to turn executables into highligted source code.
+			#! guessing turned on when need to turn executables into highlighted source code.
 
 			my $guessing = `pwd` =~ /heccer/;
 
@@ -521,18 +558,26 @@ options :
 		$html .= $cgi->hr();
 
 		if ($command_definition->{comment}
+		    || $command_definition->{overview}
 		    || $command_definition->{preparation}
 		    || $command_definition->{reparation})
 		{
 		    # give header
 
-		    $html .= $cgi->h4("Comments, Preparation, Reparation");
+		    $html .= $cgi->h4("Overview, Comments, Preparation, Reparation");
 
 		    # create table
 
 		    my $count = 1;
 
 		    my $source = {};
+
+		    if ($command_definition->{overview})
+		    {
+			$source->{$count . ". Overview of this test definition"} = $command_definition->{overview};
+
+			$count++;
+		    }
 
 		    if ($command_definition->{comment})
 		    {
@@ -946,7 +991,7 @@ sub output_source
 	}
 	else
 	{
-	    die "source_type for $source_text_file cannot be determined";
+# 	    die "source_type for $source_text_file cannot be determined";
 	}
     }
 
@@ -958,9 +1003,13 @@ sub output_source
     {
 	$result->{source_type} = "cpp";
     }
-    elsif ($source_profile =~ /perl/)
+    elsif ($source_profile =~ /perl/i)
     {
 	$result->{source_type} = "perl";
+    }
+    elsif ($source_profile =~ /python/i)
+    {
+	$result->{source_type} = "python";
     }
     else
     {
@@ -970,7 +1019,7 @@ sub output_source
     # if this is a known source type
 
     if (defined $result->{source_type}
-	&& $result->{source_type} =~ m(cpp|perl))
+	&& $result->{source_type} =~ m(cpp|perl|python))
     {
 	# set result: where to find the source text
 
