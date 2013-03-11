@@ -1,10 +1,6 @@
 -*- outline -*-
 
-* Item 1
-** subitem 1
-*** subsubitem 1
-
-This file is in outline mode.  Outline mode is used by the emacs
-family of editors and can easily be converted to latex or html.
-
+* CPAN packages to investigate
+** Lucy search engine
+http://search.cpan.org/~logie/Lucy-0.3.2/lib/Lucy.pod
 
