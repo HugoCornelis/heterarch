@@ -121,6 +121,33 @@ sub main
 
     my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
 
+    # if there is a project descriptor
+
+    my $project_descriptor_filename = "$build_directory/project-descriptor.yml";
+
+    if (-f $project_descriptor_filename)
+    {
+	# if it is valid yaml
+
+	my $project_descriptor;
+
+	eval
+	{
+	    $project_descriptor = YAML::LoadFile($project_descriptor_filename);
+	};
+
+	if ($@)
+	{
+	    die "$0: *** Error: invalid project descriptor $project_descriptor_filename";
+	}
+	elsif (exists $project_descriptor->{'document directory'})
+	{
+	    # add the directory where documents are found to the build directory
+
+	    $build_directory = "$build_directory/$project_descriptor->{'document directory'}";
+	}
+    }
+
     my $selected_tags = [ @ARGV, ];
 
     if (!defined $selected_tags)
