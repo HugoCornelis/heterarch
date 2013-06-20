@@ -52,7 +52,7 @@ sub build_directory
 	{
 	    # add the directory where documents are found to the build directory
 
-	    $result = "$build_directory/$project_descriptor->{'document directory'}";
+	    $result = "$result/$project_descriptor->{'document directory'}";
 	}
     }
 
