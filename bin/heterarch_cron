@@ -48,7 +48,7 @@ my $home_page_document = "${documentation_set_name}-homepage";
 
 my $output_filename = "${documentation_set_name}_cron.out";
 my $descriptor_check = "";
-my $build_directory = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+my $build_directory = Neurospaces::Documentation::build_directory();
 
 
 $SIG{__DIE__}

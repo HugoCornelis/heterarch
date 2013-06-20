@@ -83,7 +83,7 @@ sub main
 
     # switch to the build directory
 
-    my $build_directory = "$ENV{HOME}/neurospaces_project/$option_set_name/source/snapshots/0/";
+    my $build_directory = Neurospaces::Documentation::build_directory();
 
     if (!chdir $build_directory)
     {

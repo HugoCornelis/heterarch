@@ -86,7 +86,7 @@ sub main
 {
     read_cmd_line();
 
-    my $build_directory = "$ENV{HOME}/neurospaces_project/$option_set_name/source/snapshots/0";
+    my $build_directory = Neurospaces::Documentation::build_directory();
 
     # get all documents from the command line
 

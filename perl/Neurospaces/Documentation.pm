@@ -22,6 +22,44 @@ my $documentation_set_name = $1;
 my $root_operation_name = $2;
 
 
+sub build_directory
+{
+    #t this should come from a query using neurospaces_build because
+    #t it is the only one that knows about the project layout.
+
+    my $result = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+
+    # if there is a project descriptor
+
+    my $project_descriptor_filename = "$result/project-descriptor.yml";
+
+    if (-f $project_descriptor_filename)
+    {
+	# if it is valid yaml
+
+	my $project_descriptor;
+
+	eval
+	{
+	    $project_descriptor = YAML::LoadFile($project_descriptor_filename);
+	};
+
+	if ($@)
+	{
+	    die "$0: *** Error: invalid project descriptor $project_descriptor_filename";
+	}
+	elsif (exists $project_descriptor->{'document directory'})
+	{
+	    # add the directory where documents are found to the build directory
+
+	    $result = "$build_directory/$project_descriptor->{'document directory'}";
+	}
+    }
+
+    return $result;
+}
+
+
 sub find_documentation
 {
     use YAML;
