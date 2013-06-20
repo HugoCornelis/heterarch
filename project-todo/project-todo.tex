@@ -40,10 +40,117 @@ This TODO list was built on \today, \thistime.
 
 \section{TODO List}
 
-\subsection{Sesa}
+\subsection{Adding New Bands / Repositories}
 
-Rename it to {\bf wepl} as an Perl based antagonist for Python's {\bf
-  web.py}.
+Copied from an email conversation
+\href{https://mail.google.com/mail/?shva=1#inbox/139fccd6799c1896}{in
+  Hugo's email box}.
+
+\begin{verbatim}
+likely this will need further changes in the near future, to address
+some of the security concerns that were raised this morning and over
+the last few days.
+
+
+* add components on the server
+neurospaces_new_component --component-name cough-cough --content-set
+--repository-port 10001
+neurospaces_new_component --component-name head-full-of-flames
+--content-set --repository-port 10002
+neurospaces_new_component --component-name overflow-design
+--content-set --repository-port 10003
+
+* update on the server configuration in /etc/neurospaces/developer/build.yml
+** build order of new packages
+
+* check package configuration
+** neurospaces_packages
+** neurospaces_repositories
+
+* add keys to the monotone repositories
+mtn --db ~/neurospaces_project/MTN/tws.mtn pubkey allan.coop@gmail.com
+>/tmp/allan.coop.key
+mtn --db ~/neurospaces_project/MTN/tws.mtn pubkey
+hugo.cornelis@gmail.com >/tmp/hugo.cornelis.key
+
+mtn read </tmp/allan.coop.key --db ~/neurospaces_project/MTN/cough-cough.mtn
+mtn read </tmp/allan.coop.key --db
+~/neurospaces_project/MTN/head-full-of-flames.mtn
+mtn read </tmp/allan.coop.key --db ~/neurospaces_project/MTN/overflow-design.mtn
+
+mtn read </tmp/hugo.cornelis.key --db ~/neurospaces_project/MTN/cough-cough.mtn
+mtn read </tmp/hugo.cornelis.key --db
+~/neurospaces_project/MTN/head-full-of-flames.mtn
+mtn read </tmp/hugo.cornelis.key --db
+~/neurospaces_project/MTN/overflow-design.mtn
+
+* restart the monotone servers
+** /etc/init.d/neurospaces-servers stop
+** /etc/init.d/neurospaces-servers startmtn read </tmp/allan.coop.key
+--db ~/neurospaces_project/MTN/cough-couhg.mtn
+
+
+* on a client
+** add new packages to configuration in /etc/neurospaces/developer/build.yml
+
+* now the servers are up and running
+** they serve empty content
+** add content on a client machine with write access and checkin
+
+-------
+
+* Add initial content to the workspace on the server.
+** to assure correct integration with the developer package.
+* Initial checkin on the server.
+** to assure correctly integrated content is being served.
+
+-------
+
+* on a client machine
+** neurospaces_create_directories
+** neurospaces_sync --regex <repo-name>
+
+-------
+
+* on all machines of interested clients
+** add to /etc/neurospaces/developer/build.yml
+
+
+---
+all_packages:
+  cough-cough:
+    order: 10001
+    version_control:
+      port_number: 10001
+      server: 91.183.94.6
+  head-full-of-flames:
+    order: 10002
+    version_control:
+      port_number: 10002
+      server: 91.183.94.6
+  overflow-design:
+    order: 10003
+    version_control:
+      port_number: 10003
+      server: 91.183.94.6
+
+-------
+
+* on all machines of interested clients
+neurospaces_pull --regex cough-cough
+
+* to check write access where necessary:
+neurospaces_sync --regex cough-cough
+
+* to check integration with the developer package
+** make sure sudo is working
+** then:
+neurospaces_update --regex cough-cough
+neurospaces_configure --regex cough-cough
+neurospaces_install --regex cough-cough
+
+
+\end{verbatim}
 
 \subsection{Invoice meta data}
 
@@ -152,6 +259,14 @@ check integrity of locally published item in a browser window.
 
 
 \section{DONE List}
+
+\subsection{Sesa}
+
+Rename it to {\bf wepl} as an Perl based antagonist for Python's {\bf
+  web.py}.
+
+Sesa has been renamed to Poetical.
+
 
 \subsection{heterach build output directory}
 
