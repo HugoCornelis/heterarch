@@ -2353,9 +2353,75 @@ sub expand
 
 	    #t note that latex commands embedded in the curly braces will not work properly.
 
-	    if ($contents =~ s(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})($1\\href{../../$2/$3}{$4})g)
+	    while ($contents =~ m(([^\\])\\heterarchxref\{../../../../../([\-a-zA-Z]*)/source/snapshots/0/([^\}]*)\}\{([^\}]*)\})gs) #($1\\href{../../$2/$3}{$4})
 	    {
-		print "Replaced ($1\\heterarchxref\{../../../../../$2/source/snapshots/0/$3\}\{$4\}) with ($1\\href{../../$2/$3}{$4})\n";
+		my $position = pos($contents);
+
+		my $prefix = $1;
+
+		my $prefixqm = quotemeta($prefix);
+
+		my $component_name = $2;
+
+		my $component_nameqm = quotemeta($component_name);
+
+		my $document_path = $3;
+
+		my $document_pathqm = quotemeta($document_path);
+
+		my $link_text = $4;
+
+		my $link_textqm = quotemeta($link_text);
+
+# 		if ($options->{verbose})
+		{
+		    print "$0: Checking ($1\\heterarchxref\{../../../../../$2/source/snapshots/0/$3\}\{$4\}) for replacement with ($1\\href{../../$2/$3}{$4})\n";
+		}
+
+		# if the component is locally installed
+
+		if (-d "$ENV{HOME}/neurospaces_project/$component_name")
+		{
+		    # keep these links local
+
+# 		    if ($options->{verbose})
+		    {
+			print "$0: Converting to a local href ($document_path)\n";
+		    }
+
+		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{../../../../../$component_name/source/snapshots/0/$document_path\}\{$link_text\})gs)
+		    {
+		    }
+		    else
+		    {
+			print "$0: *** Error: did not match ($component_name/$document_path) while it was previously found for local href conversion\n";
+		    }
+		}
+
+		# else the component is not locally installed
+
+		else
+		{
+		    # create href to a well known server for this component
+
+# 		    if ($options->{verbose})
+		    {
+			print "$0: Converting to a global href ($document_path)\n";
+		    }
+
+		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{http://91.183.94.6/heterarch/$component_name/$document_path\}\{$link_text\})gs)
+		    {
+		    }
+		    else
+		    {
+			print "$0: *** Error: did not match ($component_name/$document_path) while it was previously found for global href conversion\n";
+		    }
+
+		}
+
+		# restore the matching position
+
+		pos($contents) = $position;
 	    }
 
 	    # if something has changed
