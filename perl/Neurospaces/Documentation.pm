@@ -2389,7 +2389,7 @@ sub expand
 			print "$0: Converting to a local href ($document_path)\n";
 		    }
 
-		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{../../../../../$component_name/source/snapshots/0/$document_path\}\{$link_text\})gs)
+		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{../../../../../html/htdocs/neurospaces_project/$component_name/$document_path\}\{$link_text\})gs)
 		    {
 		    }
 		    else
