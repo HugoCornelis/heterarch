@@ -1107,6 +1107,12 @@ sub build_targets
 
     my $compilation_model = shift;
 
+    # create the directory for this target
+
+    mkdir $compilation_model->{filetype};
+
+    chdir $compilation_model->{filetype};
+
     # if this filetype needs to be built
 
     my $needs_rebuild = 1;
@@ -1152,11 +1158,17 @@ sub build_targets
 	    {
 		print "$0: *** Error: ($command) failed, $?\n";
 
+		chdir '..';
+
 		return "($command) failed";
 	    }
 
 	}
     }
+
+    # we have built this target, go back to the parent directory
+
+    chdir '..';
 
     # loop over all targets
 
@@ -1171,14 +1183,8 @@ sub build_targets
 		# we are still in the directory of the previous target, so
 		# go to the parent directory
 
-		chdir '..';
+# 		chdir '..';
 	    }
-
-	    # create the directory for this target
-
-	    mkdir $target->{filetype};
-
-	    chdir $target->{filetype};
 
 	    # build the target in this directory
 
@@ -1315,6 +1321,31 @@ sub compile_latex
 					    },
 					   ],
 			       },
+			       {
+				build_commands => [
+# 						   {
+# 						    command => "cp -rp ../../plos2009.bst .",
+# 						   },
+						   {
+						    command => "cp -rp '../$filename' .",
+						   },
+						   {
+						    command => "mkdir -p figures/",
+						   },
+						   {
+						    command => "cp -rp ../../figures/* figures/ || true",
+						   },
+						   {
+						    command => "latexml --dest='$filename_base.xml' '$filename_base'",
+						   },
+						   {
+						    command => "latexmlpost --novalidate --dest='$filename_base.html' '$filename_base'",
+						   },
+						  ],
+				filedate => 0,
+				filename => "$filename_base.html",
+				filetype => 'latexml',
+			       },
 			      ],
 		  };
 
@@ -1333,8 +1364,6 @@ sub compile_latex
 	    $self->build_targets($options, undef, undef, $latex_2_html_compilation_model);
 
 	    # that the build leaves us in one of the build target directories
-
-	    chdir '..';
 
 	    chdir '..';
 
