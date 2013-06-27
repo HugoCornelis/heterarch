@@ -1,0 +1,239 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim}
+\usepackage[dvips]{epsfig}
+\usepackage{color}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+
+\begin{document}
+
+\section*{GENESIS: Documentation}
+
+{\bf Related Documentation:} \\
+\href{../genesis-system/genesis-system.tex}{\bf GENESIS\,System}
+% start: userdocs-tag-replace-items related-do-nothing
+% end: userdocs-tag-replace-items related-do-nothing
+
+\section*{Developer Installation Ubuntu (Precise)}
+
+Installing GENESIS on Ubuntu requires executing the following major steps. {\bf Note}: Installation requires administrator privileges.
+\begin{itemize}
+   \item[] Prepare and upgrade the system software.
+   \item[] Download and install the {\it DeveloperPackage}.
+   \item[] Install the software packages.
+   \item[] Check if the installation was successful. 
+\end{itemize}
+
+\subsection*{Prepare and upgrade the system software}
+
+\subsubsection*{Note on configuring sudo}
+
+When you install the G-3 developers release, it will create a
+``neurospaces\_project'' directory for development work in the home
+directory of the user doing the installation.  This will hold
+subdirectories for each of the G-3 software components.  Normally, you
+will want this user to be yourself, rather than root.  In order to
+make it possible to install files in system directories, the install
+process makes use of sudo.  Thus, you will need to install sudo and
+add yourself to the {\it /etc/sudoers file}.  Ideally, you should use
+a tool called {\it visudo} to edit this file, in order to add your
+username.  However, the easiest way on a secure single-user system,
+such as a personal laptop, is as root to do (for example for user
+'joeuser'):
+
+\begin{verbatim}
+        echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+\end{verbatim}
+
+
+\subsubsection*{Packages to Install}
+
+\begin{itemize}
+\item[] Install the following packages using the Start Menu.  Type
+  'software' in the edit box of the Start Menu and use any of the
+  proposed software package management systems.  We have used the
+  management system called 'Synaptic' (if 'Synaptic' is not installed,
+  it can be installed using the 'Muon' program available from the
+  Start Menu).  Always follow the option to install additional
+  dependencies.
+      \begin{itemize}
+         \item libyaml-perl
+         \item libexpect-perl
+         \item libinline-perl
+         \item libfile-find-rule-perl
+         \item libdigest-sha-perl
+         \item libdevel-ptkdb-perl
+         \item libreadline-dev
+         \item autoconf
+         \item automake
+         \item make
+         \item libc6-dev
+         \item libncurses5-dev
+         \item flex
+         \item bison
+         \item libperl-dev
+         \item patch
+         \item python-dev
+         \item python-yaml
+         \item swig
+         \item libclone-perl
+         \item libterm-readline-gnu-perl
+         \item libxml-simple-perl
+         \item latex2rtf
+         \item biblatex
+         \item tex4ht
+         \item texlive-humanities
+         \item rst2pdf
+         \item unrtf
+         \item jodconverter
+         \item monotone
+         \item libgtk2-perl
+         \item libgraphviz-perl
+         \item libsdl-perl
+         \item xaw3dg
+         \item libintl-perl
+         \item doxygen
+         \item cpanminus
+         \item texlive-xetex
+         \item texlive-fonts-extra
+         \item texlive-fonts-recommended
+         \item latexml
+
+           % g-tube
+
+         \item mercurial
+         \item python-numpy
+         \item python-wxgtk2.8
+         \item python-wxglade
+
+           % mtn-browse
+
+         \item libgtk2-sourceview2-perl
+         \item meld
+      \end{itemize}
+ \end{itemize}
+
+ From the command line, the {\tt apt-get} command may be useful to
+ install all the packages at once.
+
+
+\subsection*{Download and Install the {\it DeveloperPackage}}
+
+\begin{enumerate}
+   \item Download the latest version of the {\it DeveloperPackage}, available from the \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf GENESIS package archive}. It is called {\it developer-release-label.tar.gz}, where {\it release-label} is the current release identifier.
+   \item Change to the directory where you downloaded the file.
+   \item Unpack the archive by typing ``{\tt tar xfz developer-release-label.tar.gz}''.
+   \item Change to the directory with the content of the archive by typing ``{\tt cd developer-release-label}''.
+   \item Configure by typing ``{\tt ./configure}''.  If this step fails, it is likely due missing dependencies.  If you let us know what dependencies were missing for you, we can update this page, and avoid installation problems for other people.
+   \item Compile by typing ``{\tt make}''.
+   \item Install by typing ``{\tt sudo make install}''. 
+\end{enumerate}
+
+\subsection*{Install software packages}
+
+\begin{enumerate}
+   \item Use the installer script to create the correct directory layout by typing ``{\tt neurospaces\_create\_directories}''.
+   \item Pull the archives of the source code by typing ``{\tt neurospaces\_pull}''.
+   \item Update the source code in the working directories by typing ``{\tt neurospaces\_update}''.
+   \item Generate {\it make} files by typing ``{\tt neurospaces\_configure}''.
+   \item Compile and install the software by typing ``{\tt neurospaces\_install}''.
+\end{enumerate}
+
+\subsection*{Check if the installation was successful}
+
+This step is optional but strongly advised.
+
+\begin{itemize}      
+   \item[] Run tests of all the packages and save tester output to a file  by typing ``{\tt neurospaces\_check >/tmp/check.out 2>\&1}''.
+   \item[] Check the output by typing ``{\tt less /tmp/check.out}''. Importantly, search for lines containing the string {\tt error\_count}.
+\end{itemize}
+    
+
+%\subsection*{Optional Dependencies}
+
+%\subsubsection*{G-Tube}
+
+%As the G-Tube is becoming more mature as the official G-3 GUI, it is
+%strongly recommended that you also install the dependencies of the G-Tube:
+
+%\begin{itemize}
+%\item mercurial
+%\item python-numpy
+%\item python-wxgtk2.8
+%\item python-wxglade
+%\end{itemize}
+
+%\subsubsection*{Neurospaces Studio Testing (Optional)}
+
+%After successful installation, issue the shell command ``{\tt
+%  neurospaces cells/purkinje/edsjb1994.ndf --gui}'' to check that the
+%graphical component works of the Neurospaces Studio are working
+%correctly.
+
+\subsection*{Upgrading an Installation}
+
+While G-3 is under rapid development, it is important to frequently
+upgrade your installation with the ``neurospaces\_upgrade'' command.
+As with ``neurospaces\_install'', this is performed in your home
+directory, with the output and error messages directed to a log file.
+
+If Error messages are found in the upgrade log file, they may indicate
+a new dependency that needs to be installed.  When upgrading an older
+version, sometimes the installation of a particular software component
+will fail, but repeating the ``neurospaces\_upgrade'' will result in a
+successful installation.  If there have been changes in the {\bf
+  DeveloperPackage} that prevent a successful upgrade, you may update
+this package first, by using the command:
+
+\begin{verbatim}
+    neurospaces_upgrade --regex developer
+\end{verbatim}
+
+and then perform a normal neurospaces\_upgrade.
+ 
+\subsection*{Optional: Browsing Version History}
+
+It may be useful to core developers to browse recent version history
+and inspect specific changes implementing new functionality.  G-3 uses
+both {\bf monotone} and {\bf mercurial} for
+\href{../version-control/version-control.tex}{version control}.
+
+To browse the change history stored in a (local) {\bf monotone}
+repository,
+%install the following dependencies:
+%\begin{itemize}
+%\item libgtk2-sourceview2-perl
+%\item meld
+%\end{itemize}
+%Then
+ download and install {\bf mtn-browse} from
+\href{http://www.coosoft.plus.com/software.html}{http://www.coosoft.plus.com/software.html}.
+
+
+\subsection*{Uninstalling G-3 Components}
+
+The script ``neurospaces\_uninstall'' will uninstall G-3 but leave the
+workspaces unaltered.  The script will also uninstall the developer
+package, so it can best be used with a ``--regex'' option to select
+the component you want to uninstall:
+
+\begin{verbatim}
+    neurospaces_uninstall --regex model-container
+\end{verbatim}
+
+A special script uninstalls all the G-3 components but reinstalls the
+{\bf DeveloperPackage} afterwards.
+
+\begin{verbatim}
+    neurospaces_dev_uninstall --regex developer
+\end{verbatim}
+
+Note that these commands leave the workspaces unaltered.
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
