@@ -4,6 +4,12 @@
 \usepackage{color}
 \usepackage{url}
 \usepackage[colorlinks=true]{hyperref}
+\usepackage{enumitem} % [noitemsep,nolistsep] compact itemize/enumerate etc.
+\usepackage[margin=2cm]{geometry}
+
+% Typeface
+\usepackage[condensed,math]{iwona}
+\usepackage[T1]{fontenc}
 
 \begin{document}
 
@@ -17,7 +23,7 @@
 \section*{Developer Installation Ubuntu (Precise)}
 
 Installing GENESIS on Ubuntu requires executing the following major steps. {\bf Note}: Installation requires administrator privileges.
-\begin{itemize}
+\begin{itemize}[noitemsep,nolistsep] 
    \item[] Prepare and upgrade the system software.
    \item[] Download and install the {\it DeveloperPackage}.
    \item[] Install the software packages.
@@ -45,19 +51,29 @@ such as a personal laptop, is as root to do (for example for user
         echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 \end{verbatim}
 
+\subsubsection*{Configuring sudo for Mac OS X}
+
+At a command line prompt in a terminal window enter the following command to open the visudo editor:
+
+\begin{verbatim}
+        sudo visudo -f /etc/sudoers
+\end{verbatim}
+In the editor window add the following line at the end of the file (employing the standard {\tt vi} commands, e.g. {\tt i}--insert):        
+\begin{verbatim}
+        joeuser ALL=(ALL) NOPASSWD:ALL
+\end{verbatim}
 
 \subsubsection*{Packages to Install}
 
-\begin{itemize}
-\item[] Install the following packages using the Start Menu.  Type
+Install the following packages using the Start Menu.  Type
   'software' in the edit box of the Start Menu and use any of the
   proposed software package management systems.  We have used the
   management system called 'Synaptic' (if 'Synaptic' is not installed,
   it can be installed using the 'Muon' program available from the
   Start Menu).  Always follow the option to install additional
   dependencies.
-      \begin{itemize}
-         \item libyaml-perl
+\begin{description}[noitemsep,nolistsep] 
+	\item libyaml-perl
          \item libexpect-perl
          \item libinline-perl
          \item libfile-find-rule-perl
@@ -110,16 +126,13 @@ such as a personal laptop, is as root to do (for example for user
 
          \item libgtk2-sourceview2-perl
          \item meld
-      \end{itemize}
- \end{itemize}
-
+ \end{description}
  From the command line, the {\tt apt-get} command may be useful to
  install all the packages at once.
 
+\subsection*{Download and Install the {\emph{DeveloperPackage}}}
 
-\subsection*{Download and Install the {\it DeveloperPackage}}
-
-\begin{enumerate}
+\begin{enumerate}[noitemsep,nolistsep]
    \item Download the latest version of the {\it DeveloperPackage}, available from the \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf GENESIS package archive}. It is called {\it developer-release-label.tar.gz}, where {\it release-label} is the current release identifier.
    \item Change to the directory where you downloaded the file.
    \item Unpack the archive by typing ``{\tt tar xfz developer-release-label.tar.gz}''.
@@ -131,7 +144,7 @@ such as a personal laptop, is as root to do (for example for user
 
 \subsection*{Install software packages}
 
-\begin{enumerate}
+\begin{enumerate}[noitemsep,nolistsep]
    \item Use the installer script to create the correct directory layout by typing ``{\tt neurospaces\_create\_directories}''.
    \item Pull the archives of the source code by typing ``{\tt neurospaces\_pull}''.
    \item Update the source code in the working directories by typing ``{\tt neurospaces\_update}''.
@@ -143,10 +156,17 @@ such as a personal laptop, is as root to do (for example for user
 
 This step is optional but strongly advised.
 
-\begin{itemize}      
-   \item[] Run tests of all the packages and save tester output to a file  by typing ``{\tt neurospaces\_check >/tmp/check.out 2>\&1}''.
-   \item[] Check the output by typing ``{\tt less /tmp/check.out}''. Importantly, search for lines containing the string {\tt error\_count}.
-\end{itemize}
+\begin{description}[noitemsep,nolistsep]
+   \item Run tests of all the packages and save tester output to a file  by typing:
+   \begin{verbatim}
+   neurospaces\_check >/tmp/check.out 2>&1
+   \end{verbatim}
+   \item Check the output by typing:
+   \begin{verbatim}
+   less /tmp/check.out
+   \end{verbatim}
+   Importantly, search for lines containing the string {\tt error\_count}.
+\end{description}
     
 
 %\subsection*{Optional Dependencies}
@@ -189,7 +209,7 @@ this package first, by using the command:
     neurospaces_upgrade --regex developer
 \end{verbatim}
 
-and then perform a normal neurospaces\_upgrade.
+and then perform a normal {\tt neurospaces\_upgrade}.
  
 \subsection*{Optional: Browsing Version History}
 
