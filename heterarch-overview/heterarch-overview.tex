@@ -1,0 +1,111 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim}
+\usepackage[dvips]{epsfig}
+\usepackage{color}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{enumitem} % [noitemsep,nolistsep] compact itemize/enumerate etc
+\usepackage[margin=2cm]{geometry}
+
+% Typeface
+\usepackage[condensed,math]{iwona}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+
+\section*{HETERARCH: Documentation}
+
+{\bf Related Documentation:}
+% start: userdocs-tag-replace-items related-do-nothing
+% end: userdocs-tag-replace-items related-do-nothing
+
+\section*{Heterarch}
+
+\subsection*{Preamble}
+
+The Heterarch Content Management System ({\bf \small HCMS}) is an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} for {\bf Three\,Way\,Street}. 
+
+%E-publication of the physical book {\bf{\emph{Head\,Full\,of\,Flames}}} ({\bf \small HFoF}) is used as a proof of concept for our novel approach to the structure and management of online content for the purpose of sophisticated online e-publication and community building.
+
+The distinguishing feature of {\bf \small HCMS} is its use of modern techniques for the organization, structure, and recovery of digital content. Our approach is heterarchical and provides a powerful alternative to more traditional hierarchical methods of content management. It is the heterarchical nature of the {\bf \ small HCMS} that allows content recovery to be defined within ``explore'' and ``discover'' paradigms, as opposed to the still widely employed but limited alternative, the ``search'' paradigm.
+
+A change in perspective from search to discover has many benefits for both developers and users. In particular, for the developer, it allows a far greater degree of automation for the many non-trivial but time consuming processes associated with sophisticated distributed personalized digital content broadcasting and content management. For the user, it provides a powerful information-based learning experience.
+
+\subsection*{Document Purpose}
+
+This document provides an introductory overview of the functionality of {\bf \small HCMS}.
+
+\subsection*{Definitions}
+
+There are two domains of human functionality associated with the {\bf \small HCMS}. Each of these domains is divided into two further sub-domains:
+
+\begin{enumerate}[noitemsep,nolistsep] 
+\item {\href{../hfof-developer/hfof-developer.tex}{\bf Developers:}}\\
+The two sub-domains of developer functionality include:
+	\begin{description}[noitemsep,nolistsep] 
+	\item {\bf Content Developer}\\
+	A content developer must obtain authorization from a repository owner before being able to directly access a given 
+	repository.
+		\begin{description}[noitemsep,nolistsep] 
+		\item {\bf Authorized Content Developer:}\\
+		An authorized content developer is any person given access to a repository for the purpose of creating, adding, 
+		and/or modifying content. Two types of content developer are recognized:
+			\begin{description}[noitemsep,nolistsep] 
+			\item {\bf Repository owner(s):}\\
+			By default, the owner(s) of a repository is/are authorized content developer(s).
+			\item {\bf Authorized content developer(s):}\\
+			The owner(s) of a repository can authorize any person the permissions required to access {\bf \small 
+			HCMS} functionality of the given repository for the purpose of creating and/or adding content owned by the 
+			authorized person.
+			\end{description}
+		\end{description}			
+	\item {\bf Software Developer}\\
+	A software developer extends {\bf \small HCMS} functionality by the creation and integration of new software and 
+	functionality.
+	\end{description}
+\item {\bf Users:}\\
+The two sub-classes of user include:
+	\begin{description}[noitemsep,nolistsep] 
+	\item {\bf Content User}\\
+	A content user is any person who is not an Authorized Content Developer who accesses {\bf \small HCMS} content 
+	through a web browser.
+	\item {\bf Software User}\\
+	A software user is any person who employs {\bf \small HCMS} software functionality to manage a given {\bf \small 
+	HCMS} repository.
+	\end{description}
+\end{enumerate}
+
+\subsection*{HCMS Access}
+
+Access to a repository, content creation, content addition, and content modification are controlled by (a) repository owner(s).
+
+\subsection*{System Structure}
+
+We now describe content items and the way they are structured, implemented, and managed, and introduce the system functionality and its control within a {\bf \small HCMS} repository.
+
+\subsubsection*{The HCMS Repository}
+
+Each {\bf \small HCMS} installation generates a stand alone repository containing the software required to support {\bf \small HCMS} functionality, and manage and update repository content.\\
+Content items can be either generated in or added to this repository by the repository owner or an authorized content developer.\\
+Each content item may range in size from a single link to the addressable storage space known to a given {\bf \small HCMS}.\\
+External content can be hyperlinked to content within a {\bf \small HCMS} repository.
+
+\subsubsection*{Repository Location}
+
+A {\bf \small HCMS} repository includes the directory structure of a given installation and the directory where content items are maintained. Following installation of a {\bf \small HCMS}, the default location of the repository is:
+
+\begin{verbatim}
+    ~/neurospaces_project/<repository-name>/source/snapshots/0
+\end{verbatim}
+The source materials for individual content items are located in uniquely named folders/directories in this repository (at the end of the path in directory/folder ``0''). One of the directories/folders in the repository is named\,{\it NewDocument}. This default content item and the files it contains provide the templates for the creation of a new content item. The files of interest are called\,{\it descriptor.yml}, {\it NewDocument.tex}, and the sub-directory {\it figures}.
+
+\subsubsection*{Content Items}
+
+An individual content item may have any size or any length. It may contain any number of photographs/illustrations and links to any other content located in either the same repository, another {\bf \small HCMS} repository, or elsewhere on the internet.\\
+{\bf Importantly, the addition of any content to a workspace or repository is an acknowledgement by the authorized content developer of their ownership rights.}\\
+For more detailed information see \href{../developer-content/developer-content.tex}{\bf Developer\,Content}.
+
+\bibliographystyle{plain}
+\bibliography{../tex/bib/g3-refs.bib}
+
+\end{document}
