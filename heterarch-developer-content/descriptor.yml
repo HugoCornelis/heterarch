@@ -4,7 +4,8 @@ description: Content developer documentation for Heterarch Content Management Sy
 document name: heterarch-developer-content
 tags:
   - heterarch
+  - locked
   - developer
-  - technical
+  - content
   - tex
   - published

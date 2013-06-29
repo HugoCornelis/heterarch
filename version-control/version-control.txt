@@ -1,47 +1,0 @@
-GENESIS: Documentation
-Related Documentation:
-
-Version Control
-Version control of the GENESIS documentation system is currently handled by the monotone software package. Monotone is a distributed version control tool that can help automate many tedious and error-prone tasks in group software development, e.g. · Store multiple versions of files you are working on efficiently. · Transmit changes to files between you and your colleagues. · Merge changes you make with those your colleagues make. · Make notes about your opinion of the quality of versions of files. · Make decisions about using or ignoring versions, depending on the notes you receive from others. Please be aware that monotone is a slightly unorthodox version control tool, and many of its concepts are similar­but subtly or significantly different­from concepts with similar names in other version control tools. Monotone provides a simple, single-file transactional version store, with fully disconnected operation and an efficient peer-to-peer synchronization protocol. it understands history-sensitive merging, lightweight branches, integrated code review and 3rd party testing. It uses cryptographic version naming and client-side RSA certificates. It has good internationalization support, has no external dependencies and runs on Linux, Solaris, OSX, Windows, and other Unixes.
-
-Obtaining Monotone
-Monotone can be obtained by downloading the package appropriate for your computing platform from the links on the monotone home page.
-
-1
-
-Initializing Monotone
-Once the appropriate monotone package has been downloaded and installed on your computer, monotone must be initialized by performing the following steps (commands in the monospaced typewriter font should be entered from a Terminal command line prompt): 1. Generate a monotone key: mtn genkey <identifier> where the <identifier> is unique to you (typically an email account, e.g. yourname@provider). The identifier is located in a .monotone directory in your home folder located in the /Users folder. 2. Initialize the data base mtn --db=userdocs.mtn db init This creates the monotone repository file userdocs.mtn which is referenced with --db=userdocs.mtn 3. Create a workspace mtn --db=userdocs.mtn --branch="0" setup userdocs This creates a workspace directory on your local machine where you put the source files for any documentation that you create. Importantly, there is a specific required structure and content for documents in the GENESIS documentation system that is described in Create a Document. The path to the workspace directory should be ~/neurospaces_project/userdocs/source/snapshots/0 By default, the workspace directory 0 contains a folder named MTN. This is part of the monotone version control system and contains information concerning monotone's version control management. The command 2
-
-mtn --db=userdocs.mtn pubkey <identifier> > me.pubkey will place a copy of your public key in the file indicated in --db=userdocs.mtn. An automatic login can be set up with monotone by making an executable file containing the following code: ~/.monotone/monotonerc: function get_password(keypair_id) return <password here> end Further information and help about using monotone, for example resolving conflicts between documents, can be found at: http://monotone.ca/monotone.html.
-
-GENESIS and the Monotone Version Control System
-Installation and maintenance of the GENESIS documentation system is fully automated with document versioning under the control of monotone.
-
-Overview
-In its simplest form, the GENESIS documentation version control system can be seen as having three levels (see figure below): 1. The local documentation workspace: Exists at a specified location within the GENESIS developers installation on your local machine. The contents of this workspace are private to the local filesystem. 2. The private document repository: Provides the first step in document publication. Documentation version control is initiated by checking documents in your local workspace into the document repository on your local machine.
-
-3
-
-3. The public document repository: Pushing documents from your local repository to the publicly accessible repository makes all documentation in your local repository available (i) for publication on the GENESIS website and (ii) to become part of the GENESIS documentation system that can optionally be downloaded as part of a GENESIS installation. It also allows other members of your development team to work simultaneously on documentation.
-
-The components of the monotone version control system are illustrated in the above figure. It shows the relationship between a local workspace, its associated monotone repository, and how after an initial "check in" (ci), a document can be "pushed" to the monotone server database that forms a monotone repository. Note that documents are private to your local account until they are pushed to the monotone server. At this point they become available to other registered users of the monotone system. Once a document is located on the monotone server repository, it is available to be published as part of the GENESIS documentation system. This means that it will be automatically incorporated and downloaded as part of the userdocs module when GENESIS is installed or updated.
-
-4
-
-Monotone Workflow Examples
-The following sections give some example workflows for monotone use. More detailed tutorials and documentation are available from the monotone website.
-
-Updating the Local Workspace
-Updating your local workspace begins with determining which files are registered with monotone. This is done by querying your local monotone repository. This generates a list of any new files that may have been added to your local work space since the last update mtn ls unknown This command generates a list of all files in your local workspace that are not known to monotone. To have any files that this command lists added to your local repository, enter: mtn add --unknown Reissuing the "mtn ls unknown" command should now result in no output. Alternatively, once files have been registered in your local workspace, the following command reports which have been changed since the last code check in (see following): mtn ls changed Importantly, the default file type for the GENESIS Documentation SysA tem is the L TEX .tex file. To register a different file type with monotone and add it to your local workspace, for example a PDF file (see Common Suffixes for a more complete list of recognized file types), use the following command: mtn add --no-respect-ignore <directory-name>/<file-name>.pdf The files that have been registered with monotone can now be added to your local repository with the following command: mtn ci where ci stands for "check in". Monotone responds by opening the log file indicated in . --db=userdocs.mtn where the nature of the changes or revision to the document(s) that are being checked in can be recorded. 5
-
-Synchronizing the Local Workspace with the Monotone Repository
-The following procedure is suggested for syncing with repository at the end of each day and/or documentation writing session. mtn ls unknown . . . mtn add --unknown These commands add any new files discovered in your local workspace to your local monotone repository. That this has occurred correctly can be checked with mtn ls known . This command should generate the same list of file names as that returned by the "mtn ls unknown" command. Note the period "." which is part of the command syntax. You can then check for files in you local workspace that have been deleted or moved mtn ls missing You can then drop any files missing from your local workspace repository by entering: mtn drop --missing and then check in the changes to the monotone repository on the server with mtn ci You can automate the synchronization of your local data base (i.e. a push and a pull) with the monotone repository on the server by placing an executable file (named for example, userdocs-sync) in a bin directory in your local work space, e.g. neurospaces project/userdocs/source/snapshots/0/bin. The executable contains the command sequence: neurospaces_sync --enable userdocs --regex userdocs --verbose and issuing the command 6
-
-userdocs-sync simultaneously updates the monotone repository on the server and transfers any updates to documentation on the server to your local monotone repository. Once this has been done, the files that have been pushed to the monotone server are available for other registered users to pull down to their own local monotone repository and to check them out (co) to their local workspace.
-
-File Recovery
-The latest version of a file can be recovered with the following command mtn revert <file name> .
-
-7
-
-

@@ -23,27 +23,24 @@
 
 \subsection*{Preamble}
 
-The Heterarch Content Management System ({\bf \small HCMS}) is an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} for {\bf Three\,Way\,Street}. 
-
+The Heterarch Content Management System ({\bf \small HCMS}) is an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} for {\bf Three\,Way\,Street}.\\
 %E-publication of the physical book {\bf{\emph{Head\,Full\,of\,Flames}}} ({\bf \small HFoF}) is used as a proof of concept for our novel approach to the structure and management of online content for the purpose of sophisticated online e-publication and community building.
-
-The distinguishing feature of {\bf \small HCMS} is its use of modern techniques for the organization, structure, and recovery of digital content. Our approach is heterarchical and provides a powerful alternative to more traditional hierarchical methods of content management. It is the heterarchical nature of the {\bf \ small HCMS} that allows content recovery to be defined within ``explore'' and ``discover'' paradigms, as opposed to the still widely employed but limited alternative, the ``search'' paradigm.
-
+The distinguishing feature of {\bf \small HCMS} is its use of modern techniques for the organization, structure, and recovery of digital content and/or identity. Our approach is heterarchical and provides a powerful alternative to more traditional hierarchical methods of software implementation and content management. It is the heterarchical nature of the {\bf \small HCMS} that allows content recovery to be defined within an educational paradigm that ranges from ``search'', through ``explore'' to ``discovery''.\\
 A change in perspective from search to discover has many benefits for both developers and users. In particular, for the developer, it allows a far greater degree of automation for the many non-trivial but time consuming processes associated with sophisticated distributed personalized digital content broadcasting and content management. For the user, it provides a powerful information-based learning experience.
 
 \subsection*{Document Purpose}
 
-This document provides an introductory overview of the functionality of {\bf \small HCMS}.
+This document provides an introductory overview of {\bf \small HCMS} functionality.
 
 \subsection*{Definitions}
 
-There are two domains of human functionality associated with the {\bf \small HCMS}. Each of these domains is divided into two further sub-domains:
+There are two domains of human activity associated with the {\bf \small HCMS}. Each of these domains is divided into two further sub-domains:
 
 \begin{enumerate}[noitemsep,nolistsep] 
-\item {\href{../hfof-developer/hfof-developer.tex}{\bf Developers:}}\\
+\item {\href{../hfof-developer/hfof-developer.tex}{\bf Developer}}\\
 The two sub-domains of developer functionality include:
 	\begin{description}[noitemsep,nolistsep] 
-	\item {\bf Content Developer}\\
+	\item[A.] {\bf Content Developer}\\
 	A content developer must obtain authorization from a repository owner before being able to directly access a given 
 	repository.
 		\begin{description}[noitemsep,nolistsep] 
@@ -59,21 +56,175 @@ The two sub-domains of developer functionality include:
 			authorized person.
 			\end{description}
 		\end{description}			
-	\item {\bf Software Developer}\\
+	\item[B.] {\bf Software Developer}\\
 	A software developer extends {\bf \small HCMS} functionality by the creation and integration of new software and 
 	functionality.
 	\end{description}
-\item {\bf Users:}\\
+\item {\bf User}\\
 The two sub-classes of user include:
 	\begin{description}[noitemsep,nolistsep] 
-	\item {\bf Content User}\\
+	\item[A.] {\bf Content User}\\
 	A content user is any person who is not an Authorized Content Developer who accesses {\bf \small HCMS} content 
 	through a web browser.
-	\item {\bf Software User}\\
+	\item[B.] {\bf Software User}\\
 	A software user is any person who employs {\bf \small HCMS} software functionality to manage a given {\bf \small 
 	HCMS} repository.
 	\end{description}
 \end{enumerate}
+
+\subsection*{Heterarch Installation}
+
+Developer or Software Use of {\bf\small Heterarch} requires it to be installed on your local machine. A {\bf\small Heterarch} developer installation is defined as an installation that synchronizes with the \href{../developer-repository/developer-repository.tex}{\bf Developer\,Repositories} and is under \href{../version-control/version-control.tex}{\bf Version\,Control}. In these cases the following installation procedure must be followed.
+
+\subsection*{Prerequisites}
+
+There are several prerequisites to the construction of a {\bf\small{Heterarch}} development environment. These include:
+
+\begin{description}[noitemsep,nolistsep]
+\item {\bf Required tools:}\\
+{\it gdb},\,{\it gcc}, and\,{\it (x)Emacs} with the\,{\it elisp} packages.
+\item \href{../version-control/version-control.tex}{{\bf Version\,control:}}\\
+Monotone is used as a statically linked binary (currently version 0.45). As it is a distributed version control system, developers can use, {\it monotone} to maintain and exchange their code repositories and executables. Monotone installation is supported by the\,{\it DeveloperPackage}. 
+\item {\bf  The \href{../developer-package/developer-package.tex}{\emph{DeveloperPackage}}:}\\
+Can optionally be used to do initial directory layout. Importantly, the\,{\it DeveloperPackage} requires the correct directory layout. See the script {\it neurospaces\_create\_directories} below.
+\end{description}
+{\bf Note:} Compiling from source will only produce executables and libraries for the host architecture. For example if you have a 64-bit system and 32-bit {\bf Perl}, the compiled {\bf SWIG} libraries will not load, giving an error citing "wrong architecture." So when compiling on a machine make sure that {\bf Perl}, {\bf Python} and all of their loadable modules and libraries are of the same architecture as the host machine.
+
+\subsection*{Download Code for Heterarch Developer Installation}
+
+% Source code for Heterarch can be found at: \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf GENESIS package archive}.
+
+The easiest way to get the latest version of the {\bf\small{Heterarch}} source code is via the  \href{../developer-package/developer-package.tex}{\bf{\emph{DeveloperPackage}}}.
+
+\subsection*{Software Dependencies}
+
+Prior to installing {\bf\small{Heterarch}} on your local computer you will need to install the necessary software dependencies. A general list of software dependencies can be found in \href{../heterarch-dependencies/heterarch-dependencies.tex}{\bf Heterarch\,Dependencies}. More specific dependencies are given in the installation documentation of the supported operating systems. For an overview see \href{../heterarch-installation/heterarch-installation.tex}{\bf Heterarch\,Installation}.
+
+\subsection*{Prerequisite Operations}
+
+Once you have software dependencies like {\bf monotone} installed you must set up some things on your machine in order to use the {\it DeveloperPackage}. 
+
+\subsubsection*{Setting up your monotone key}
+
+In order to use monotone the user needs to create their monotone key using the command:
+
+\begin{verbatim}
+  mtn genkey email@myaddress.com
+\end{verbatim}
+The email you use does not need to be a valid email address, it is simply an identifier that other developers using the repository will use to associate with your checkins. Even if you are not going to be checking in any code you still need a key to create and update your workspace. After entering the command it will prompt you for a passphrase, that will be used as a password whenever you perform any operations on the repository.
+ After creating your key with your desired email identifier you will have a new directory in your home directory called {\it .monotone}. To keep from having to enter your passphrase every time you perform any monotone operation, you may automate it by creating a file in {\it .monotone} called {\it monotonerc}. In your {\it monotonerc} file place this code:
+ 
+\begin{verbatim}
+   function get_passphrase(keypair_id)	
+      return "mypassword"
+   end
+\end{verbatim}
+where the text {\it mypassword} is your passphrase, that you created earlier. 
+
+\subsection*{Installing the {\emph{DeveloperPackage}}}
+
+Download the latest version of the {\it DeveloperPackage}, available from the \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf Heterarch\,package\,archive}.  It is called {\it developer-release-label.tar.gz}, where {\it release-label} is the current release identifier. ({\bf Note:} If downloading via your browser, do not unpack the package during the download as it will be placed into its own subdirectory).
+\begin{enumerate}[noitemsep,nolistsep]
+   \item Change to the directory where you downloaded the file.
+   \item Unpack archive: ``{\tt tar xfz developer-release-label.tar.gz}''.
+   \item Change to the directory with the content of the archive: ``{\tt cd developer-release-label}''.
+   \item Configure the {\it DeveloperPackage}: ``{\tt ./configure}''.
+   \item Compile and install the {\it DeveloperPackage}: ``{\tt sudo make install}'' (requires administrator privileges).
+\end{enumerate}
+
+\subsection*{General Developer Installation Procedure}
+
+Following manual installation of the \href{../developer-package/developer-package.tex}{\bf{\emph{DeveloperPackage}}}, the generalized scheme to download and install the available Heterarch components
+%\href{../reserved-words/reserved-words.tex}{\bf Components}
+is via the following commands:
+
+\begin{enumerate}[noitemsep,nolistsep]
+\item {\bf Create the correct directory layout:}
+\begin{verbatim}
+   neurospaces_create_directories
+\end{verbatim}
+
+\item {\bf Pull all the code from the remote repositories:}
+\begin{verbatim}
+   neurospaces_pull
+\end{verbatim}
+
+\item {\bf Create workspace with up to date source code:}
+\begin{verbatim}
+   neurospaces_update
+\end{verbatim}
+
+\item {\bf Generate make files:}
+\begin{verbatim}
+   neurospaces_configure
+\end{verbatim}
+
+\item {\bf Clean all workspaces:} (Used when upgrading {\emph{DeveloperPackage}}, or following a build to remove previously built files).
+\begin{verbatim}
+   neurospaces_clean
+\end{verbatim}
+
+\item {\bf Compile and install all the packages:}
+\begin{verbatim}
+   neurospaces_install
+\end{verbatim}
+
+\item {\bf Optionally check if the installation is successful:}
+\begin{verbatim}
+   neurospaces_check
+\end{verbatim}
+
+\end{enumerate}
+
+\section*{Accessing the Version Control Repository from the {\emph{DeveloperPackage}}}
+
+%The version control repository is accessible from the {\it DeveloperPackage}. Important for this feature to work is to have the correct directory layout on your developer machine.
+
+%In summary, what you want to do is this: {\it pull} the set of default packages from the servers:
+%\begin{verbatim}
+%   neurospaces_build --repo-pull repo-genesis3.cbi.utsa.edu --repo-co \
+%      --verbose --developer --directories-create --no-configure \
+%      --no-compile --no-install
+%\end{verbatim}
+%This command has options that inhibit the default actions of configuration, compilation and installation. If you also want to compile and install in just one run, simply omit those options:
+
+%\begin{verbatim}
+%   neurospaces_build --repo-pull repo-genesis3.cbi.utsa.edu --repo-co \
+%      --verbose --developer --directories-create
+%\end{verbatim}
+
+There are developer friendly frontends to the {\it neurospaces\_build} script in the {\it DeveloperPackage}:
+\begin{description}[noitemsep,nolistsep]
+\item {\it neurospaces\_serve}\\
+Starts serving the source code repositories such that other people can {\it pull} and {\it sync} to your machine ({\bf Note} This locks all your databases).
+\item {\it neurospaces\_pull}\\
+Download the source code from a repository.
+\item {\it neurospaces\_status}\\
+Check for local source code modification (no network required).
+\item {\it neurospaces\_sync}\\
+Synchronize local source code modification with a repository.
+\item {\it neurospaces\_update}\\
+Update local source code using the repositories locally stored on your computer (ie. a local operation). 
+\end{description}
+
+\section*{Global Resources}
+
+A Heterarch developer keeps developer resources in the directory
+
+\begin{verbatim}
+   $HOME/neurospaces_project/
+\end{verbatim}
+In this directory we find a subdirectory for each of the software components currently under development.
+Besides the directories associated with software components, we also
+find directories for local documentation ({\bf
+  \$HOME/neurospaces\_project/docs}) and for source code repositories
+for the \href{../version-control/version-control.tex}{\bf version\,control\,systems} 
+that require a dedicated directory for this.  {\bf
+  \$HOME/neurospaces\_project/\_MTN} is such a directory.
+A personal text file {\bf TODO.txt} keeps track of items that await
+local implementation, but maybe are only indirectly related to {\bf\small{Heterarch}} development.  This file is commonly formatted according to the
+\href{http://www.gnu.org/software/emacs/}{\bf Emacs}\href{http://www.emacswiki.org/emacs/OutlineMode}{\bf\--outline\,major\,mode}.
+The Emacs outline mode can be converted to latex and HTML when needed.
 
 \subsection*{HCMS Access}
 

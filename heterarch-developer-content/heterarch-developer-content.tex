@@ -19,19 +19,17 @@
 % start: userdocs-tag-replace-items related-do-nothing
 % end: userdocs-tag-replace-items related-do-nothing
 
-\section*{Developer Content Management Documentation}
+\section*{Developer Content Management}
 
 This document provides information for the {\bf \small Heterarch} Content Management System ({\bf \small HCMS}), an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} in collaboration with {\bf Three\,Way\,Street}.
 
-\subsection*{Software}
+\subsection*{Interaction with HCMS Functionality}
 
-\subsubsection*{Interaction with {\bf \small HCMS} Functionality}
-
-{\bf \small HCMS} is controlled in one of three ways determined by the functionality required (see \href{../heterarch-overview/heterarch-overview.tex}{\bf Definitions} for details):
+{\bf \small HCMS} is accessed or controlled in one of three ways. This is determined by level of experience and the functionality required (see Definitions in \href{../heterarch-overview/heterarch-overview.tex}{\bf Heterarch\,Overview} for details):
 
 \begin{enumerate}[noitemsep,nolistsep]
-\item{\bf Browser Interface:} This is the user level interface. It allows users to interact with content known to {\bf \small HCMS}.
-\item {\bf The Content Framework Graphic User Interface (CF-GUI):} This is the preferred developer interface. The commands the {\bf \small CF-GUI} implements are the same as those available from the command line interface. It is accessible by repository owners and other authorized content developers and developers authorized by repository owners.
+\item{\bf Browser Interface:} The user level interface. It allows users to interact with {\bf \small HCMS} content.
+\item {\bf The Content Framework Graphic User Interface (CF-GUI):} The preferred developer interface. The commands the {\bf \small CF-GUI} implements are a subset of those available from the command line interface. It is accessible by repository owners and other authorized content developers and developers authorized by repository owners.
 \item {\bf Command Line Interface:} All {\bf \small HCMS} functionality can be accessed and controlled from a command line prompt in a terminal window. It is the legacy developer level interface.
 \end{enumerate}
 
@@ -42,7 +40,7 @@ The preferred {\bf \small Heterarch} Developer GUI is called the Content Framewo
 \noindent It can be started from a (X-Window) command line prompt with the following command:
 
 \begin{verbatim}
-	neurospaces-manager-gui
+   neurospaces-manager-gui
 \end{verbatim}
 
 \noindent The {\small \bf CF-GUI} is the primary management tool for a {\bf \small HCMS} repository. The figure below illustrates the default appearance of this GUI.
@@ -54,24 +52,22 @@ The preferred {\bf \small Heterarch} Developer GUI is called the Content Framewo
 
 \subsection*{CF-GUI Components}
 
-There are four functionally different areas arranged as columns in the {\small \bf CF-GUI}. From left to right they include: Locally Available Package Tags, Locally Available Packages, Package Information, and Package Operations.
+There are four functionally different panes arranged as columns in the {\small \bf CF-GUI}. From left to right they include: Locally Available Package Tags, Locally Available Packages, Package Information, and Package Operations.
 We now introduce these different components.
 
 \begin{enumerate}
-\item {\bf Package Domain:}\\
+\item {\bf Package Domain}\\
 Tags listed under the {\bf \small Locally\,Available\,Package\,Tags} heading give the locally available package domains known to {\bf \small HCMS}.\\
 \noindent Selecting the check-box to the left of a given package domain tag generates a list of packages associated with the selected domain in the {\bf \small Locally\,Available\,Packages} window.
 
-\subsubsection*{Available Packages}
+\item {\bf Available Packages}\\
+The {\bf \small Locally\,Available\,Packages} pane lists all accessible packages within (check-box) selected package domains. Selecting an available package generates a listing of information about the package in the  {\bf \small Package\,Information} pane.
 
-The {\bf \small Locally\,Availble\,Packages} window lists all accessible packages within (check-box) selected package domains. Selecting an available package generates a listing of information about the package in the  {\bf \small Package\,Information} window.
-
-\subsubsection*{Package\,Information}
-
-The {\bf \small Package\,Information} window gives information about the location, status, and contents of the selected package. The listing is obtained through the version control functionality of {\bf \small HCMS}.  It includes:
+\item {\bf Package Information}\\
+The {\bf \small Package\,Information} pane gives information about the location, status, and contents of the selected package. The listing is obtained through the version control functionality of {\bf \small HCMS}.  It includes:
 
 \begin{description}[noitemsep,nolistsep] 
-\item {\bf Repository name:} In the {\small \bf CF-GUI} example given above, {\bf \small heterarch}.
+\item {\bf Repository name:} In the {\small \bf CF-GUI} example given above this is {\bf \small heterarch}.
 \item {\bf Location of the package build script generating the report:} For the given example, {\tt \small /usr/local/bin/neurospaces\_build}.
 \item {\bf Repository information known to version control:} Includes package and repository name, IP number of the server where the repository is located, and the repository tags.
 \item {\bf Version control summary:} Includes content revision ID number and revision parent ID number. The name of the authorized content developer, date and time content item changes were put under version control, and the repository branch where any revised content will be maintained.
@@ -135,7 +131,7 @@ To manually create a new repository on your local machine the following steps mu
   
 You can check the status of this file with the following command entered at a command line prompt in a terminal window:
 \begin{verbatim}
-neurospaces_packages
+   neurospaces_packages
 \end{verbatim}
 It should list the name of the new package and confirms that addition of the new build configuration to the {\tt \small build.yml} configuration file was successful:
 \begin{verbatim}
@@ -157,31 +153,31 @@ Note: As it is a yml file, the {\tt \small build.yml} file is white space sensit
 \item The following commands should then be run in the given order at a command line prompt  in a terminal window.\\
 (Note: You should replace $<$repository-name$>$ with the name of the repository you want to build. To simplify naming, we recommend you follow the {\bf \small HCMS} naming convention which is to replace white space with a single dash (-)):
 \begin{verbatim}
-	neurospaces_create_directories <repository-name>
-	neurospaces_pull <repository-name>
-	neurospaces_update <repository-name>
-	neurospaces_configure <repository-name>
-	neurospaces_install <repository-name>
+   neurospaces_create_directories <repository-name>
+   neurospaces_pull <repository-name>
+   neurospaces_update <repository-name>
+   neurospaces_configure <repository-name>
+   neurospaces_install <repository-name>
 \end{verbatim}
 \item If you make a mistake you can remove what you have done by running the following commands:
 \begin{verbatim}
-	cd ~/neurospaces_project/<repository-name>
-	rm -fr source/snapshots/0
-	cd ~/neurospaces\_project
-	rm MTN/<name>.mtn
+   cd ~/neurospaces_project/<repository-name>
+   rm -fr source/snapshots/0
+   cd ~/neurospaces\_project
+   rm MTN/<name>.mtn
 \end{verbatim}
 \end{enumerate}
 
 \subsubsection*{On all machines of interested clients}
 After updating your local {\tt \small build.yml} configuration file as described above, run the following command from a command line prompt in a terminal window:
 \begin{verbatim}
-neurospaces_pull <repository-name>
+   neurospaces_pull <repository-name>
 \end{verbatim}
 
 \subsubsection*{Check write access where necessary}
 
 \begin{verbatim}
-neurospaces_sync <repository-name>
+   neurospaces_sync <repository-name>
 \end{verbatim}
 
 \subsubsection*{Check integration with the developer package}
@@ -189,9 +185,9 @@ neurospaces_sync <repository-name>
 Make sure {\tt \small sudo}\marginpar{needs documentation, should be working anyway in the virtual machine that we will configure} is working, then issue the following commands from the prompt in a terminal window:
 
 \begin{verbatim}
-neurospaces_update <repository-name>
-neurospaces_configure <repository-name>
-neurospaces_install <repository-name>
+   neurospaces_update <repository-name>
+   neurospaces_configure <repository-name>
+   neurospaces_install <repository-name>
 \end{verbatim}
 
 \subsection*{Manual Content Creation}
@@ -202,7 +198,7 @@ The command to create a new content item may be issued manually at a command lin
 
 The content item name should follow the {\bf \small HCMS} content-naming convention--words in the name are separated by a single dash--where {\tt <\dots>} is replaced with the unique name. The command takes the following:
 \begin{verbatim}
-	<repository-name>-create <content-name>
+   <repository-name>-create <content-name>
 \end{verbatim}
 
 This command automatically generates the unique content management structure required to support a given content item. The structure is obtained from a built-in content item template called {\it NewDocument} which is automatically placed in a repository when it is created.
