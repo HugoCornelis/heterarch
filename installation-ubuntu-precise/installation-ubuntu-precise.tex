@@ -186,7 +186,7 @@ successful installation.  If there have been changes in the {\bf
 this package first, by using the command:
 
 \begin{verbatim}
-    neurospaces_upgrade --regex developer
+    neurospaces_upgrade developer
 \end{verbatim}
 
 and then perform a normal neurospaces\_upgrade.
@@ -210,24 +210,21 @@ Then download and install {\bf mtn-browse} from
 \href{http://www.coosoft.plus.com/software.html}{http://www.coosoft.plus.com/software.html}.
 
 
-\subsection*{Uninstalling G-3 Components}
+\subsection*{Uninstalling Heterarch Components}
 
-The script ``neurospaces\_uninstall'' will uninstall G-3 but leave the
-workspaces unaltered.  The script will also uninstall the developer
-package, so it can best be used with a ``--regex'' option to select
-the component you want to uninstall:
-
-\begin{verbatim}
-    neurospaces_uninstall --regex model-container
-\end{verbatim}
-
-A special script uninstalls all the G-3 components but reinstalls the
-{\bf DeveloperPackage} afterwards.
+The script ``neurospaces\_uninstall'' will uninstall
+{\bf\small{Heterarch}} but leave the workspaces unaltered.  The script
+will also uninstall the developer package, so it can best be used with
+a selection of the components you want to uninstall:
 
 \begin{verbatim}
-    neurospaces_dev_uninstall --regex developer
+   neurospaces_uninstall model-container
 \end{verbatim}
-
+A special script uninstalls all the {\bf\small{Heterarch}} components but reinstalls the
+{\it DeveloperPackage} afterwards.
+\begin{verbatim}
+   neurospaces_dev_uninstall developer
+\end{verbatim}
 Note that these commands leave the workspaces unaltered.
 
 
