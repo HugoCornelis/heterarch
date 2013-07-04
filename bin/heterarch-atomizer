@@ -1,0 +1,213 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -d:ptkdb -w
+#
+
+use strict;
+
+
+use Data::Dumper;
+
+use Getopt::Long;
+
+use Neurospaces::Documentation;
+
+use XML::Simple;
+use XML::XSLT;
+
+use YAML;
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*)[_-](.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+$SIG{__DIE__}
+    = sub {
+	use Carp;
+
+	confess @_;
+    };
+
+
+my $option_dry_run;
+my $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+my $option_verbose;
+my $option_xml_selector = [];
+
+my $exit_code = 0;
+
+my $document_names = [ 'diakonoff-web-privacy', ];
+
+
+my $xslt_example
+= '
+<xsl:stylesheet version="1.0"
+                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+                xmlns="http://www.w3.org/TR/xhtml1/strict">
+
+<xsl:strip-space elements="doc chapter section"/>
+<xsl:output
+   method="xml"
+   indent="yes"
+   encoding="iso-8859-1"
+/>
+
+<xsl:template match="doc">
+ <html>
+   <head>
+     <title>
+       <xsl:value-of select="title"/>
+     </title>
+   </head>
+   <body>
+     <xsl:apply-templates/>
+   </body>
+ </html>
+</xsl:template>
+
+<xsl:template match="doc/title">
+  <h1>
+    <xsl:apply-templates/>
+  </h1>
+</xsl:template>
+
+<xsl:template match="chapter/title">
+  <h2>
+    <xsl:apply-templates/>
+  </h2>
+</xsl:template>
+
+<xsl:template match="section/title">
+  <h3>
+    <xsl:apply-templates/>
+  </h3>
+</xsl:template>
+
+<xsl:template match="para">
+  <p>
+    <xsl:apply-templates/>
+  </p>
+</xsl:template>
+
+<xsl:template match="note">
+  <p class="note">
+    <b>NOTE: </b>
+    <xsl:apply-templates/>
+  </p>
+</xsl:template>
+
+<xsl:template match="emph">
+  <em>
+    <xsl:apply-templates/>
+  </em>
+</xsl:template>
+
+</xsl:stylesheet>
+';
+
+sub main
+{
+    read_cmd_line();
+
+    my $document_names = [ 'diakonoff-web-privacy', ];
+
+    my $xsl = $xslt_example;
+
+    my $xslt = XML::XSLT->new ($xsl, warnings => 1);
+
+    my $result = {};
+
+    my $source_directory = "/output/latexml/";
+
+    foreach my $document_name (@$document_names)
+    {
+	my $document_path
+	    = $ENV{HOME}
+		. "/neurospaces_project/"
+		    . $option_set_name
+			. "/source/snapshots/0/"
+			    . $document_name
+				. $source_directory
+				    . $document_name
+					. ".xml";
+
+	$xslt->transform($document_path);
+
+	my $latexml = XMLin($document_path);
+
+# 	print Dumper($latexml);
+
+	my $document_result = XMLin($xslt->toString());
+
+	$result->{$document_name} = $document_result;
+    }
+
+    print Dumper({ all_results => $result, }, );
+	
+}
+
+
+sub read_cmd_line
+{
+    my $option_help;
+    my $option_version;
+
+    my $result
+	= GetOptions
+	    (
+	     "dry-run!" => \$option_dry_run,
+	     "help!" => \$option_help,
+	     "set-name=s" => \$option_set_name,
+	     "tags=s" => $option_tags,
+	     "v|verbose+" => \$option_verbose,
+	     "version" => \$option_version,
+	     "xml-selector=s" => $option_xml_selector,
+	    );
+
+    if ($option_version)
+    {
+	my $version = "not defined";
+
+	print $version . "\n";
+
+	exit 1;
+    }
+
+    if ($option_help)
+    {
+	print
+	    "
+$0 <options> <documents>
+
+$0: atomize documents for use with heterarch.
+
+options:
+    --dry-run         print what documents would be build without actually building them.
+    --help            print usage information.
+    --set-name        select a document set (builtin default is userdocs).
+    --tags            process the documents with these tags, multiple tags options may be given.
+    --verbose         set verbosity level.
+    --version         give version information.
+    --xml-selector    set the XML selector for output, multiple selectors may be given.
+";
+
+	exit 1;
+    }
+
+    $document_names = [ @ARGV, ];
+}
+
+
+main();
+
+
+exit $exit_code;
+
+

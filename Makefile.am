@@ -21,6 +21,7 @@ SUBDIRS = \
 
 # fill in the scripts that should go with the distribution:
 dist_bin_SCRIPTS = \
+	bin/heterarch-atomizer \
 	bin/heterarch-build \
 	bin/heterarch-check \
 	bin/heterarch-create \
