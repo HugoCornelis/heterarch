@@ -20,7 +20,7 @@
 % start: userdocs-tag-replace-items related-do-nothing
 % end: userdocs-tag-replace-items related-do-nothing
 
-\section*{Developer Installation Ubuntu (Precise)}
+\section*{Developer Installation Ubuntu (Raring)}
 
 Installing HETERARCH on Ubuntu requires executing the following major steps. {\bf Note}: Installation requires administrator privileges.
 \begin{description}[noitemsep,nolistsep] 
@@ -49,6 +49,18 @@ such as a personal laptop, is as root to do (for example for user
 
 \begin{verbatim}
    echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+\end{verbatim}
+
+During the install process, you will be prompted for your password.
+However, when directing the output of an install or a
+{\tt neurospaces\_check} to a file, this can become a problem. The
+automated tests performed by a check take a long time, and it is easy
+to miss a password request and have it time out.  If you are on a
+secure single-user system, you may wish to avoid the password check
+and set it with (for example):
+
+\begin{verbatim}
+        echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 \end{verbatim}
 
 \subsubsection*{Configuring sudo for Mac OS X}
