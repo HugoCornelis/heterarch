@@ -40,14 +40,14 @@ The preferred {\bf \small Heterarch} Developer GUI is called the Content Framewo
 \noindent It can be started from a (X-Window) command line prompt with the following command:
 
 \begin{verbatim}
-   neurospaces-manager-gui
+   heterarch-gui
 \end{verbatim}
 
 \noindent The {\small \bf CF-GUI} is the primary management tool for a {\bf \small HCMS} repository. The figure below illustrates the default appearance of this GUI.
 
 \begin{figure}[h]
    \centering
-   \includegraphics[scale=0.4]{figures/neurospaces-developer-management-console.eps}
+   \includegraphics[scale=0.4]{figures/heterarch-developer-content-gui.eps}
 \end{figure}
 
 \subsection*{CF-GUI Components}
@@ -56,8 +56,8 @@ There are four functionally different panes arranged as columns in the {\small \
 We now introduce these different components.
 
 \begin{enumerate}
-\item {\bf Package Domain}\\
-Tags listed under the {\bf \small Locally\,Available\,Package\,Tags} heading give the locally available package domains known to {\bf \small HCMS}.\\
+\item {\bf Package Domains}\\
+Tags listed under the {\bf \small Locally\,Available\,Package\,Tags} heading give the locally available package domains known to {\bf \small Heterarch}.\\
 \noindent Selecting the check-box to the left of a given package domain tag generates a list of packages associated with the selected domain in the {\bf \small Locally\,Available\,Packages} window.
 
 \item {\bf Available Packages}\\
@@ -91,24 +91,24 @@ Run operation {\tt \small neurospaces\_repository}.
 Run operation {\tt \small neurospaces\_status}.
 \item {\bf upgrade}\\
 Run operation {\tt \small neurospaces\_upgrade}.
-\item {\bf pull}\\
-Run operation {\tt \small neurospaces\_pull}.
-\item {\bf sync}\\
-Run operation {\tt \small neurospaces\_sync}.
+%\item {\bf pull}\\
+%Run operation {\tt \small neurospaces\_pull}.
+%\item {\bf sync}\\
+%Run operation {\tt \small neurospaces\_sync}.
 \item {\bf content\underline{s}ync}\\
 Run operation {\tt \small neurospaces\_content\_sync}.
 \item {\bf clean}\\
-Run operation {\tt \small neurospaces\_clean}.
-\item {\bf update}\\
-Run operation {\tt \small neurospaces\_update}.
-\item {\bf diff}\\
-Run operation {\tt \small neurospaces\_diff}.
-\item {\bf configure}\\
-Run operation {\tt \small neurospaces\_configure}.
-\item {\bf install}\\
-Run operation {\tt \small neurospaces\_install}.
-\item {\bf check}\\
-Run operation {\tt \small neurospaces\_check}.
+%Run operation {\tt \small neurospaces\_clean}.
+%\item {\bf update}\\
+%Run operation {\tt \small neurospaces\_update}.
+%\item {\bf diff}\\
+%Run operation {\tt \small neurospaces\_diff}.
+%\item {\bf configure}\\
+%Run operation {\tt \small neurospaces\_configure}.
+%\item {\bf install}\\
+%Run operation {\tt \small neurospaces\_install}.
+%\item {\bf check}\\
+%Run operation {\tt \small neurospaces\_check}.
 \item {\bf content\underline{b}uild}\\
 Run operation {\tt \small neurospaces\_content\_build}.
 \item {\bf content\underline{c}heck}\\
@@ -150,7 +150,7 @@ Note: As it is a yml file, the {\tt \small build.yml} file is white space sensit
   \marginpar{we should fold this in into the {\bf \small
       Configurator}, a package that has been under design for 7 years
     or so, now seems the right time to implement it.}
-\item The following commands should then be run in the given order at a command line prompt  in a terminal window.\\
+\item {\bf On all machines of interested clients:} After updating your local {\tt \small build.yml} configuration file as described above, the following commands should  be run in the given order at a command line prompt  in a terminal window.\\
 (Note: You should replace $<$repository-name$>$ with the name of the repository you want to build. To simplify naming, we recommend you follow the {\bf \small HCMS} naming convention which is to replace white space with a single dash (-)):
 \begin{verbatim}
    neurospaces_create_directories <repository-name>
@@ -166,29 +166,21 @@ Note: As it is a yml file, the {\tt \small build.yml} file is white space sensit
    cd ~/neurospaces\_project
    rm MTN/<name>.mtn
 \end{verbatim}
-\end{enumerate}
 
-\subsubsection*{On all machines of interested clients}
-After updating your local {\tt \small build.yml} configuration file as described above, run the following command from a command line prompt in a terminal window:
-\begin{verbatim}
-   neurospaces_pull <repository-name>
-\end{verbatim}
-
-\subsubsection*{Check write access where necessary}
+\item {\bf Check write access where necessary:} After completion of repository installation steps, the following command should  be run at a command line prompt  in a terminal window to confirm that all write accesses are correctly configured.
 
 \begin{verbatim}
    neurospaces_sync <repository-name>
 \end{verbatim}
 
-\subsubsection*{Check integration with the developer package}
-
-Make sure {\tt \small sudo}\marginpar{needs documentation, should be working anyway in the virtual machine that we will configure} is working, then issue the following commands from the prompt in a terminal window:
+\item {\bf Check integration with the developer package:} Make sure {\tt \small sudo}\marginpar{needs documentation, should be working anyway in the virtual machine that we will configure} is working, then issue the following commands from the prompt in a terminal window:
 
 \begin{verbatim}
    neurospaces_update <repository-name>
    neurospaces_configure <repository-name>
    neurospaces_install <repository-name>
 \end{verbatim}
+\end{enumerate}
 
 \subsection*{Manual Content Creation}
 
