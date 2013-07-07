@@ -23,7 +23,7 @@ if ($?)
     die "$0: *** Error: heterarch-check concludes there is something wrong with your documentation workspace.";
 }
 
-system "neurospaces_sync --enable heterarch heterarch --verbose";
+system "neurospaces_sync --enable heterarch heterarch";
 
 if ($?)
 {
@@ -31,7 +31,7 @@ if ($?)
 }
 else
 {
-    system "neurospaces_update --enable heterarch heterarch --verbose";
+    system "neurospaces_update --enable heterarch heterarch";
 }
 
 
