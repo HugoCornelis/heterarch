@@ -83,89 +83,51 @@ Install the following packages using the Start Menu.  Type
   it can be installed using the 'Muon' program available from the
   Start Menu).  Always follow the option to install additional
   dependencies.
-  \begin{itemize}
-  \item auctex
-  \item autoconf
-  \item automake
-  \item biblatex
-  \item bison
-  \item cpanminus
-  \item css-mode
-  \item doxygen
-  \item flex
-  \item gnuplot-mode
-  \item jodconverter
-  \item latex2rtf
-  \item latexml
-  \item libc6-dev
-  \item libcatalyst-devel-perl
-  \item libcatalyst-engine-apache-perl
-  \item libcatalyst-modules-extra-perl
-  \item libcatalyst-modules-perl
-  \item libcatalyst-perl
-  \item libclone-perl
-  \item libdevel-ptkdb-perl
-  \item libdigest-sha-perl
-  \item libexpect-perl
-  \item libfile-find-rule-perl
-  \item libgraphviz-perl
-  \item libgtk2-perl
-  \item libinline-perl
-  \item libintl-perl
-  \item libmodule-install-perl
-  \item libncurses5-dev
-  \item libperl-dev
-  \item libreadline-dev
-  \item libsdl-perl
-  \item libterm-readline-gnu-perl
-  \item libxml-simple-perl
-  \item libxml-xslt-perl
-  \item libyaml-perl
-  \item make
-  \item monotone
-  \item ocaml-mode
-  \item octave3.2-emacsen
-  \item patch
-  \item psgml
-  \item python-dev
-  \item python-mode
-  \item python-yaml
-  \item rst2pdf
-  \item swig
-  \item tex4ht
-  \item texlive-fonts-extra
-  \item texlive-fonts-recommended
-  \item texlive-humanities
-  \item texlive-xetex
-  \item unrtf
-  \item x-face-el
-  \item xaw3dg
-  \item xemacs21
-  \item xemacs21-basesupport
-  \item xemacs21-basesupport-el
-  \item xemacs21-bin
-  \item xemacs21-mule-canna-wnn
-  \item xemacs21-mulesupport
-  \item xemacs21-mulesupport-el
-  \item xemacs21-support
-  \item xemacs21-supportel
-
-    % g-tube
-
-  \item mercurial
-  \item python-numpy
-  \item python-wxglade
-  \item python-wxgtk2.8
-
-    % mtn-browse
-
-  \item libgtk2-sourceview2-perl
-  \item meld
-
-  \end{itemize}
-\end{itemize}
-
-This \href{scripts/install-dependencies.sh}{script} may be helpfull in installing these dependencies automatically.
+      \begin{description}[noitemsep,nolistsep]
+         \item libyaml-perl
+         \item libexpect-perl
+         \item libinline-perl
+         \item libfile-find-rule-perl
+         \item libdigest-sha-perl
+         \item libdevel-ptkdb-perl
+         \item libreadline-dev
+         \item autoconf
+         \item automake
+         \item make
+         \item libc6-dev
+         \item libncurses5-dev
+         \item flex
+         \item bison
+         \item libperl-dev
+         \item patch
+         \item python-dev
+         \item python-yaml
+         \item swig
+         \item libclone-perl
+         \item libterm-readline-gnu-perl
+         \item libxml-simple-perl
+         \item latex2rtf
+         \item biblatex
+         \item tex4ht
+         \item texlive-humanities
+         \item rst2pdf
+         \item unrtf
+         \item jodconverter
+         \item monotone
+         \item libgtk2-perl
+         \item libgraphviz-perl
+         \item libsdl-perl
+         \item xaw3dg
+         \item libintl-perl
+         \item doxygen
+         \item cpanminus
+         \item libcatalyst-modules-perl
+         \item libcatalyst-devel-perl
+         \item libcatalyst-modules-extra-perl
+         \item libcatalyst-perl
+         \item libcatalyst-engine-apache-perl
+         \item libmodule-install-perl
+      \end{description}
 
 This \href{scripts/install-dependencies.sh}{\bf script} may be helpful in installing these dependencies automatically.
 
@@ -236,7 +198,7 @@ successful installation.  If there have been changes in the {\bf{\emph{Developer
 this package first, by using the command:
 
 \begin{verbatim}
-    neurospaces_upgrade developer
+    neurospaces_upgrade --regex developer
 \end{verbatim}
 and then perform a normal {\tt neurospaces\_upgrade}.
  
@@ -244,36 +206,34 @@ and then perform a normal {\tt neurospaces\_upgrade}.
 
 It may be useful to core developers to browse recent version history
 and inspect specific changes implementing new functionality.  {\bf\small Heterarch} uses {\bf monotone} for
-\href{../version-control/version-control.tex}{version control}.\\
+\href{../version-control/version-control.tex}{\bf version\,control}.\\
 To browse the change history stored in a (local) {\bf monotone}
-repository,
-% install the following dependencies:
-%\begin{itemize}
-%\item libgtk2-sourceview2-perl
-%\item meld
-%\end{itemize}
-%Then
- download and install \href{http://www.coosoft.plus.com/software.html}{\bf mtn-browse}.
+repository, install the following dependencies:
 
+\begin{itemize}[noitemsep,nolistsep]
+\item libgtk2-sourceview2-perl
+\item meld
+\end{itemize}
+Then download and install {\it mtn-browse} from
+\href{http://www.coosoft.plus.com/software.html}{\bf http://www.coosoft.plus.com/software.html}.
 
-\subsection*{Uninstalling Heterarch Components}
+\subsection*{Uninstalling G-3 Components}
 
-The script ``neurospaces\_uninstall'' will uninstall
-{\bf\small{Heterarch}} but leave the workspaces unaltered.  The script
-will also uninstall the developer package, so it can best be used with
-a selection of the components you want to uninstall:
+The script {\tt neurospaces\_uninstall} will uninstall {\bf\small Heterarch} but leave the
+workspaces unaltered.  The script will also uninstall the developer
+package, so it can best be used with a {\tt --regex} option to select
+the component you want to uninstall:
 
 \begin{verbatim}
-   neurospaces_uninstall model-container
+    neurospaces_uninstall --regex model-container
 \end{verbatim}
 A special script uninstalls all the {\bf\small Heterarch} components but reinstalls the
 {\bf{\emph{DeveloperPackage}}} afterwards.
 
 \begin{verbatim}
-   neurospaces_dev_uninstall developer
+    neurospaces_dev_uninstall --regex developer
 \end{verbatim}
 Note that these commands leave the workspaces unaltered.
-
 
 \end{document}
 

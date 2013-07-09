@@ -23,10 +23,12 @@
 
 \subsection*{Preamble}
 
-The Heterarch Content Management System ({\bf \small HCMS}) is an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} for {\bf Three\,Way\,Street}.\\
+The Heterarch Content Management System ({\bf \small HCMS}) is an open source software platform that supports distributed personalized digital content broadcasting. It is developed and maintained by {\bf Neurospaces\,Development} in collaboration with {\bf Three\,Way\,Street}.
+
 %E-publication of the physical book {\bf{\emph{Head\,Full\,of\,Flames}}} ({\bf \small HFoF}) is used as a proof of concept for our novel approach to the structure and management of online content for the purpose of sophisticated online e-publication and community building.
-The distinguishing feature of {\bf \small HCMS} is its use of modern techniques for the organization, structure, and recovery of digital content and/or identity. Our approach is heterarchical and provides a powerful alternative to more traditional hierarchical methods of software implementation and content management. It is the heterarchical nature of the {\bf \small HCMS} that allows content recovery to be defined within an educational learning paradigm that ranges from ``search'', through ``explore'' to ``discover''.\\
-A change in perspective from search to discover has many benefits for both developers and users. In particular, for the developer, it allows a far greater degree of automation for the many non-trivial but time consuming processes associated with sophisticated distributed personalized digital content broadcasting and content management. For the user, it provides a powerful information-based learning experience.
+One distinguishing feature of {\bf \small HCMS} is the use of modern techniques for the organization, structure, and recovery of digital content and/or identity. Our approach is heterarchical and provides a powerful alternative to more traditional hierarchical methods of software implementation and content management. It is the heterarchical nature of the {\bf \small HCMS} that allows content recovery to be defined within an educational learning paradigm that ranges from ``search'', through ``explore'' to ``discover'', ``understand'', and ``know''.
+
+This fractionation of cognitive activity has many benefits for both developers and users. In particular, for the developer, it allows a far greater degree of control over data flows and thus automation of the many non-trivial but time consuming processes associated with sophisticated distributed personalized digital content broadcasting and management. For the user, it reconfigures the traditional hierarchical online experience of the internet into a powerful heterarchcal information-based learning environment.
 
 \subsection*{Document Purpose}
 
@@ -34,27 +36,26 @@ This document provides an introductory overview of {\bf \small HCMS} functionali
 
 \subsection*{Definitions}
 
-There are two domains of human activity associated with the {\bf \small HCMS}. Each of these domains is divided into two further sub-domains:
+There are two domains of human activity associated with the {\bf \small HCMS}. Each of these domains is divided into two sub-domains:
 
 \begin{enumerate}[noitemsep,nolistsep] 
-\item {\href{../hfof-developer/hfof-developer.tex}{\bf Developer}}\\
+\item {\bf Developer}\\
 The two sub-domains of developer functionality include:
 	\begin{description}[noitemsep,nolistsep] 
 	\item[A.] {\bf Content Developer}\\
 	A content developer must obtain authorization from a repository owner to be able to directly access a given 
 	repository.
 		\begin{description}[noitemsep,nolistsep] 
-		\item {\bf Authorized Content Developer:}\\
-		An authorized content developer is any person given access to a repository for the purpose of creating, adding, 
-		and/or modifying content. Two types of content developer are recognized:
-			\begin{description}[noitemsep,nolistsep] 
-			\item {\bf Repository owner(s):}\\
-			By default, the owner(s) of a repository is/are authorized content developer(s).
-			\item {\bf Authorized content developer(s):}\\
-			The owner(s) of a repository can authorize any person the permissions required to access {\bf \small 
-			HCMS} functionality of the given repository for the purpose of creating and/or adding content owned by the 
-			authorized person.
-			\end{description}
+		\item {\bf Authorized Content Developer}
+			\begin{itemize}[noitemsep,nolistsep] 
+			\item By default, the owner(s) of a repository is/are (an) authorized person(s) and may be (an) authorized 
+			content developer(s).
+			\item The owner(s) of a repository can authorize any person the permissions required to access {\bf \small
+			HCMS} functionality of a given repository for the purpose of creating, adding  and/or modifying content 
+			owned by an authorized person.
+			\item An authorized content developer is any person given access to a repository for the purpose of
+			creating,  adding, and/or modifying content. %Two types of content developer are recognized:
+		\end{itemize}
 		\end{description}			
 	\item[B.] {\bf Software Developer}\\
 	A software developer extends {\bf \small HCMS} functionality by the creation and integration of new software and 
@@ -65,7 +66,7 @@ The two sub-domains of user include:
 	\begin{description}[noitemsep,nolistsep] 
 	\item[A.] {\bf Content User}\\
 	A content user is any person who is not an Authorized Content Developer who accesses {\bf \small HCMS} content 
-	through a web browser.
+	through a internet browser or other web interface.
 	\item[B.] {\bf Software User}\\
 	A software user is any person who employs {\bf \small HCMS} software functionality to manage a given {\bf \small 
 	HCMS} repository.
@@ -74,26 +75,22 @@ The two sub-domains of user include:
 
 \subsection*{Installation}
 
-If you are a Content Developer or a Software Developer or Software User, you must install {\bf\small Heterarch} on your local machine.\\
 Currently, there are two types of {\bf \small Heterarch} installation:
 
 \begin{enumerate}[noitemsep,nolistsep] 
-\item[(A)] {\bf User:} Installation is a simple automated process that employs an installer package. The following installer packages are available:
-\item[(B)] {\bf Developer}
+\item[(A)] {\bf User:} If you are a Content User, no software is required as you access the content of a {\bf\small Heterarch} repository with a browser of your choice.
+\item[(B)] {\bf Developer}: If you are a Content or Software Developer, or a Software User, you must install {\bf\small Heterarch} on your local machine.\\
+{\bf Note:} If you are a Developer you are usually also a Software User. For the purposes of this documentation Software Users are considered to be Developers.
 \end{enumerate}
-Typically, for each type of installation, once your machine is correctly configured and any missing \href{../heterarch-dependencies/heterarch-dependencies.tex}{\bf Heterarch Software Dependencies} are installed, the installation process is highly automated.
-
-\subsection*{User Installation}
-
-Installation is a simple automated process that employs an installer package.
+Typically, once your machine is correctly configured and any missing \href{../heterarch-dependencies/heterarch-dependencies.tex}{\bf Heterarch Software Dependencies} are installed, the installation process is highly automated.
 
 \subsection*{Developer Installation}
 
 The following links introduce and define the required installation steps:
 \begin{enumerate}[noitemsep,nolistsep]
-\item {\bf Developer Content:} General installation instructions located in \href{../heterarch-developer-content/heterarch-developer-content.tex}{\bf Developer\,Content}.\\
+\item {\bf Developer Content:} This is a more limited subset of Developer Software. General installation instructions are located in \href{../heterarch-developer-content/heterarch-developer-content.tex}{\bf Developer\,Content}.\\
 Such an installation synchronizes with the \href{../developer-repository/developer-repository.tex}{\bf Developer\,Repositories} and is under \href{../version-control/version-control.tex}{\bf Version\,Control}.
-\item {\bf Developer Software:} General installation instructions located in \href{../heterarch-developer-software.tex}{\bf Developer\,Software}. Such an installation synchronizes with the \href{../developer-repository/developer-repository.tex}{\bf Developer\,Repositories} and is under \href{../version-control/version-control.tex}{\bf Version\,Control}.\\
+\item {\bf Developer Software:} Software tools and functionalities are significantly extended beyond that required for Developer Content. General installation instructions are located in \href{../heterarch-developer-software.tex}{\bf Developer\,Software}.\\ Such an installation also synchronizes with the \href{../developer-repository/developer-repository.tex}{\bf Developer\,Repositories} and is under \href{../version-control/version-control.tex}{\bf Version\,Control}.\\
 \end{enumerate}
 
 \subsection*{HCMS Access}
@@ -126,7 +123,7 @@ An individual content item may have any size or any length. It may contain any n
 {\bf Importantly, the addition of any content to a workspace or repository is an acknowledgement by the authorized content developer of their ownership rights.}\\
 For more detailed information see \href{../developer-content/developer-content.tex}{\bf Developer\,Content}.
 
-\bibliographystyle{plain}
-\bibliography{../tex/bib/g3-refs.bib}
+%\bibliographystyle{plain}
+%\bibliography{../tex/bib/g3-refs.bib}
 
 \end{document}
