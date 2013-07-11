@@ -22,7 +22,7 @@ require Poetical::FormType::Encapsulators::Library::Webmin::Net;
 
 sub _decapsulate_boolean_on_off
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     return($path, $value);
 }
@@ -30,7 +30,7 @@ sub _decapsulate_boolean_on_off
 
 sub _decapsulate_boolean_yes_no
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     return($path, $value);
 }
@@ -38,7 +38,7 @@ sub _decapsulate_boolean_yes_no
 
 sub _decapsulate_checkbox
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     # CGI passes true values back as the empty string
 
@@ -63,7 +63,7 @@ sub _decapsulate_checkbox
 
 sub _decapsulate_constant
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     return($path, $value);
 }
@@ -71,7 +71,7 @@ sub _decapsulate_constant
 
 sub _decapsulate_optional_textfield
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     #t do stuff to separate radios and textfield
 
@@ -81,7 +81,7 @@ sub _decapsulate_optional_textfield
 
 sub _decapsulate_radiogroup
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     die "This is not supported yet.";
 
@@ -91,7 +91,7 @@ sub _decapsulate_radiogroup
 
 sub _decapsulate_textarea
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     return($path, $value);
 }
@@ -99,7 +99,15 @@ sub _decapsulate_textarea
 
 sub _decapsulate_textfield
 {
-    my ($self, $path, $column, $contents, $value, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
+
+    return($path, $value);
+}
+
+
+sub _decapsulate_url
+{
+    my ($self, $path, $row, $column, $contents, $value, $options) = @_;
 
     return($path, $value);
 }
@@ -107,7 +115,7 @@ sub _decapsulate_textfield
 
 sub _encapsulate_boolean_on_off
 {
-    my ($self, $path, $column_number, $content, $options) = @_;
+    my ($self, $path, $row, $column_number, $content, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -127,13 +135,14 @@ sub _encapsulate_boolean_on_off
 			},
 	     -override => 1,
 	     -values => [ 1, 0, ],
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	    );
 }
 
 
 sub _encapsulate_boolean_yes_no
 {
-    my ($self, $path, $column_number, $content, $options) = @_;
+    my ($self, $path, $row, $column_number, $content, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -156,13 +165,14 @@ sub _encapsulate_boolean_yes_no
 			 '1',
 			 '0',
 			],
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	    );
 }
 
 
 sub _encapsulate_button
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my %arglist = (
 		   -name => "button_$path",
@@ -192,7 +202,12 @@ sub _encapsulate_button
 	$arglist{'-action'} = $options->{action};
     }
 
-    $contents = $self->{CGI}->submit(%arglist);
+    $contents
+	= $self->{CGI}->submit
+	    (
+	     %arglist,
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
+	    );
 
     if (defined $contents)
     {
@@ -207,7 +222,7 @@ sub _encapsulate_button
 
 sub _encapsulate_checkbox
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -219,16 +234,19 @@ sub _encapsulate_checkbox
 	     -label => '',
 	     -name => "checkbox${separator}$path",
 	     -value => '',
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	    );
 }
 
 
 sub _encapsulate_constant
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     if (defined $contents)
     {
+	$contents = $self->{CGI}->span($options, $contents);
+
 	return $contents;
     }
     else
@@ -240,7 +258,7 @@ sub _encapsulate_constant
 
 sub _encapsulate_number
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     print STDERR "_encapsulate_number() options :\n", Dumper($options);
 
@@ -283,6 +301,7 @@ sub _encapsulate_number
 	     -id => "field${separator}$path",
 	     -name => "field${separator}$path",
 	     -override => 1,
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	     %$options,
 	    );
 
@@ -299,7 +318,7 @@ sub _encapsulate_number
 
 sub _encapsulate_optional_textfield
 {
-    my ($self, $path, $column, $value, $options) = @_;
+    my ($self, $path, $row, $column, $value, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -341,6 +360,7 @@ sub _encapsulate_optional_textfield
 	     -labels => $options->{labels} || { 'default' => 'Use default', textfield => 'Use this value :', },
 	     -name => "optiongroup${separator}$path",
 	     -values => [ 'default', 'textfield', ],
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	    );
 
     $contents
@@ -359,7 +379,7 @@ sub _encapsulate_optional_textfield
 
 sub _encapsulate_radiogroup
 {
-    my ($self, $path, $column, $value, $options) = @_;
+    my ($self, $path, $row, $column, $value, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -374,6 +394,7 @@ sub _encapsulate_radiogroup
 	     -labels => $options->{labels},
 	     -name => "radiogroup${separator}$path",
 	     -values => $options->{values},
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	    );
 
     return $contents;
@@ -382,7 +403,7 @@ sub _encapsulate_radiogroup
 
 sub _encapsulate_textarea
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -395,6 +416,7 @@ sub _encapsulate_textarea
 	     -id => "field${separator}$path",
 	     -name => "field${separator}$path",
 	     -override => 1,
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
 	     %$options,
 	    );
 
@@ -404,7 +426,7 @@ sub _encapsulate_textarea
 
 sub _encapsulate_textfield
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my $separator = $self->{separator} || '_';
 
@@ -415,6 +437,7 @@ sub _encapsulate_textfield
 		   -id => "field${separator}$path",
 		   -name => "field${separator}$path",
 		   -override => 1,
+		   ($row == 0 ? ( -autofocus => 1 ) : ()),
 		  );
 
     if (
@@ -444,51 +467,51 @@ sub _encapsulate_textfield
 	delete $options->{validation};
     }
 
-    # for maxlength
+#     # for maxlength
 
-    if (exists $options->{maxlength})
-    {
-	# pass on given value, '0' means same as content size.
+#     if (exists $options->{maxlength})
+#     {
+# 	# pass on given value, '0' means same as content size.
 
-	if ($options->{maxlength})
-	{
-	    $arglist{'-maxlength'} = $options->{maxlength};
-	}
-	else
-	{
-	    $arglist{'-maxlength'} = $size;
-	}
-    }
+# 	if ($options->{maxlength})
+# 	{
+# 	    $arglist{'-maxlength'} = $options->{maxlength};
+# 	}
+# 	else
+# 	{
+# 	    $arglist{'-maxlength'} = $size;
+# 	}
+#     }
 
-    # or
+#     # or
 
-    else
-    {
-	# the default is equal to the size or 30 as legacy from the old
-	# TableFormType implementation.
+#     else
+#     {
+# 	# the default is equal to the size or 30 as legacy from the old
+# 	# TableFormType implementation.
 
-	$arglist{'-maxlength'} = 30;
-    }
+# 	$arglist{'-maxlength'} = 30;
+#     }
 
-    if (exists $options->{size})
-    {
-	if ($options->{size} == 0)
-	{
-	    $arglist{'-size'} = $size;
-	}
-	else
-	{
-	    $arglist{'-size'} = $options->{size};
-	}
-    }
-    else
-    {
-	#t this default is legacy from the old implementation of the
-	#t TableFormType.  It is repeated by the calibration/device variables
-	#t (last row that allows to add new constants.)
+#     if (exists $options->{size})
+#     {
+# 	if ($options->{size} == 0)
+# 	{
+# 	    $arglist{'-size'} = $size;
+# 	}
+# 	else
+# 	{
+# 	    $arglist{'-size'} = $options->{size};
+# 	}
+#     }
+#     else
+#     {
+# 	#t this default is legacy from the old implementation of the
+# 	#t TableFormType.  It is repeated by the calibration/device variables
+# 	#t (last row that allows to add new constants.)
 
-	$arglist{'-size'} = 10;
-    }
+# 	$arglist{'-size'} = 10;
+#     }
 
     %arglist = ( %arglist, %$options, );
 
@@ -496,9 +519,29 @@ sub _encapsulate_textfield
 
     print STDERR "Textfield options :\n", Dumper(\%arglist);
 
-    $contents = $self->{CGI}->textfield(%arglist);
+    $contents
+	= $self->{CGI}->textfield
+	    (
+	     %arglist,
+	     ($row == 0 ? ( -autofocus => 1 ) : ()),
+	    );
 
     return $contents;
+}
+
+
+sub _encapsulate_url
+{
+    my ($self, $path, $row, $column, $contents, $options) = @_;
+
+    if (defined $contents)
+    {
+	return "<a href=\"$contents\" title=\"$contents\" class=\"link\">$contents<a/>";
+    }
+    else
+    {
+	return '&nbsp;';
+    }
 }
 
 

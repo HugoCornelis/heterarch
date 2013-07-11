@@ -2053,7 +2053,7 @@ sub form_info_start
 
     if ($self->{output_mode} =~ 'html')
     {
-	$str .= '<table cellpadding="0" cellspacing="0" frame="box" summary="structured view of $self->{name}.">';
+	$str .= "<table cellpadding=\"0\" cellspacing=\"0\" frame=\"box\" summary=\"structured view of $self->{name}.\">";
     }
 
     $self->writer($str);
@@ -2269,7 +2269,7 @@ sub parse_input
 
 			my $store_data = $decapsulated_key;
 
-			# security first : protect single slashes
+			# security first : protect single quotes
 
 			$store_data =~ s/'/\\'/g;
 
