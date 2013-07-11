@@ -261,6 +261,7 @@ sub form_info_contents
 			.= $self->encapsulate_start
 			    (
 			     "$self->{name}${separator}${column_label}${separator}${row_key}",
+			     $row_count,
 			     $column_number,
 			     $content,
 			     $encapsulator_options,
@@ -272,6 +273,7 @@ sub form_info_contents
 			    .= $self->$encapsulator
 				(
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
+				 $row_count,
 				 $column_number,
 				 $content,
 				 $encapsulator_options,
@@ -284,6 +286,7 @@ sub form_info_contents
 				(
 				 $self,
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
+				 $row_count,
 				 $column_number,
 				 $content,
 				 $encapsulator_options,
@@ -294,6 +297,7 @@ sub form_info_contents
 			.= $self->encapsulate_end
 			    (
 			     "$self->{name}${separator}${column_label}${separator}${row_key}",
+			     $row_count,
 			     $column_number,
 			     $content,
 			     $encapsulator_options,
@@ -321,6 +325,7 @@ sub form_info_contents
 					|| /^number$/
 					    || /^textarea$/
 						|| /^textfield$/
+						    || /^url$/
 					and do
 				    {
 					my $encapsulator = "_encapsulate_$_";
@@ -331,6 +336,7 @@ sub form_info_contents
 					    .= $self->encapsulate_start
 						(
 						 "$self->{name}${separator}${column_label}${separator}${row_key}",
+						 $row_count,
 						 $column_number,
 						 $content,
 						 $encapsulator_options,
@@ -340,6 +346,7 @@ sub form_info_contents
 					    .= $self->$encapsulator
 						(
 						 "$self->{name}${separator}${column_label}${separator}${row_key}",
+						 $row_count,
 						 $column_number,
 						 $content,
 						 $encapsulator_options,
@@ -349,6 +356,7 @@ sub form_info_contents
 					    .= $self->encapsulate_end
 						(
 						 "$self->{name}${separator}${column_label}${separator}${row_key}",
+						 $row_count,
 						 $column_number,
 						 $content,
 						 $encapsulator_options,
@@ -356,6 +364,14 @@ sub form_info_contents
 
 					last TYPE;
 				    };
+
+			/^hidden$/
+			    and do
+			    {
+				$str .= "<input type=\"hidden\" name=\"$self->{name}${separator}${column_label}${separator}${row_key}\" id=\"$self->{name}${separator}${column_label}${separator}${row_key}\" value=\"$content\" /><br />";
+
+				last TYPE;
+			    };
 
 			#		/^code$/ &&
 			# default : generate with sub.
@@ -366,22 +382,19 @@ sub form_info_contents
 			    .= $self->encapsulate_start
 				(
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
+				 $row_count,
 				 $column_number,
 				 $content,
 				 $encapsulator_options,
 				);
 
-
-			#t should take a look at the calibration table logic.
-			#t Seems that filter_data is allowed to be taken from the
-			#t original data if no filter has been defined.
-
-			$str .= &{$column->{generate}}($self, $row_key, $row, $filter_data);
+			$str .= &{$column->{code}}($self, $row_key, $row, $filter_data);
 
 			$str
 			    .= $self->encapsulate_end
 				(
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
+				 $row_count,
 				 $column_number,
 				 $content,
 				 $encapsulator_options,
@@ -461,9 +474,9 @@ sub form_info_start
 
     my $str = '';
 
-    my $border_width = defined $self->{border_width} ? $self->{border_width} : 3;
+    my $border_width = defined $self->{border_width} ? $self->{border_width} : 0;
 
-    $str .= '<table border="$border_width" cellpadding="4" cellspacing="0" style="border-collapse: collapse">';
+    $str .= "<table border=\"$border_width\" cellpadding=\"4\" cellspacing=\"0\" style=\"border-collapse: collapse\">";
 
     $self->writer($str);
 }

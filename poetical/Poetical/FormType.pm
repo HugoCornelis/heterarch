@@ -267,7 +267,7 @@ sub new
 
 sub encapsulate_end
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my $result = "";
 
@@ -295,7 +295,7 @@ sub encapsulate_end
 
 sub encapsulate_start
 {
-    my ($self, $path, $column, $contents, $options) = @_;
+    my ($self, $path, $row, $column, $contents, $options) = @_;
 
     my $result = ' &nbsp;';
 
@@ -417,16 +417,16 @@ sub formalize
 
 #     $referer =~ s/;/\\;/g;
 
-    my $document_history = $query->param("document_history");
+#     my $document_history = $query->param("document_history");
 
-    if (!defined $document_history)
-    {
-	$document_history = $referer;
-    }
-    else
-    {
-	$document_history .= ";" . $referer;
-    }
+#     if (!defined $document_history)
+#     {
+# 	$document_history = $referer;
+#     }
+#     else
+#     {
+# 	$document_history .= ";" . $referer;
+#     }
 
     if (exists $self->{workflow})
     {
@@ -436,9 +436,9 @@ sub formalize
 
 	if ($header_options)
 	{
-	    my $str = $workflow->header($header_options, '', $document_history);
+# 	    my $str = $workflow->header($header_options, '', $document_history);
 
-	    $self->writer($str);
+# 	    $self->writer($str);
 	}
     }
 
@@ -523,15 +523,15 @@ sub formalize
 
 	my $separator = $self->{separator} || '_';
 
-	$self->writer
-	    (
-	     $query->hidden
-	     (
-	      -name => "document_history",
-	      -default => $document_history,
-	      -override => 1,
-	     )
-	    );
+# 	$self->writer
+# 	    (
+# 	     $query->hidden
+# 	     (
+# 	      -name => "document_history",
+# 	      -default => $document_history,
+# 	      -override => 1,
+# 	     )
+# 	    );
 
 	# formalize the hidden state information
 
