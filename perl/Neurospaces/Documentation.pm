@@ -24,10 +24,9 @@ my $root_operation_name = $2;
 
 sub build_directory
 {
-    #t this should come from a query using neurospaces_build because
-    #t it is the only one that knows about the project layout.
+    # get the project directory
 
-    my $result = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+    my $result = project_directory();
 
     # if there is a project descriptor
 
@@ -48,11 +47,11 @@ sub build_directory
 	{
 	    die "$0: *** Error: invalid project descriptor $project_descriptor_filename";
 	}
-	elsif (exists $project_descriptor->{'document directory'})
+	elsif (exists $project_descriptor->{'documentation directory'})
 	{
 	    # add the directory where documents are found to the build directory
 
-	    $result = "$result/$project_descriptor->{'document directory'}";
+	    $result .= "/" . $project_descriptor->{'documentation directory'};
 	}
     }
 
@@ -110,6 +109,17 @@ sub find_documentation
     }
 
     return $documents;
+}
+
+
+sub project_directory
+{
+    #t this should come from a query using neurospaces_build because
+    #t it is the only one that knows about the project layout.
+
+    my $result = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+
+    return $result;
 }
 
 
@@ -910,105 +920,6 @@ sub compile_html
 }
 
 
-sub build_targets
-{
-    my $self = shift;
-
-    my $options = shift;
-
-    my $filename = shift;
-
-    my $filedate = shift;
-
-    my $compilation_model = shift;
-
-    # create the directory for this target
-
-    mkdir $compilation_model->{filetype};
-
-    chdir $compilation_model->{filetype};
-
-    # if this filetype needs to be built
-
-    my $needs_rebuild = 1;
-
-    my $target_filename = $compilation_model->{filename};
-
-    if (defined $filedate
-	and -e $target_filename)
-    {
-	my ($target_dev, $target_ino, $target_mode, $target_nlink, $target_uid, $target_gid, $target_rdev, $target_size, $target_atime, $target_mtime, $target_ctime, $target_blksize, $target_blocks)
-	    = stat($target_filename);
-
-	if ($filedate < $target_mtime)
-	{
-	    $needs_rebuild = 1;
-	}
-	else
-	{
-	    $needs_rebuild = 0;
-	}
-
-	$compilation_model->{filedate} = $target_mtime;
-    }
-
-    if ($needs_rebuild)
-    {
-	# execute the commands to build the target file
-
-	my $build_commands = $compilation_model->{build_commands} || [];
-
-	foreach my $build_command (@$build_commands)
-	{
-	    my $command = $build_command->{command};
-
-	    if ($options->{verbose})
-	    {
-		print "$0: " . "build_targets($command)\n";
-	    }
-
-	    system "$command";
-
-	    if ($?)
-	    {
-		print "$0: *** Error: ($command) failed, $?\n";
-
-		chdir '..';
-
-		return "($command) failed";
-	    }
-
-	}
-    }
-
-    # we have built this target, go back to the parent directory
-
-    chdir '..';
-
-    # loop over all targets
-
-    my $targets = $compilation_model->{targets} || [];
-
-    if ($targets)
-    {
-	foreach my $target (@$targets)
-	{
-	    if (defined $filedate)
-	    {
-		# we are still in the directory of the previous target, so
-		# go to the parent directory
-
-# 		chdir '..';
-	    }
-
-	    # build the target in this directory
-
-	    $self->build_targets($options, $compilation_model->{filename}, $compilation_model->{filedate}, $target);
-	}
-    }
-}
-
-
 sub compile_latex
 {
     my $self = shift;
@@ -1040,6 +951,7 @@ sub compile_latex
 		   filedate => 0,
 		   filename => "$filename_base.tex",
 		   filetype => 'latex',
+		   identifier => 'latex',
 		   targets => [
 			       {
 				build_commands => [
@@ -1074,6 +986,7 @@ sub compile_latex
 				filedate => 0,
 				filename => "$filename_base.dvi",
 				filetype => 'dvi',
+				identifier => 'latex/dvi',
 				targets => [
 					    {
 					     build_commands => [
@@ -1111,6 +1024,7 @@ sub compile_latex
 					     filedate => 0,
 					     filename => "$filename_base.html",
 					     filetype => 'htlatex',
+					     identifier => 'latex/dvi/htlatex',
 					    },
 					    {
 					     build_commands => [
@@ -1121,6 +1035,7 @@ sub compile_latex
 					     filedate => 0,
 					     filename => "$filename_base.ps",
 					     filetype => 'ps',
+					     identifier => 'latex/dvi/ps',
 					     targets => [
 							 {
 							  build_commands => [
@@ -1131,6 +1046,7 @@ sub compile_latex
 							  filedate => 0,
 							  filename => "$filename_base.pdf",
 							  filetype => 'pdf',
+							  identifier => 'latex/dvi/ps/pdf',
 							 },
 							],
 					    },
@@ -1160,6 +1076,7 @@ sub compile_latex
 				filedate => 0,
 				filename => "$filename_base.html",
 				filetype => 'latexml',
+				identifier => 'latex/latexml',
 			       },
 			      ],
 		  };
@@ -1176,7 +1093,7 @@ sub compile_latex
 	    # since the itemize blocks kill the cron job. After we remove
 	    # the references and resave the file.
 
-	    $self->build_targets($options, undef, undef, $latex_2_html_compilation_model);
+	    $self->latex_build_targets($options, undef, undef, $latex_2_html_compilation_model);
 
 	    # that the build leaves us in one of the build target directories
 
@@ -2438,6 +2355,132 @@ sub is_wav
     my $self = shift;
 
     return $self->has_tag('wav');
+}
+
+
+sub latex_build_targets
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $filename = shift;
+
+    my $filedate = shift;
+
+    my $compilation_model = shift;
+
+    my $compilers = $options->{compilers};
+
+    # the default is to compile with all compilers
+
+    # but if at least one compiler is given
+
+    my $must_compile = @$compilers == 0;
+
+    foreach my $compiler (@$compilers)
+    {
+	# one of the given compilers must match with the identifier in the compilation_model
+
+	if ($compiler eq $compilation_model->{identifier})
+	{
+	    $must_compile = 1;
+	}
+    }
+
+    # if we must not compile
+
+    if (not $must_compile)
+    {
+	# return
+
+	return;
+    }
+
+    # create the directory for this target
+
+    mkdir $compilation_model->{filetype};
+
+    chdir $compilation_model->{filetype};
+
+    # if this filetype needs to be built
+
+    my $needs_rebuild = 1;
+
+    my $target_filename = $compilation_model->{filename};
+
+    if (defined $filedate
+	and -e $target_filename)
+    {
+	my ($target_dev, $target_ino, $target_mode, $target_nlink, $target_uid, $target_gid, $target_rdev, $target_size, $target_atime, $target_mtime, $target_ctime, $target_blksize, $target_blocks)
+	    = stat($target_filename);
+
+	if ($filedate < $target_mtime)
+	{
+	    $needs_rebuild = 1;
+	}
+	else
+	{
+	    $needs_rebuild = 0;
+	}
+
+	$compilation_model->{filedate} = $target_mtime;
+    }
+
+    if ($needs_rebuild)
+    {
+	# execute the commands to build the target file
+
+	my $build_commands = $compilation_model->{build_commands} || [];
+
+	foreach my $build_command (@$build_commands)
+	{
+	    my $command = $build_command->{command};
+
+	    if ($options->{verbose})
+	    {
+		print "$0: " . "latex_build_targets($command)\n";
+	    }
+
+	    system "$command";
+
+	    if ($?)
+	    {
+		print "$0: *** Error: ($command) failed, $?\n";
+
+		chdir '..';
+
+		return "($command) failed";
+	    }
+
+	}
+    }
+
+    # we have built this target, go back to the parent directory
+
+    chdir '..';
+
+    # loop over all targets
+
+    my $targets = $compilation_model->{targets} || [];
+
+    if ($targets)
+    {
+	foreach my $target (@$targets)
+	{
+	    if (defined $filedate)
+	    {
+		# we are still in the directory of the previous target, so
+		# go to the parent directory
+
+# 		chdir '..';
+	    }
+
+	    # build the target in this directory
+
+	    $self->latex_build_targets($options, $compilation_model->{filename}, $compilation_model->{filedate}, $target);
+	}
+    }
 }
 
 

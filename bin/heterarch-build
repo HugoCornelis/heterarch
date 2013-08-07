@@ -65,6 +65,7 @@ $SIG{INT}
 
 
 my $option_check;
+my $option_compilers = [];
 my $option_dry_run;
 my $option_email = [];
 my $option_parse_only = 0;
@@ -196,8 +197,9 @@ sub main
 			= $document->$operation
 			    (
 			     {
-			      verbose => $option_verbose,
+			      compilers => $option_compilers,
 			      set_name => $option_set_name,
+			      verbose => $option_verbose,
 			     },
 			    );
 
@@ -277,10 +279,38 @@ sub read_cmd_line
     my $option_help = 0;
     my $option_version;
 
+    # switch to the build directory
+
+    my $build_directory = Neurospaces::Documentation::project_directory();
+
+    if (!chdir $build_directory)
+    {
+	die "$0: cannot change to the build directory ($build_directory)";
+    }
+
+    # read project configuration
+
+    my $project_descriptor;
+
+    eval
+    {
+	$project_descriptor = YAML::LoadFile("$build_directory/project-descriptor.yml");
+    };
+
+    # add the project compiler options
+
+    if (defined $project_descriptor)
+    {
+	unshift @ARGV, @{$project_descriptor->{'document-build'}->{options}};
+    }
+
+    # parse the resulting command line
+
     my $result
 	= GetOptions
 	    (
 	     "check!" => \$option_check,
+	     "compilers=s" => $option_compilers,
 	     "dry-run!" => \$option_dry_run,
 	     "email=s" => $option_email,
 	     "help!" => \$option_help,
@@ -321,6 +351,7 @@ synopsis:
 
 options:
     --check           check documentation filesystem correctness.
+    --compilers       select the compilers, may be given multiple times.
     --dry-run         print what documents would be build without actually building them.
     --email           send the built document to this email address, repeat for each receiver.
                       NOTE: see http://www.amirwatad.com/blog/archives/2009/03/21/send-email-from-the-command-line-using-gmail-account/ as an example of a local configuration of your MTA.
