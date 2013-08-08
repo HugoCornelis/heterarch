@@ -28,6 +28,7 @@ dist_bin_SCRIPTS = \
 	bin/heterarch-pull \
 	bin/heterarch-push \
 	bin/heterarch-rename \
+	bin/heterarch-selector \
 	bin/heterarch-snippet \
 	bin/heterarch-sync \
 	bin/heterarch-tagfilter \

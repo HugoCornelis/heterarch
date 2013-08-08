@@ -1,0 +1,258 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -w -d:ptkdb
+#
+
+
+use strict;
+
+
+BEGIN
+{
+    #! make check
+
+    push @INC, '../perl';
+
+    #! make distcheck
+
+    push @INC, '../../perl';
+
+    #! normal run
+
+    push @INC, './perl';
+
+    #! after install
+
+    push @INC, '/usr/local/glue/swig/perl';
+}
+
+
+use Getopt::Long;
+
+use Neurospaces::Documentation;
+
+use YAML;
+
+
+$0 =~ m(.*/(.*));
+
+my $program_name = $1;
+
+$program_name =~ m((.*)[_-](.*));
+
+my $documentation_set_name = $1;
+my $root_operation_name = $2;
+
+
+$SIG{__DIE__}
+    = sub {
+
+	use Carp;
+
+	confess @_;
+    };
+
+
+$SIG{INT}
+    = sub {
+	use Carp;
+
+	confess @_;
+
+	exit 1;
+    };
+
+
+my $option_dry_run;
+my $option_parse_only = 0;
+my $option_regex = ".*";
+our $option_set_name = $documentation_set_name || "userdocs";
+my $option_tags = [];
+my $option_verbose;
+
+my $argument_documents = [];
+my $argument_selectors = [];
+
+
+sub main
+{
+    read_cmd_line();
+
+    # switch to the build directory
+
+    my $build_directory = Neurospaces::Documentation::build_directory();
+
+    if (!chdir $build_directory)
+    {
+	die "$0: cannot change to the build directory ($build_directory)";
+    }
+
+    # get all documents from the command line
+
+    my $documents
+	= Neurospaces::Documentation::find_documentation
+	    (
+	     {
+	      names => [ @$argument_documents, ],
+	      tags => $option_tags,
+	     },
+	    );
+
+    if ($option_dry_run)
+    {
+	print Dump( { all_documents => $documents, }, );
+    }
+    else
+    {
+	# loop over all documents to query
+
+	if (!scalar keys %$documents)
+	{
+	    print "$0: no documents to query\n";
+	}
+
+	foreach my $document_name (sort keys %$documents)
+	{
+	    $document_name =~ s(/$)();
+
+	    $document_name =~ s(.*/)();
+
+	    chomp $document_name;
+
+	    if ($document_name !~ m/$option_regex/)
+	    {
+		next;
+	    }
+
+	    my $document
+		= Neurospaces::Documentation::Document->new
+		    (
+		     {
+		      name => $document_name,
+		     },
+		    );
+
+	    # execute the operation
+
+	    my $error
+		= $document->select
+		    (
+		     {
+		      selectors => $argument_selectors,
+		      set_name => $option_set_name,
+		      verbose => $option_verbose,
+		     },
+		    );
+
+	    if ($error)
+	    {
+		print "$0: *** Error: for document $document_name: selection failed ($error)\n";
+
+		last;
+	    }
+	}
+    }
+}
+
+
+sub read_cmd_line
+{
+    my $option_help = 0;
+    my $option_version;
+
+    # switch to the build directory
+
+    my $build_directory = Neurospaces::Documentation::project_directory();
+
+    if (!chdir $build_directory)
+    {
+	die "$0: cannot change to the build directory ($build_directory)";
+    }
+
+    # read project configuration
+
+    my $project_descriptor;
+
+    eval
+    {
+	$project_descriptor = YAML::LoadFile("$build_directory/project-descriptor.yml");
+    };
+
+#     # add the project compiler options
+
+#     if (defined $project_descriptor)
+#     {
+# 	unshift @ARGV, @{$project_descriptor->{'document-build'}->{options}};
+#     }
+
+    # parse the resulting command line
+
+    my $result
+	= GetOptions
+	    (
+	     "dry-run!" => \$option_dry_run,
+	     "help!" => \$option_help,
+	     "parse-only!" => \$option_parse_only,
+	     "regex=s" => \$option_regex,
+	     "set-name=s" => \$option_set_name,
+	     "tags=s" => $option_tags,
+	     "verbose+" => \$option_verbose,
+	     "version" => \$option_version,
+	    );
+
+    if (!$result)
+    {
+	die "$0: *** Error: Error in option processing";
+    }
+
+    if ($option_version)
+    {
+    }
+
+    # reporting options
+
+    if ($option_help)
+    {
+	print
+	    "
+
+$program_name: select atoms from a publication.  The first argument on
+the command line is a document name that was previously built
+(currently must be xml).  The following arguments are selectors
+(currently xpath).
+
+synopsis:
+    $0 <document name> <selector1> <selector2> ...
+
+options:
+    --dry-run         print what documents would be build without actually building them.
+    --help            print usage information.
+    --parse-only      only execute parse commands, without actually building documentation.
+    --regex           selects documents by name (default is all).
+    --set-name        select a document set (builtin default is userdocs).
+    --tags            process the documents with these tags, multiple tags options may be given.
+    --version         give version information.
+    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+
+example usage:
+    $0 $option_set_name-homepage /document/section/title
+
+";
+
+	exit 0;
+    }
+
+    if (scalar @ARGV < 2)
+    {
+	die "$0: *** Error: Error in argument processing";
+    }
+
+    $argument_documents = [ shift @ARGV, ];
+
+    $argument_selectors = [ @ARGV, ];
+
+}
+
+
+main();
+
+

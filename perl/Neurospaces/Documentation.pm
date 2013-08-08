@@ -18,7 +18,7 @@ my $program_name = $1;
 
 $program_name =~ m((.*)[_-](.*));
 
-my $documentation_set_name = $1;
+my $documentation_set_name = $::option_set_name || $1;
 my $root_operation_name = $2;
 
 
@@ -71,6 +71,8 @@ sub find_documentation
 
     # get all documents explicitly asked for
 
+    $documentation_set_name = $::option_set_name || $documentation_set_name;
+
     $documents
 	= {
 	   map
@@ -117,6 +119,8 @@ sub project_directory
     #t this should come from a query using neurospaces_build because
     #t it is the only one that knows about the project layout.
 
+    $documentation_set_name = $::option_set_name || $documentation_set_name;
+
     my $result = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
 
     return $result;
@@ -147,13 +151,13 @@ sub unique
 
 sub contents_page_generate
 {
-#     mkdir "html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory";
-
     my $configuration = shift;
 
     my $html_output_directory = shift;
 
     my $home_page_document = shift;
+
+    $documentation_set_name = $::option_set_name || $documentation_set_name;
 
     my $contents_file = $html_output_directory . "/${documentation_set_name}/contents.html";
 
@@ -1828,6 +1832,8 @@ sub email
 
     my $options = shift;
 
+    $documentation_set_name = $::option_set_name || $documentation_set_name;
+
     my $set_name = $options->{set_name} || "${documentation_set_name}";
 
     my $build_directory = "$ENV{HOME}/neurospaces_project/$set_name/source/snapshots/0/";
@@ -1922,6 +1928,8 @@ sub expand
 
     if ($contents_documents->{$document_name})
     {
+	$documentation_set_name = $::option_set_name || $documentation_set_name;
+
 	my $command = "${documentation_set_name}-tagreplaceitems '$document_name' '$document_name' --verbose";
 
 	print "$0: executing \"$command\"\n";
@@ -1953,6 +1961,8 @@ sub expand
 	{
 	    # expand the document
 
+	    $documentation_set_name = $::option_set_name || $documentation_set_name;
+
 	    my $command = "${documentation_set_name}-tagreplaceitems $related_tag '$document_name' --verbose --exclude '$document_name'";
 
 	    print "$0: executing \"$command\"\n";
@@ -1973,6 +1983,8 @@ sub expand
     if (0 and -f "$document_name/output/$document_name.tex")
     {
 	# expand the document
+
+	$documentation_set_name = $::option_set_name || $documentation_set_name;
 
 	my $command = "${documentation_set_name}-snippet '$document_name/output/$document_name.tex' --verbose";
 
@@ -2653,6 +2665,8 @@ sub publish
 
 	    if ($options->{verbose})
 	    {
+		$documentation_set_name = $::option_set_name || $documentation_set_name;
+
 		print "$0: copying files for $directory to html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory\n";
 	    }
 
@@ -2750,7 +2764,86 @@ sub related_tags
 
     return $result;
 }
-	
+
+
+sub select
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $document_name = $self->{name};
+
+    my $error;
+
+    my $selectors = $options->{selectors};
+
+    # read the XML version of the document
+
+    my $build_directory = Neurospaces::Documentation::build_directory();
+
+    my $filename = "$build_directory/$document_name/output/latexml/$document_name.xml";
+
+    if (-f $filename)
+    {
+	use XML::XPath;
+	use XML::XPath::XMLParser;
+
+	print "<selection>\n";
+
+	print "  <document_set>\n";
+
+	print "    $build_directory\n";
+
+	print "  </ document_set>\n";
+
+	print "  <document_name>\n";
+
+	print "    $document_name\n";
+
+	print "  </ document_name>\n";
+
+	print "</ selection>\n";
+
+	print "<result>\n";
+
+	my $xp
+	    = XML::XPath->new
+		(
+		 filename => "$build_directory/$document_name/output/latexml/$document_name.xml",
+		);
+
+	foreach my $selector (@$selectors)
+	{
+	    my $nodeset = $xp->find( $selector );
+
+	    foreach my $node ($nodeset->get_nodelist())
+	    {
+		if (UNIVERSAL::isa($node, 'XML::XPath::Node::Attribute'))
+		{
+		    print "  " . $node->getNodeValue() . "\n";
+		}
+		else
+		{
+		    print "  " . $node->toString() . "\n";
+		}
+	    }
+
+	    print "</ result>\n";
+	}
+    }
+    else
+    {
+	# set the error
+
+	$error = "cannot read XML document ($filename)";
+    }
+
+    # return the error
+
+    return $error;
+}
+
 
 sub select_compiled_html
 {
@@ -2851,6 +2944,8 @@ sub update_hyperlinks
     # documentation can be pdf we need to check all of the published docs
     # for the pdf tag. Operation is a bit expensive.
     # NOTE: Duplicates code from ${documentation_set_name}-tagreplaceitems
+
+    $documentation_set_name = $::option_set_name || $documentation_set_name;
 
     my $published_pdfs_yaml = `${documentation_set_name}-tagfilter 2>&1 pdf published`;
 
