@@ -63,11 +63,13 @@ $SIG{INT}
 
 
 my $option_dry_run;
+my $option_namespace_prefixing = 1;
 my $option_parse_only = 0;
 my $option_regex = ".*";
-our $option_set_name = $documentation_set_name || "userdocs";
 my $option_tags = [];
 my $option_verbose;
+
+our $option_set_name = $documentation_set_name || "userdocs";
 
 my $argument_documents = [];
 my $argument_selectors = [];
@@ -190,6 +192,7 @@ sub read_cmd_line
 	= GetOptions
 	    (
 	     "dry-run!" => \$option_dry_run,
+	     "namespace-prefixing" => \$option_namespace_prefixing,
 	     "help!" => \$option_help,
 	     "parse-only!" => \$option_parse_only,
 	     "regex=s" => \$option_regex,
@@ -224,14 +227,16 @@ synopsis:
     $0 <document name> <selector1> <selector2> ...
 
 options:
-    --dry-run         print what documents would be build without actually building them.
-    --help            print usage information.
-    --parse-only      only execute parse commands, without actually building documentation.
-    --regex           selects documents by name (default is all).
-    --set-name        select a document set (builtin default is userdocs).
-    --tags            process the documents with these tags, multiple tags options may be given.
-    --version         give version information.
-    --v|verbose       tell what is being done, specify multiple times to get more feedback.
+    --dry-run              print what documents would be queriedwithout actually building them.
+    --namespace-prefixing  enable automated xml namespace prefixing for use with the default xml namespace.
+                           note: by default turned on, use --no-namespace-prefixing to turn this off.
+    --help                 print usage information.
+    --parse-only           only execute parse commands, without actually querying documentation.
+    --regex                selects documents by name (default is all).
+    --set-name             select a document set (builtin default is userdocs).
+    --tags                 process the documents with these tags, multiple tags options may be given.
+    --version              give version information.
+    --v|verbose            tell what is being done, specify multiple times to get more feedback.
 
 example usage:
     $0 $option_set_name-homepage /document/section/title
@@ -249,6 +254,16 @@ example usage:
     $argument_documents = [ shift @ARGV, ];
 
     $argument_selectors = [ @ARGV, ];
+
+    print "option_namespace_prefixing: $option_namespace_prefixing\n";
+
+    if ($option_namespace_prefixing)
+    {
+	foreach my $argument_selector (@$argument_selectors)
+	{
+	    1 while $argument_selector =~ s(/([^:]+)(/|$))(/lx:$1$2)g;
+	}
+    }
 
 }
 
