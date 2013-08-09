@@ -192,7 +192,7 @@ sub read_cmd_line
 	= GetOptions
 	    (
 	     "dry-run!" => \$option_dry_run,
-	     "namespace-prefixing" => \$option_namespace_prefixing,
+	     "namespace-prefixing!" => \$option_namespace_prefixing,
 	     "help!" => \$option_help,
 	     "parse-only!" => \$option_parse_only,
 	     "regex=s" => \$option_regex,
@@ -254,8 +254,6 @@ example usage:
     $argument_documents = [ shift @ARGV, ];
 
     $argument_selectors = [ @ARGV, ];
-
-    print "option_namespace_prefixing: $option_namespace_prefixing\n";
 
     if ($option_namespace_prefixing)
     {
