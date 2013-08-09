@@ -2786,8 +2786,7 @@ sub select
 
     if (-f $filename)
     {
-	use XML::XPath;
-	use XML::XPath::XMLParser;
+	use XML::LibXML;
 
 	print "<selection>\n";
 
@@ -2807,30 +2806,139 @@ sub select
 
 	print "<result>\n";
 
-	my $xp
-	    = XML::XPath->new
+	my $dom1
+	    = XML::LibXML->new->parse_file
 		(
-		 filename => "$build_directory/$document_name/output/latexml/$document_name.xml",
+		 "$build_directory/$document_name/output/latexml/$document_name.xml",
 		);
+
+	my $dom2 = XML::LibXML->new->parse_string(<<'EOT');
+<?xml version="1.0" encoding="UTF-8"?>
+<?latexml searchpaths=".,//home/hugo/neurospaces_project/jokes-on-you/source/snapshots/0/jokes/joke-001/output/latexml/"?>
+<?latexml options="12pt" class="article"?>
+<?latexml package="verbatim"?>
+<?latexml options="dvips" package="epsfig"?>
+<?latexml options="dvipsnames,usenames" package="color"?>
+<?latexml package="url"?>
+<?latexml options="colorlinks=true" package="hyperref"?>
+<?latexml package="enumitem"?>
+<!-- %[noitemsep,nolistsep] compact itemize/enumerate etc. -->
+<?latexml options="compact" package="titlesec"?>
+<?latexml options="margin=2cm" package="geometry"?>
+<!-- %Typeface -->
+<?latexml options="condensed,math" package="iwona"?>
+<?latexml options="T1" package="fontenc"?>
+<!-- %Remove spacing following headings, ie. implement \usepackage[compact]{titlesec} -->
+<!-- %\titlespacing{\section}{0pt}{*0}{*0} -->
+<!-- %\titlespacing{\subsection}{0pt}{*0}{*0} -->
+<!-- %\titlespacing{\subsubsection}{0pt}{*0}{*0} -->
+<!-- %Remove section numbering -->
+<!-- %\setcounter{secnumdepth}{0} -->
+<!-- %Inter-repository linking -->
+<!-- %**** joke-001.tex Line 25 **** -->
+<!-- %Generate a nicely located tilde -->
+<?latexml RelaxNGSchema="LaTeXML"?>
+<document xmlns="http://dlmf.nist.gov/LaTeXML">
+  <section xml:id="Sx1">
+    <title>Jokes on You</title>
+    <!-- %{\bf Related Documentation:} 
+     %start: heterarch-tagreplaceitems related-do-nothing
+     %end: heterarch-tagreplaceitems related-do-nothing-->
+    <para xml:id="Sx1.p1">
+      <description xml:id="I1">[noitemsep,nolistsep]
+<item xml:id="I1.i1"><para xml:id="I1.i1.p1"><p>A man walks into a bar and says “ouch”!</p></para></item></description>
+    </para>
+  </section>
+  <section xml:id="Sx2">
+    <title>Explanation</title>
+    <para xml:id="Sx2.p1">
+      <p>This joke “turns on”<note class="footnote" mark="1">Depends upon.</note> the meaning of the word <text font="bold">bar</text>.<break/>The word <text font="bold">bar</text> has a number of different meanings. They include:</p>
+      <description xml:id="I2">[noitemsep,nolistsep]
+<item xml:id="I2.i1"><para xml:id="I2.i1.p1"><p><text font="bold">Noun:</text></p><enumerate xml:id="I2.I1">[noitemsep,nolistsep]
+<!-- %**** joke-001.tex Line 50 **** --><item refnum="a" xml:id="I2.I1.i1"><para xml:id="I2.I1.i1.p1"><p>A long rod or rigid piece of wood, metal, or similar material, that is longer than it is wide; typically used as
+an obstruction, fastening, or weapon.</p></para></item><item refnum="b" xml:id="I2.I1.i2"><para xml:id="I2.I1.i2.p1"><p>An amount of food or another substance formed into a rectangular narrow block,<break/>e.g. <text font="italic">a bar of chocolate</text>, or <text font="italic">a bar of gold</text>.</p></para></item><item refnum="c" xml:id="I2.I1.i3"><para xml:id="I2.I1.i3.p1"><p>A band of colour or light, especially on a flat surface,<break/>e.g. <text font="italic">bars of sunlight shafting through the louvres of a blind</text>.</p></para></item><item refnum="d" xml:id="I2.I1.i4"><para xml:id="I2.I1.i4.p1"><p>A sandbank or shoal at the mouth of a harbour, bay, or estuary.</p></para></item><item refnum="e" xml:id="I2.I1.i5"><para xml:id="I2.I1.i5.p1"><p>In heraldry, a charge in the form of a narrow horizontal stripe across a shield.</p></para></item><item refnum="f" xml:id="I2.I1.i6"><para xml:id="I2.I1.i6.p1"><p>Relating to alcohol, a counter across which alcoholic drinks or refreshments are served, or a room in a
+restaurant or hotel in which alcohol is served, or a place where alcohol and sometimes other refreshments are
+served. Otherwise a small store or booth serving refreshments or providing a service, e.g. <text font="italic">a dairy bar</text>.</p></para></item><item refnum="g" xml:id="I2.I1.i7"><para xml:id="I2.I1.i7.p1"><p>A barrier or restriction to an action or advance, e.g. <text font="italic">political difference is not always a bar to
+friendship</text>.</p></para></item><item refnum="h" xml:id="I2.I1.i8"><para xml:id="I2.I1.i8.p1"><p>In musical notation, a bar (or measure) is a segment of time defined by a given number of beats, each of
+which are assigned a particular note value. The word bar is more common in British English, and the word
+measure is more common in American English. In the latter (American English), although the words bar and
+measure are often used interchangeably the correct use of the word 'bar' refers only to the vertical line itself,
+while the word `measure' refers to the beats contained between bars.</p></para></item><item refnum="i" xml:id="I2.I1.i9"><para xml:id="I2.I1.i9.p1"><p>A partition in a courtroom, now usually notional, beyond which most people may not pass and at which
+an accused person stands, it may be distinguished from the dock, e.g. <text font="italic">the defendant stands at the bar</text>, but
+<text font="italic">appears in the dock</text>.</p></para></item><item refnum="j" xml:id="I2.I1.i10"><para xml:id="I2.I1.i10.p1"><p>In law, a plea arresting an action or claim in a law case, or a particular court of law; otherwise, any other
+kind of tribunal, e.g. <text font="italic">the bar of public opinion</text>.</p></para></item></enumerate></para><!-- %**** joke-001.tex Line 75 **** --></item><item xml:id="I2.i2"><para xml:id="I2.i2.p1"><p><text font="bold">Verb:</text></p><enumerate xml:id="I2.I2">[noitemsep,nolistsep]
+<item refnum="a" xml:id="I2.I2.i1"><para xml:id="I2.I2.i1.p1"><p>Secure (something, especially a door or window) with a bar or bars, e.g. <text font="italic">bolt and bar the door</text>.</p></para></item><item refnum="b" xml:id="I2.I2.i2"><para xml:id="I2.I2.i2.p1"><p>Prevent or forbid entrance, e.g. <text font="italic">some ideas can be a bar to progress</text>, or <text font="italic">adult themes may be
+used to bar children from the theatre</text>.</p></para></item><item refnum="c" xml:id="I2.I2.i3"><para xml:id="I2.I2.i3.p1"><p>Prohibit (someone) from doing something, e.g. <text font="italic">in some countries drinking alcohol is a bar to driving a
+motor vehicle</text>.</p></para></item><item refnum="d" xml:id="I2.I2.i4"><para xml:id="I2.I2.i4.p1"><p>Forbid (an activity) to someone, e.g. <text font="italic">height may bar you from certain jobs</text>.</p></para></item><item refnum="e" xml:id="I2.I2.i5"><para xml:id="I2.I2.i5.p1"><p>Exclude (something) from consideration, e.g. <text font="italic">Overeating while overweight is a bar to weight
+loss</text>.</p></para></item><item refnum="f" xml:id="I2.I2.i6"><para xml:id="I2.I2.i6.p1"><p>Prevent or delay (an action) by objection.</p></para></item></enumerate></para></item></description>
+      <p>The humour in this joke relies on the use of the word <text font="bold">bar</text> as a Noun in the sense of meanings 1 and 6.<break/>There are many, many jokes that start out, “A man walks into a bar …” and for this reason a listener will usually assume the context of meaning 6. The humour is in the fact that the word is unexpectedly used in the sense of meaning 1.</p>
+    </para>
+  </section>
+</document>
+EOT
+
+	my $dom3 = XML::LibXML->new->parse_string(<<EOT);
+<?xml version="1.0"?>
+<xml xmlns="http://my.company.com/ns/nsone" 
+    xmlns:ns2="http://your.company.com/nstwo">
+    Text im Dokument
+    <ns2:element id="myID" name="myname" style="old" />
+    <object objid="001" objname="Object1" />
+    <element id="002" name="myname" />
+</xml>
+EOT
+
+	my $dom4 = XML::LibXML->new->parse_string(<<EOT);
+<response xmlns="http://my.company.com/ns/nsone">
+  <paragraph>
+    <sentence id="1">Hey</sentence>
+    <sentence id="2">Hello</sentence>
+  </paragraph>
+</response>
+EOT
+
+	my $root = $dom1->documentElement();
+
+	my $xc = XML::LibXML::XPathContext->new( $root );
+
+	$xc->registerNs("ns", "http://dlmf.nist.gov/LaTeXML");
+
+# 	foreach my $sentence_node ( $xc->findnodes('//ns:sentence[position()=2]')->get_nodelist )
+	foreach my $sentence_node ( $xc->findnodes('//ns:document/ns:section/ns:title')->get_nodelist() )
+	{
+	    print "  " . $sentence_node->textContent() . "\n";
+	}
+
+	my $xc = XML::LibXML::XPathContext->new( $root );
+	$xc->registerNs("ns2", "http://your.company.com/nstwo");
+	$xc->registerNs("ns1", "http://my.company.com/nsone");
+
+	if (0)
+	{
+	my $nodes = $root->findnodes( '/ns1:xml/ns2:element[@id="myID"]' );
+
+	print "*** $nodes\n";
+
+	foreach my $node (@$nodes)
+	{
+	    print "*** $node\n";
+	}
+
+	my $xpc = XML::LibXML::XPathContext->new( $root );
+
+        $xpc->registerNs("n", "http://dlmf.nist.gov/LaTeXML");
 
 	foreach my $selector (@$selectors)
 	{
-	    my $nodeset = $xp->find( $selector );
+	    my $nodes = $dom1->findnodes( $selector );
 
-	    foreach my $node ($nodeset->get_nodelist())
+	    foreach my $node (@$nodes)
 	    {
-		if (UNIVERSAL::isa($node, 'XML::XPath::Node::Attribute'))
-		{
-		    print "  " . $node->getNodeValue() . "\n";
-		}
-		else
-		{
-		    print "  " . $node->toString() . "\n";
-		}
+		print "  " . $node->toString() . "\n";
 	    }
-
-	    print "</ result>\n";
 	}
+    }
+	print "</ result>\n";
     }
     else
     {
