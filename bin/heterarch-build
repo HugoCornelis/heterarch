@@ -299,7 +299,9 @@ sub read_cmd_line
 
     # add the project compiler options
 
-    if (defined $project_descriptor)
+    if (defined $project_descriptor
+	and defined $project_descriptor->{'document-build'}
+	and defined $project_descriptor->{'document-build'}->{options})
     {
 	unshift @ARGV, @{$project_descriptor->{'document-build'}->{options}};
     }
