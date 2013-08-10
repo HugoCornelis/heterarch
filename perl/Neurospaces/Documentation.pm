@@ -2788,23 +2788,23 @@ sub select
     {
 	use XML::LibXML;
 
-	print "<selection>\n";
+	print "  <selection>\n";
 
-	print "  <document_set>\n";
+	print "    <document_set>\n";
 
-	print "    $build_directory\n";
+	print "      $build_directory\n";
 
-	print "  </ document_set>\n";
+	print "    </ document_set>\n";
 
-	print "  <document_name>\n";
+	print "    <document_name>\n";
 
-	print "    $document_name\n";
+	print "      $document_name\n";
 
-	print "  </ document_name>\n";
+	print "    </ document_name>\n";
 
-	print "</ selection>\n";
+	print "  </ selection>\n";
 
-	print "<result>\n";
+	print "  <result>\n";
 
 	my $dom
 	    = XML::LibXML->new->parse_file
@@ -2828,13 +2828,13 @@ sub select
 
 	    foreach my $node (@$nodes)
 	    {
-# 		print "  " . $node->textContent() . "\n";
+# 		print "    " . $node->textContent() . "\n";
 
-		print "  " . $node->toString() . "\n";
+		print "    " . $node->toString() . "\n";
 	    }
 	}
 
-	print "</ result>\n";
+	print "  </ result>\n";
     }
     else
     {

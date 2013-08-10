@@ -49,6 +49,8 @@ $SIG{__DIE__}
 	use Carp;
 
 	confess @_;
+
+	exit 1;
     };
 
 
@@ -62,17 +64,16 @@ $SIG{INT}
     };
 
 
+my $option_documents = [];
 my $option_dry_run;
 my $option_namespace_prefixing = 1;
 my $option_parse_only = 0;
 my $option_regex = ".*";
+my $option_selectors = [];
 my $option_tags = [];
 my $option_verbose;
 
 our $option_set_name = $documentation_set_name || "userdocs";
-
-my $argument_documents = [];
-my $argument_selectors = [];
 
 
 sub main
@@ -88,31 +89,33 @@ sub main
 	die "$0: cannot change to the build directory ($build_directory)";
     }
 
-    # get all documents from the command line
+#     # get all documents from the command line
 
-    my $documents
-	= Neurospaces::Documentation::find_documentation
-	    (
-	     {
-	      names => [ @$argument_documents, ],
-	      tags => $option_tags,
-	     },
-	    );
+#     my $documents
+# 	= Neurospaces::Documentation::find_documentation
+# 	    (
+# 	     {
+# 	      names => [ @$option_documents, ],
+# 	      tags => $option_tags,
+# 	     },
+# 	    );
 
-    if ($option_dry_run)
-    {
-	print Dump( { all_documents => $documents, }, );
-    }
-    else
+#     if ($option_dry_run)
+#     {
+# 	print Dump( { all_documents => $documents, }, );
+#     }
+#     else
     {
 	# loop over all documents to query
 
-	if (!scalar keys %$documents)
-	{
-	    print "$0: no documents to query\n";
-	}
+# 	if (!scalar keys %$documents)
+# 	{
+# 	    print "$0: no documents to query\n";
+# 	}
 
-	foreach my $document_name (sort keys %$documents)
+	print "<heterarch-query>\n";
+
+	foreach my $document_name (sort @$option_documents)
 	{
 	    $document_name =~ s(/$)();
 
@@ -139,7 +142,7 @@ sub main
 		= $document->select
 		    (
 		     {
-		      selectors => $argument_selectors,
+		      selectors => $option_selectors,
 		      set_name => $option_set_name,
 		      verbose => $option_verbose,
 		     },
@@ -152,6 +155,8 @@ sub main
 		last;
 	    }
 	}
+
+	print "</ heterarch-query>\n";
     }
 }
 
@@ -191,11 +196,13 @@ sub read_cmd_line
     my $result
 	= GetOptions
 	    (
+	     "documents=s" => $option_documents,
 	     "dry-run!" => \$option_dry_run,
 	     "namespace-prefixing!" => \$option_namespace_prefixing,
 	     "help!" => \$option_help,
 	     "parse-only!" => \$option_parse_only,
 	     "regex=s" => \$option_regex,
+	     "selectors=s" => $option_selectors,
 	     "set-name=s" => \$option_set_name,
 	     "tags=s" => $option_tags,
 	     "verbose+" => \$option_verbose,
@@ -224,15 +231,17 @@ the command line is a document name that was previously built
 (currently xpath).
 
 synopsis:
-    $0 <document name> <selector1> <selector2> ...
+    $0 --document <document name 1> ... --selector <selector 1> ...
 
 options:
+    --documents            documents to query.
     --dry-run              print what documents would be queriedwithout actually building them.
     --namespace-prefixing  enable automated xml namespace prefixing for use with the default xml namespace.
                            note: by default turned on, use --no-namespace-prefixing to turn this off.
     --help                 print usage information.
     --parse-only           only execute parse commands, without actually querying documentation.
     --regex                selects documents by name (default is all).
+    --selectors            selectors to use for the query.
     --set-name             select a document set (builtin default is userdocs).
     --tags                 process the documents with these tags, multiple tags options may be given.
     --version              give version information.
@@ -246,20 +255,42 @@ example usage:
 	exit 0;
     }
 
-    if (scalar @ARGV < 2)
+    # if there are no arguments left
+
+    if (scalar @ARGV <= 1
+
+	# and no document or selector options have been found
+
+	and (scalar @$option_documents == 0
+	     or scalar @$option_selectors == 0))
     {
-	die "$0: *** Error: Error in argument processing";
+	# that is an error
+
+	die "$0: *** Error: Error in option processing";
     }
 
-    $argument_documents = [ shift @ARGV, ];
+    if (scalar @ARGV > 1)
+    {
+	$option_documents = [ shift @ARGV, ];
 
-    $argument_selectors = [ @ARGV, ];
+	$option_selectors = [ @ARGV, ];
+    }
+
+    if ($option_verbose)
+    {
+	print Dump(
+		   {
+		    'Documents to query' => $option_documents,
+		    'Selectors' => $option_selectors,
+		   },
+		  );
+    }
 
     if ($option_namespace_prefixing)
     {
-	foreach my $argument_selector (@$argument_selectors)
+	foreach my $option_selector (@$option_selectors)
 	{
-	    1 while $argument_selector =~ s(/([^:]+)(/|$))(/lx:$1$2)g;
+	    1 while $option_selector =~ s(/([^:]+)(/|$))(/lx:$1$2)g;
 	}
     }
 
