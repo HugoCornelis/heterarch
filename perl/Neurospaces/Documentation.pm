@@ -153,15 +153,15 @@ sub contents_page_generate
 {
     my $configuration = shift;
 
-    my $html_output_directory = shift;
+    my $publication_directory = shift;
 
     my $home_page_document = shift;
 
+    my $build_directory = Neurospaces::Documentation::build_directory();
+
     $documentation_set_name = $::option_set_name || $documentation_set_name;
 
-    my $contents_file = $html_output_directory . "/${documentation_set_name}/contents.html";
-
-#     my $contents_file = $html_output_directory . "/html/contents.html";
+    my $contents_file = $publication_directory . "/contents.html";
 
     open(CONTENTS,">$contents_file") or die "cannot open file for writing: $!";
 
@@ -351,7 +351,24 @@ sub report_all_output
 
 sub start_publication_production
 {
+    my $options = shift;
+
+    my $result;
+
     $all_publication_results = {};
+
+    # prepare directory structure
+
+    my $publication_directory = $options->{publication_directory};
+
+    system "mkdir -p '$publication_directory'";
+
+    if ($?)
+    {
+	return "mkdir -p '$publication_directory'";
+    }
+
+    return $result;
 }
 
 
@@ -2598,6 +2615,8 @@ sub publish
 
     my $result;
 
+    my $publication_directory = $options->{publication_directory};
+
     # read the descriptor
 
     my $descriptor_error = $self->read_descriptor();
@@ -2667,20 +2686,20 @@ sub publish
 	    {
 		$documentation_set_name = $::option_set_name || $documentation_set_name;
 
-		print "$0: copying files for $directory to html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory\n";
+		print "$0: copying files for $directory to $publication_directory/$target_directory\n";
 	    }
 
 	    # put it in the place for publication.
 
-	    mkdir "../html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory";
+	    mkdir "$publication_directory/$target_directory";
 
 	    #! note: -pr for BSD (MAC) compatibility.
 
-	    system "cp -pr $output/* '../html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory'";
+	    system "cp -pr $output/* '$publication_directory/$target_directory'";
 
 	    if ($?)
 	    {
-		$result = "cp -pr $output/* '../html/htdocs/neurospaces_project/${documentation_set_name}/$target_directory'";
+		$result = "cp -pr $output/* '$publication_directory/$target_directory'";
 	    }
 
 	}

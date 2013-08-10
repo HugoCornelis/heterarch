@@ -108,13 +108,16 @@ sub main
     }
     else
     {
+	my $publication_directory = "$ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}";
+
 	# start the publication process
 
-	Neurospaces::Documentation::Publications::start_publication_production();
-
-	# prepare directory structure
-
-	`mkdir -p html/htdocs/neurospaces_project/$option_set_name/`;
+	Neurospaces::Documentation::Publications::start_publication_production
+		(
+		 {
+		  publication_directory => $publication_directory,
+		 },
+		);
 
 	# loop over all documents to be build
 
@@ -198,6 +201,7 @@ sub main
 			    (
 			     {
 			      compilers => $option_compilers,
+			      publication_directory => $publication_directory,
 			      set_name => $option_set_name,
 			      verbose => $option_verbose,
 			     },
@@ -242,15 +246,18 @@ sub main
 	{
 	    my $configuration = {};
 
-	    my $html_ouput_directory = "$ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project";
-
 # 	    my $html_ouput_directory = "html/htdocs/neurospaces_project";
 
 # 	    Neurospaces::Documentation::Publications::copy_html_data($configuration, $html_ouput_directory);
 
 	    my $home_page_document = "${documentation_set_name}-homepage";
 
-	    Neurospaces::Documentation::Publications::contents_page_generate($configuration, $html_ouput_directory, $home_page_document);
+	    Neurospaces::Documentation::Publications::contents_page_generate
+		    (
+		     $configuration,
+		     $publication_directory,
+		     $home_page_document,
+		    );
 	}
 
 	if (!$option_report_tags)
