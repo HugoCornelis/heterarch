@@ -89,17 +89,6 @@ sub main
 	die "$0: cannot change to the build directory ($build_directory)";
     }
 
-#     # get all documents from the command line
-
-#     my $documents
-# 	= Neurospaces::Documentation::find_documentation
-# 	    (
-# 	     {
-# 	      names => [ @$option_documents, ],
-# 	      tags => $option_tags,
-# 	     },
-# 	    );
-
 #     if ($option_dry_run)
 #     {
 # 	print Dump( { all_documents => $documents, }, );
@@ -255,6 +244,50 @@ example usage:
 	exit 0;
     }
 
+    # get all documents from the command line
+
+    if (scalar @$option_tags)
+    {
+	my $documents
+	    = Neurospaces::Documentation::find_documentation
+		(
+		 {
+		  # 	      names => [ @$option_documents, ],
+		  tags => $option_tags,
+		 },
+		);
+
+	if ($option_verbose)
+	{
+	    print Dump( { published => $documents, }, );
+	}
+
+	$option_documents = [ @$option_documents, keys %$documents, ];
+    }
+
+    # if there are documents to be queried and no selectors determined yet
+
+    if (scalar @ARGV > 0
+	and (scalar @$option_documents > 0))
+    {
+	# we take the rest of the arguments as selectors
+
+	$option_selectors = [ @ARGV, ];
+
+	@ARGV = ();
+    }
+
+    if ($option_verbose)
+    {
+	print Dump(
+		   {
+		    documents => $option_documents,
+		    selectors => $option_selectors,
+		    arguments => [ @ARGV, ],
+		   },
+		  );
+    }
+
     # if there are no arguments left
 
     if (scalar @ARGV <= 1
@@ -266,7 +299,7 @@ example usage:
     {
 	# that is an error
 
-	die "$0: *** Error: Error in option processing";
+	die "$0: *** Error: Error in option processing: no documents given or no selectors given";
     }
 
     if (scalar @ARGV > 1)
