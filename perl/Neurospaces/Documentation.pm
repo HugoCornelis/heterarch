@@ -2854,7 +2854,14 @@ sub select
 	    {
 # 		print "    " . $node->textContent() . "\n";
 
-		$result .= "    " . $node->toString() . "\n";
+		if ($options->{output_type} eq 'xml')
+		{
+		    $result .= "    " . $node->toString() . "\n";
+		}
+		else
+		{
+		    $result .= "'$document_name:" . $node->line_number(). "': '" . $node->toString() . "'\n";
+		}
 	    }
 	}
 
