@@ -323,7 +323,7 @@ example usage:
     {
 	foreach my $option_selector (@$option_selectors)
 	{
-	    1 while $option_selector =~ s(/([^:]+)(/|$))(/lx:$1$2)g;
+	    1 while $option_selector =~ s(/([-_a-zA-Z]+)(\[|/|$))(/lx:$1$2)g;
 	}
     }
 
