@@ -255,14 +255,14 @@ synopsis:
     $0 --document <document name 1> ... --selector <selector 1> ...
 
 options:
-    --documents            documents to query.
+    --documents            documents to query, use multiple times to specify multiple documents.
     --dry-run              print what documents would be queriedwithout actually building them.
     --namespace-prefixing  enable automated xml namespace prefixing for use with the default xml namespace.
                            note: by default turned on, use --no-namespace-prefixing to turn this off.
     --help                 print usage information.
     --output-type          select the type of output, may be given multiple times (xml, text).
     --parse-only           only execute parse commands, without actually querying documentation.
-    --regex                selects documents by name (default is all).
+    --regex                selects documents by regex (default regex is all).
     --selectors            selectors to use for the query.
     --set-name             select a document set (builtin default is userdocs).
     --tags                 process the documents with these tags, multiple tags options may be given.

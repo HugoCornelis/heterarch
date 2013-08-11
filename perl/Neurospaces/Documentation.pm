@@ -2825,6 +2825,15 @@ sub select
 
 	    $result .= "    </ document_name>\n";
 
+	    foreach my $selector (@$selectors)
+	    {
+		$result .= "    <selector>\n";
+
+		$result .= "      $selector\n";
+
+		$result .= "    </selector>\n";
+	    }
+
 	    $result .= "  </ selection>\n";
 
 	    $result .= "  <result>\n";
