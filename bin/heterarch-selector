@@ -152,7 +152,7 @@ sub main
 		}
 		else
 		{
-		    my $error = ref $result;
+		    my $error = $$result;
 
 		    if ($error)
 		    {
