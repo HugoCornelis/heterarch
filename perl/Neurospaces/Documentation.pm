@@ -2793,6 +2793,8 @@ sub select
 
     my $document_name = $self->{name};
 
+    my $result = '';
+
     my $error;
 
     my $selectors = $options->{selectors};
@@ -2807,23 +2809,26 @@ sub select
     {
 	use XML::LibXML;
 
-	print "  <selection>\n";
+	if ($options->{output_type} eq 'xml')
+	{
+	    $result .= "  <selection>\n";
 
-	print "    <document_set>\n";
+	    $result .= "    <document_set>\n";
 
-	print "      $build_directory\n";
+	    $result .= "      $build_directory\n";
 
-	print "    </ document_set>\n";
+	    $result .= "    </ document_set>\n";
 
-	print "    <document_name>\n";
+	    $result .= "    <document_name>\n";
 
-	print "      $document_name\n";
+	    $result .= "      $document_name\n";
 
-	print "    </ document_name>\n";
+	    $result .= "    </ document_name>\n";
 
-	print "  </ selection>\n";
+	    $result .= "  </ selection>\n";
 
-	print "  <result>\n";
+	    $result .= "  <result>\n";
+	}
 
 	my $dom
 	    = XML::LibXML->new->parse_file
@@ -2849,22 +2854,32 @@ sub select
 	    {
 # 		print "    " . $node->textContent() . "\n";
 
-		print "    " . $node->toString() . "\n";
+		$result .= "    " . $node->toString() . "\n";
 	    }
 	}
 
-	print "  </ result>\n";
+	if ($options->{output_type} eq 'xml')
+	{
+	    $result .= "  </ result>\n";
+	}
     }
     else
     {
 	# set the error
 
-	$error = "cannot read XML document ($filename)";
+	$error = \"cannot read XML document ($filename)";
     }
 
-    # return the error
+    # return the error or the result
 
-    return $error;
+    if ($error)
+    {
+	return $error;
+    }
+    else
+    {
+	return $result;
+    }
 }
 
 

@@ -67,6 +67,7 @@ $SIG{INT}
 my $option_documents = [];
 my $option_dry_run;
 my $option_namespace_prefixing = 1;
+my $option_output_types = [];
 my $option_parse_only = 0;
 my $option_regex = ".*";
 my $option_selectors = [];
@@ -102,50 +103,80 @@ sub main
 # 	    print "$0: no documents to query\n";
 # 	}
 
-	print "<heterarch-query>\n";
-
-	foreach my $document_name (sort @$option_documents)
+	foreach my $output_type (@$option_output_types)
 	{
-	    $document_name =~ s(/$)();
+	    my $stop;
 
-	    $document_name =~ s(.*/)();
-
-	    chomp $document_name;
-
-	    if ($document_name !~ m/$option_regex/)
+	    if ($output_type eq 'xml')
 	    {
-		next;
+		print "<heterarch-query>\n";
 	    }
 
-	    my $document
-		= Neurospaces::Documentation::Document->new
-		    (
-		     {
-		      name => $document_name,
-		     },
-		    );
-
-	    # execute the operation
-
-	    my $error
-		= $document->select
-		    (
-		     {
-		      selectors => $option_selectors,
-		      set_name => $option_set_name,
-		      verbose => $option_verbose,
-		     },
-		    );
-
-	    if ($error)
+	    foreach my $document_name (sort @$option_documents)
 	    {
-		print "$0: *** Error: for document $document_name: selection failed ($error)\n";
+		$document_name =~ s(/$)();
 
+		$document_name =~ s(.*/)();
+
+		chomp $document_name;
+
+		if ($document_name !~ m/$option_regex/)
+		{
+		    next;
+		}
+
+		my $document
+		    = Neurospaces::Documentation::Document->new
+			(
+			 {
+			  name => $document_name,
+			 },
+			);
+
+		# execute the operation
+
+		my $result
+		    = $document->select
+			(
+			 {
+			  output_type => $output_type,
+			  selectors => $option_selectors,
+			  set_name => $option_set_name,
+			  verbose => $option_verbose,
+			 },
+			);
+
+		if (not ref $result)
+		{
+		    print $result;
+		}
+		else
+		{
+		    my $error = ref $result;
+
+		    if ($error)
+		    {
+			print "$0: *** Error: for document $document_name: selection failed ($error)\n";
+
+			$stop = "$document_name: $error";
+
+			last;
+		    }
+		}
+	    }
+
+	    if ($stop)
+	    {
 		last;
 	    }
+	    else
+	    {
+		if ($output_type eq 'xml')
+		{
+		    print "</ heterarch-query>\n";
+		}
+	    }
 	}
-
-	print "</ heterarch-query>\n";
     }
 }
 
@@ -189,6 +220,7 @@ sub read_cmd_line
 	     "dry-run!" => \$option_dry_run,
 	     "namespace-prefixing!" => \$option_namespace_prefixing,
 	     "help!" => \$option_help,
+	     "output-type=s" => $option_output_types,
 	     "parse-only!" => \$option_parse_only,
 	     "regex=s" => \$option_regex,
 	     "selectors=s" => $option_selectors,
@@ -228,6 +260,7 @@ options:
     --namespace-prefixing  enable automated xml namespace prefixing for use with the default xml namespace.
                            note: by default turned on, use --no-namespace-prefixing to turn this off.
     --help                 print usage information.
+    --output-type          select the type of output, may be given multiple times (xml, text).
     --parse-only           only execute parse commands, without actually querying documentation.
     --regex                selects documents by name (default is all).
     --selectors            selectors to use for the query.
@@ -327,6 +360,10 @@ example usage:
 	}
     }
 
+    if (not scalar @$option_output_types)
+    {
+	$option_output_types = [ 'xml', ];
+    }
 }
 
 
