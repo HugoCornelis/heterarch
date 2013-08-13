@@ -1091,7 +1091,7 @@ sub compile_latex
 						    command => "latexml --dest='$filename_base.xml' '$filename_base'",
 						   },
 						   {
-						    command => "latexmlpost --novalidate --dest='$filename_base.html' '$filename_base'",
+						    command => "latexmlpost --format=xhtml --novalidate --dest='$filename_base.html' '$filename_base'",
 						   },
 						  ],
 				filedate => 0,
@@ -2803,7 +2803,16 @@ sub select
 
     my $build_directory = Neurospaces::Documentation::build_directory();
 
-    my $filename = "$build_directory/$document_name/output/latexml/$document_name.xml";
+    my $filename;
+
+    if ($options->{input_type} eq 'latexml')
+    {
+	$filename = "$build_directory/$document_name/output/latexml/$document_name.xml";
+    }
+    elsif ($options->{input_type} eq 'html')
+    {
+	$filename = "$build_directory/$document_name/output/latexml/$document_name.html";
+    }
 
     if (-f $filename)
     {
@@ -2839,17 +2848,38 @@ sub select
 	    $result .= "  <result>\n";
 	}
 
-	my $dom
-	    = XML::LibXML->new->parse_file
-		(
-		 "$build_directory/$document_name/output/latexml/$document_name.xml",
-		);
+	my $dom = XML::LibXML->new->parse_file($filename);
 
 	my $root = $dom->documentElement();
 
 	my $xc = XML::LibXML::XPathContext->new( $root );
 
-	$xc->registerNs("lx", "http://dlmf.nist.gov/LaTeXML");
+	if ($options->{input_type} eq 'latexml')
+	{
+	    $xc->registerNs("lx", "http://dlmf.nist.gov/LaTeXML");
+
+	    if ($options->{namespace_prefixing})
+	    {
+		foreach my $selector (@$selectors)
+		{
+		    1 while $selector =~ s(/([-_a-zA-Z]+)(\[|/|$))(/lx:$1$2)g;
+		}
+	    }
+	}
+	elsif ($options->{input_type} eq 'html')
+	{
+	    $xc->registerNs("xhtml", "http://www.w3.org/1999/xhtml");
+	    $xc->registerNs("mathml", "http://www.w3.org/1998/Math/MathML");
+	    $xc->registerNs("svg", "http://www.w3.org/2000/svg");
+
+	    if ($options->{namespace_prefixing})
+	    {
+		foreach my $selector (@$selectors)
+		{
+		    1 while $selector =~ s(/([-_a-zA-Z]+)(\[|/|$))(/xhtml:$1$2)g;
+		}
+	    }
+	}
 
 	foreach my $selector (@$selectors)
 	{

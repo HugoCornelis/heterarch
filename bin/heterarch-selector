@@ -66,6 +66,7 @@ $SIG{INT}
 
 my $option_documents = [];
 my $option_dry_run;
+my $option_input_type = 'latexml';
 my $option_namespace_prefixing = 1;
 my $option_output_types = [];
 my $option_parse_only = 0;
@@ -139,6 +140,8 @@ sub main
 		    = $document->select
 			(
 			 {
+			  input_type => $option_input_type,
+			  namespace_prefixing => $option_namespace_prefixing,
 			  output_type => $output_type,
 			  selectors => $option_selectors,
 			  set_name => $option_set_name,
@@ -218,6 +221,7 @@ sub read_cmd_line
 	    (
 	     "documents=s" => $option_documents,
 	     "dry-run!" => \$option_dry_run,
+	     "input-type=s" => \$option_input_type,
 	     "namespace-prefixing!" => \$option_namespace_prefixing,
 	     "help!" => \$option_help,
 	     "output-type=s" => $option_output_types,
@@ -257,6 +261,7 @@ synopsis:
 options:
     --documents            documents to query, use multiple times to specify multiple documents.
     --dry-run              print what documents would be queriedwithout actually building them.
+    --input-type           type of input (latexml (default) or html).
     --namespace-prefixing  enable automated xml namespace prefixing for use with the default xml namespace.
                            note: by default turned on, use --no-namespace-prefixing to turn this off.
     --help                 print usage information.
@@ -350,14 +355,6 @@ example usage:
 		    'Selectors' => $option_selectors,
 		   },
 		  );
-    }
-
-    if ($option_namespace_prefixing)
-    {
-	foreach my $option_selector (@$option_selectors)
-	{
-	    1 while $option_selector =~ s(/([-_a-zA-Z]+)(\[|/|$))(/lx:$1$2)g;
-	}
     }
 
     if (not scalar @$option_output_types)
