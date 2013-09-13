@@ -638,6 +638,11 @@ sub new
 
 	$self->{gui_encapsulators} = $encapsulators;
 
+    }
+    else
+    {
+	my $column_specification = $self->{contents};
+
 	my $units
 	    = {
 	       map

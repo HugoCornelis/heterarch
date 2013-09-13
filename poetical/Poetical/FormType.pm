@@ -269,6 +269,8 @@ sub encapsulate_end
 {
     my ($self, $path, $row, $column, $contents, $options) = @_;
 
+    my $separator = $self->{separator} || '_';
+
     my $result = "";
 
     $result .= '<td style="border-left-style: hidden">';
@@ -276,18 +278,33 @@ sub encapsulate_end
     if (exists $options->{gui_units}
 	&& $options->{gui_units})
     {
-	$result .= ' &nbsp;' . " ($options->{gui_units})";
+	delete $options->{validation};
+
+	my %arglist = (
+		       -id => "units${separator}$path",
+		       -name => "units${separator}$path",
+		      );
+
+	%arglist = ( %arglist, %$options, );
+
+	%arglist = map { $_ => $arglist{$_}; } grep { /^-/; } keys %arglist;
+
+	use Data::Dumper;
+
+	print STDERR "Units options :\n", Dumper(\%arglist);
+
+	$result .= $self->{CGI}->span($options, ' &nbsp;' . " ($options->{gui_units})");
     }
 
     $result .= '</td>';
 
-    if (exists $options->{center}
-        && $options->{center})
-    {
-	$result .= '</center>';
-    }
+#     if (exists $options->{center}
+#         && $options->{center})
+#     {
+# 	$result .= '</center>';
+#     }
 
-    $result .= " &nbsp;";
+#     $result .= " &nbsp;";
 
     return $result;
 }
@@ -297,13 +314,15 @@ sub encapsulate_start
 {
     my ($self, $path, $row, $column, $contents, $options) = @_;
 
-    my $result = ' &nbsp;';
+    my $result = '';
 
-    if (exists $options->{center}
-        && $options->{center})
-    {
-	$result .= '<center>';
-    }
+#     my $result = ' &nbsp;';
+
+#     if (exists $options->{center}
+#         && $options->{center})
+#     {
+# 	$result .= '<center>';
+#     }
 
     return $result;
 }

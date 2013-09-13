@@ -221,9 +221,9 @@ sub read_cmd_line
 	    (
 	     "documents=s" => $option_documents,
 	     "dry-run!" => \$option_dry_run,
+	     "help!" => \$option_help,
 	     "input-type=s" => \$option_input_type,
 	     "namespace-prefixing!" => \$option_namespace_prefixing,
-	     "help!" => \$option_help,
 	     "output-type=s" => $option_output_types,
 	     "parse-only!" => \$option_parse_only,
 	     "regex=s" => \$option_regex,
@@ -337,7 +337,7 @@ example usage:
     {
 	# that is an error
 
-	die "$0: *** Error: Error in option processing: no documents given or no selectors given";
+	die "$0: *** Error: Error in option processing: no documents given or no selectors given on the command line";
     }
 
     if (scalar @ARGV > 1)
