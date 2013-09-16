@@ -1093,6 +1093,15 @@ sub compile_latex
 						   {
 						    command => "latexmlpost --format=xhtml --novalidate --dest='$filename_base.html' '$filename_base'",
 						   },
+
+						   # it seems that when there is no title given
+						   # in the latex, latexmlpost produces an empty
+						   # element for the title in the html.  This causes
+						   # problems with firefox.
+
+						   {
+						    command => 'perl -i -p -e \'s{(\s+)<title/>(\s+)}{$1<title> No title given </title>$2}\' ' . "'$filename_base.html'",
+						   },
 						  ],
 				filedate => 0,
 				filename => "$filename_base.html",
