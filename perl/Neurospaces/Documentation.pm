@@ -2957,7 +2957,7 @@ sub select_compiled_html
     {
 	# now select which of the conversions we will use for the website
 
-	my $source_format = 'latexml';
+	my $source_format = 'htlatex';
 
 	print `pwd`;
 
