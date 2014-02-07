@@ -21,9 +21,10 @@ AC_PREREQ(2.59)
 # $Format: "AC_INIT(${package}, ${major}.${minor}.${micro}-${label}, ${email})"$
 AC_INIT(${package}, 0.0.0-alpha, hugo.cornelis@gmail.com)
 
+dnl Obtain operating system information.
+AC_CANONICAL_TARGET
 
-
-dnl # see https://metacpan.org/source/ASPIERS/Stow-v2.1.2/configure.ac
+# see https://metacpan.org/source/ASPIERS/Stow-v2.1.2/configure.ac
 
 dnl dnl Check for perl on our system.
 dnl dnl Call to AC_SUBST(PERL) is implicit
@@ -109,7 +110,7 @@ case "$host_os" in
     AC_MSG_CHECKING([Checking the perl module installation path])	
     pmdir_relative_path=`\
       $PERL -MConfig \
-        -wle '($_ = $Config{installsitelib}) \
+        -wle '($_ = $Config{installsitelib})
               =~ s!^\Q$Config{siteprefix}/!!; \
               print'`
  
@@ -134,17 +135,11 @@ case "$host_os" in
 
     #-- Here we determine the install path for perl modules --
     AC_MSG_CHECKING([Checking the perl module installation path])	
-
-dnl Commenting out the relative path call
-dnl     pmdir_relative_path=`\
-dnl       $PERL -MConfig \
-dnl         -wle '($_ = $Config{installsitelib})
-dnl               =~ s!^\Q$Config{siteprefix}/!!; \
-dnl               print'`
-
-    pmdir_path=`\
+    pmdir_relative_path=`\
       $PERL -MConfig \
-        -wle '($_ = $Config{installsitelib});print'`
+        -wle '($_ = $Config{installsitelib})
+              =~ s!^\Q$Config{siteprefix}/!!; \
+              print'`
  
     AC_ARG_WITH(
       [pmdir],
@@ -152,7 +147,7 @@ dnl               print'`
       [--with-pmdir=DIR],
       [Install Perl modules in DIR]),
       [PMDIR=${withval}],
-      [PMDIR="$pmdir_path"])
+      [PMDIR='${prefix}'/"$pmdir_relative_path"])
 
     AC_SUBST([PMDIR])
     AC_MSG_RESULT([ $PMDIR ])
@@ -161,31 +156,6 @@ dnl               print'`
   ;;
 
 esac
-
-
-
-AC_MSG_CHECKING(whether we build universal binaries.)
-AC_ARG_WITH(universal,
-[AS_HELP_STRING([--with-universal],
-              [Build universal binaries on Mac OS X.])],
-[ case "$val" in
-  no)
-
-    AC_MSG_RESULT(no)
-    OSX_UNIVERSAL="no"
-
-    ;;
-  *)
-
-    AC_MSG_RESULT(yes)
-    OSX_UNIVERSAL="yes"
-
-    ;;
-  esac ],
-  AC_MSG_RESULT(no)
-  OSX_UNIVERSAL="no"
-)
-AC_SUBST(OSX_UNIVERSAL)
 
 
 
