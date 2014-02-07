@@ -989,6 +989,12 @@ sub compile_latex
 						    command => "cp -rp ../../figures/* figures/ || true",
 						   },
 						   {
+						    command => "mkdir -p sounds/",
+						   },
+						   {
+						    command => "cp -rp ../../sounds/* sounds/ || true",
+						   },
+						   {
 						    command => "latex -halt-on-error '$filename'",
 						   },
 						   {
@@ -1022,6 +1028,12 @@ sub compile_latex
 								},
 								{
 								 command => "cp -rp ../../figures/* figures/ || true",
+								},
+								{
+								 command => "mkdir -p sounds/",
+								},
+								{
+								 command => "cp -rp ../../sounds/* sounds/ || true",
 								},
 								{
 								 command => "latex -halt-on-error '$filename'",
@@ -1086,6 +1098,12 @@ sub compile_latex
 						   },
 						   {
 						    command => "cp -rp ../../figures/* figures/ || true",
+						   },
+						   {
+						    command => "mkdir -p sounds/",
+						   },
+						   {
+						    command => "cp -rp ../../sounds/* sounds/ || true",
 						   },
 						   {
 						    command => "latexml --dest='$filename_base.xml' '$filename_base'",
