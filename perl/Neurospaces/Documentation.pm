@@ -2634,6 +2634,72 @@ sub output_register
 }
 
 
+=head2 prepare
+
+Prepare a file containing a document for processing.
+
+This sub places the document ino a temporary location, unrelated to a
+publicly known documentation set.
+
+Returns a Neurospaces::Documentation::Document.
+
+=cut
+
+sub prepare
+{
+    my $filename = shift;
+
+    $filename =~ m((.*)/(.*)\.(.*));
+
+    my $source_directory = $1;
+
+    my $document_name = $2;
+
+    my $extension = $3;
+
+    my $directory_name = "/tmp/$$/$document_name";
+
+    {
+	my $created = mkdir "/tmp/$$";
+
+	if (not $created)
+	{
+	    return undef;
+	}
+    }
+
+    {
+	my $created = mkdir "/tmp/$$/$document_name";
+
+	if (not $created)
+	{
+	    return undef;
+	}
+    }
+
+    my $result
+	= Neurospaces::Documentation::Document->new
+	    (
+	     {
+	      directory_name => $directory_name,
+	     },
+	    );
+
+    return $result;
+}
+
+
+=head2 publish
+
+Publish the document after it has been compiled.
+
+At present, the compiled document is copied to the directory
+output/html.
+
+Returns undef for success, a string describing the error on failure.
+
+=cut
+
 sub publish
 {
     my $self = shift;
