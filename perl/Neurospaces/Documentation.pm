@@ -2232,6 +2232,17 @@ sub expand
 }
 
 
+=head2 is_wav
+
+Find the snippets available for this document.
+
+The snippets are found in the documents /snippets directory as files
+whose filenames do not end in the '~' character.
+
+A hash of Neurospaces::Documentation::Snippet objects is returned.
+
+=cut
+
 sub find_snippets
 {
     my $self = shift;
@@ -2279,6 +2290,12 @@ sub find_snippets
 }
 
 
+=head2 has_tag
+
+Does the document have the given tag?
+
+=cut
+
 sub has_tag
 {
     my $self = shift;
@@ -2296,6 +2313,12 @@ sub has_tag
 }
 
 
+=head2 is_html
+
+Is the document an HTML file?
+
+=cut
+
 sub is_html
 {
     my $self = shift;
@@ -2303,6 +2326,14 @@ sub is_html
     return $self->has_tag('html');
 }
 
+
+=head2 is_latex
+
+Is the document a latex file?
+
+This is inferred from not being any of the other file types.
+
+=cut
 
 sub is_latex
 {
@@ -2324,6 +2355,12 @@ sub is_latex
 }
 
 
+=head2 is_mp3
+
+Is the document an MP3 file?
+
+=cut
+
 sub is_mp3
 {
     my $self = shift;
@@ -2331,6 +2368,12 @@ sub is_mp3
     return $self->has_tag('mp3');
 }
 
+
+=head2 is_msword
+
+Is the document an MSWord file?
+
+=cut
 
 sub is_msword
 {
@@ -2343,6 +2386,12 @@ sub is_msword
 }
 
 
+=head2 is_obsolete
+
+Is the document obsolete?
+
+=cut
+
 sub is_obsolete
 {
     my $self = shift;
@@ -2350,6 +2399,12 @@ sub is_obsolete
     return $self->has_tag('obsolete');
 }
 
+
+=head2 is_pdf
+
+Is the document a PDF file?
+
+=cut
 
 sub is_pdf
 {
@@ -2359,6 +2414,12 @@ sub is_pdf
 }
 
 
+=head2 is_png
+
+Is the document a PNG file?
+
+=cut
+
 sub is_png
 {
     my $self = shift;
@@ -2367,6 +2428,12 @@ sub is_png
 }
 
 
+=head2 is_ps
+
+Is the document a postscript file?
+
+=cut
+
 sub is_ps
 {
     my $self = shift;
@@ -2374,6 +2441,12 @@ sub is_ps
     return $self->has_tag('ps');
 }
 
+
+=head2 is_redirect
+
+Is the document an HTTP redirect?
+
+=cut
 
 sub is_redirect
 {
@@ -2390,6 +2463,12 @@ sub is_redirect
 }
 
 
+=head2 is_restructured_text
+
+Is the document restructured text?
+
+=cut
+
 sub is_restructured_text
 {
     my $self = shift;
@@ -2397,6 +2476,12 @@ sub is_restructured_text
     return $self->has_tag('rst');
 }
 
+
+=head2 is_rich_text_format
+
+Is the document a rich text format file?
+
+=cut
 
 sub is_rich_text_format
 {
@@ -2406,6 +2491,12 @@ sub is_rich_text_format
 }
 
 
+=head2 is_wav
+
+Is the document a wav file?
+
+=cut
+
 sub is_wav
 {
     my $self = shift;
@@ -2413,6 +2504,19 @@ sub is_wav
     return $self->has_tag('wav');
 }
 
+
+=head2 latex_build_targets
+
+Build the latex targets of the document according to the given
+compilation model.
+
+To build the intermediate stages this sub recurses as required.
+
+Dates are taken into account to decide whether a given target or
+intermediate target should be build.  But, currently, due to an
+unknown bug this may not work under all circumstances.
+
+=cut
 
 sub latex_build_targets
 {
@@ -2540,6 +2644,15 @@ sub latex_build_targets
 }
 
 
+=head2 new
+
+Construct a new document abstraction.
+
+If the document is not given a name, it is inferred from the
+directory_name option.
+
+=cut
+
 sub new
 {
     my $package = shift;
@@ -2571,6 +2684,15 @@ sub new
 }
 
 
+=head2 nop
+
+Do not perform any processing on a document.
+
+This sub is used as a substitute for other processing subs where
+appropriate.
+
+=cut
+
 sub nop
 {
     my $self = shift;
@@ -2582,6 +2704,15 @@ sub nop
     return $result;
 }
 
+
+=head2 output_filename
+
+Compute the output filename of the document.
+
+Use by heterarch-tagreplaceitems, but inconsistent with other subs
+AFAICT, because it prefixes the result with the name of the document.
+
+=cut
 
 sub output_filename
 {
@@ -2614,6 +2745,16 @@ sub output_filename
     return $result;
 }
 
+
+=head2 output_register
+
+Add the given output to the output methods of this document.
+
+The given output must be a hash that maps an extension to a filenamen
+including a relative path.  Commonly the relative path starts with
+"output/".
+
+=cut
 
 sub output_register
 {
