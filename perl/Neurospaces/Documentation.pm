@@ -2651,7 +2651,13 @@ sub pdf_2_text_blocks
 
     my $options = shift;
 
+    my $filters = $options->{filters};
+
+    my $packing = $options->{packing};
+
     my $verbose = $options->{verbose};
+
+    my $whitespace = $options->{whitespace};
 
     # by default: empty result
 
@@ -2843,9 +2849,33 @@ sub pdf_2_text_blocks
 		       width => $3,
 		      };
 
+		# if only white space
+
+		my $skip = 0;
+
+		if (not $options->{whitespace})
+		{
+		    foreach my $filter_name (keys %$filters)
+		    {
+			my $filter = $filters->{$filter_name};
+
+			$skip = ($current_text_line->{content} =~ m/$filter/);
+
+			if ($skip)
+			{
+			    last;
+			}
+		    }
+		}
+
+		if ($skip)
+		{
+		    # keep the last line the same
+		}
+
 		# if this is the first line
 
-		if ($last_line eq -1)
+		elsif ($last_line eq -1)
 		{
 		    # start the result of the current text block
 
@@ -2855,17 +2885,27 @@ sub pdf_2_text_blocks
 		    {
 			$current_text_block = $current_text_line;
 		    }
+
+		    # remember the last line we parsed
+
+		    $last_line = $current_text_line;
 		}
 
 		# if this node has the same left offset as the previous one
 
-		elsif ($last_line->{left} eq $current_text_line->{left})
-		    # 		   and $last_line->{font} eq $text_line->{font})
-		    # 		   and $last_line->{height} eq $text_line->{height})
+		elsif (($last_line->{left} eq $current_text_line->{left}
+		       # 		   and $last_line->{font} eq $text_line->{font})
+		       # 		   and $last_line->{height} eq $text_line->{height})
+		       )
+		       and not $options->{packing})
 		{
 		    # concat the results
 
 		    $current_text_block->{content} .= "\n" . $current_text_line->{content};
+
+		    # remember the last line we parsed
+
+		    $last_line = $current_text_line;
 		}
 
 		# else
@@ -2879,11 +2919,12 @@ sub pdf_2_text_blocks
 		    # start a new text block
 
 		    $current_text_block = $current_text_line;
+
+		    # remember the last line we parsed
+
+		    $last_line = $current_text_line;
+
 		}
-
-		# remember the last line we parsed
-
-		$last_line = $current_text_line;
 	    }
 
 	}
