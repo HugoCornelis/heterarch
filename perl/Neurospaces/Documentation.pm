@@ -2634,6 +2634,299 @@ sub output_register
 }
 
 
+=head2 pdf_2_text_blocks
+
+Prepare a file containing a document for processing.
+
+This sub places the document ino a temporary location, unrelated to a
+publicly known documentation set.
+
+Returns a Neurospaces::Documentation::Document.
+
+=cut
+
+sub pdf_2_text_blocks
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $verbose = $options->{verbose};
+
+    # by default: empty result
+
+    my $result = [];
+
+    # parse the pdf file
+
+    my $directory_name = $self->{directory_name};
+
+    use Cwd;
+
+    my $cwd = getcwd();
+
+    if (not chdir $directory_name)
+    {
+	return "cannot change to directory $directory_name (now in " . `pwd` . ")";
+    }
+
+    my $document_name = $self->{name};
+
+    my $pdf_filename = $document_name . ".pdf";
+
+    my $xml_string = `pdftohtml "$pdf_filename" -xml -stdout`;
+
+    if (not chdir $cwd)
+    {
+	return "cannot change to directory $cwd (now in " . `pwd` . ")";
+    }
+
+    if (0)
+    {
+	my $left_offsets = {};
+
+	use XML::Simple;
+
+	my $xml
+	    = XMLin
+		(
+		 $xml_string,
+		 ForceArray => 1,
+		 ForceContent => 1,
+		 KeyAttr => [],
+		);
+
+	if ($verbose)
+	{
+	    use Data::Dumper;
+
+	    print Dumper($xml);
+	}
+
+	# sort and loop over all text lines in this pdf
+
+	my $text_blocks = [];
+
+	my $last_line = -1;
+
+	my $current_text_block_content = '';
+
+	my $text_lines = $xml->{page}->[0]->{text};
+
+	foreach my $text_line (sort { $a->{left} <=> $b->{left} } @$text_lines)
+	{
+	    # if this is from the same text block
+
+	    if ($last_line eq -1)
+	    {
+		$current_text_block_content = $text_line->{content};
+	    }
+	    elsif ($last_line->{left} eq $text_line->{left})
+		# 		   and $last_line->{font} eq $text_line->{font})
+		# 		   and $last_line->{height} eq $text_line->{height})
+	    {
+		$current_text_block_content .= "\n" . $text_line->{content};
+	    }
+
+	    # else
+
+	    else
+	    {
+		# push the current text block to the result
+
+		push
+		    @$text_blocks,
+		    {
+		     content => $current_text_block_content,
+		     left => $last_line->{left},
+		    };
+
+		# start a new text block
+
+		$current_text_block_content = $text_line->{content};
+	    }
+
+	    # remember the last line we parsed
+
+	    $last_line = $text_line;
+	}
+
+	# loop over all the found text blocks and register their left offset
+
+	foreach my $text_block (@$text_blocks)
+	{
+	    $left_offsets->{$text_block->{left}} = $text_block;
+	}
+    }
+
+    {
+	use XML::LibXML;
+
+	my $dom = XML::LibXML->new->load_xml(string => $xml_string);
+
+	my $root = $dom->documentElement();
+
+	my $xc = XML::LibXML::XPathContext->new( $root );
+
+	# loop over all the text nodes
+
+	my $last_line = -1;
+
+	my $text_blocks = [];
+
+	my $current_text_block;
+
+	my $selector = "/pdf2xml/page/text"; #  "/pdf2xml/page/text[\@left=\"741\"]";
+
+	my $nodes = $xc->findnodes( $selector );
+
+	foreach my $node (@$nodes)
+	{
+	    my $attributes = [ $node->attributes(), ];
+
+	    if ($verbose)
+	    {
+		print "$0:" . $node->toString() . " :: " . $node->nodeValue() . " :: " . "\n";
+
+		print "$0: attributes: " . ( join ", ", map { $_->nodeName() . " -> " . $_->value; } @$attributes ) . "\n";
+	    }
+
+	    my $childnodes = [ $node->childNodes(), ];
+
+	    foreach my $childnode (@$childnodes)
+	    {
+		if ($verbose)
+		{
+		    print "$0:  " . $childnode->toString() . "\n";
+		}
+
+		my $childname = $childnode->nodeName();
+
+		if ($childname eq 'i')
+		{
+		    if ($verbose)
+		    {
+			print "$0:  <i> " . $childnode->toString() . "\n";
+		    }
+		}
+		elsif ($childname eq 'b')
+		{
+		    if ($verbose)
+		    {
+			print "$0:  <b> " . $childnode->toString() . "\n";
+		    }
+		}
+		else
+		{
+		    if ($verbose)
+		    {
+			print "$0:  content " . $childnode->toString() . "\n";
+		    }
+		}
+	    }
+
+	    # construct a line for this node
+
+	    my $node_string = $node->toString();
+
+	    if ($node_string =~ m(<text top="([0-9]+)" left="([0-9]+)" width="([0-9]+)" height="([0-9]+)" font="([0-9]+)">(.+)</text>)i)
+	    {
+		#t here we can split the text box into multiple parts using the journal specific splitter
+
+		my $current_text_line
+		    = {
+		       content => $6,
+		       font => $5,
+		       height => $4,
+		       left => $2,
+		       top => $1,
+		       width => $3,
+		      };
+
+		# if this is the first line
+
+		if ($last_line eq -1)
+		{
+		    # start the result of the current text block
+
+		    my $node_string = $node->toString();
+
+		    if ($node_string =~ m(<text top="([0-9]+)" left="([0-9]+)" width="([0-9]+)" height="([0-9]+)" font="([0-9]+)">(.+)</text>)i)
+		    {
+			$current_text_block = $current_text_line;
+		    }
+		}
+
+		# if this node has the same left offset as the previous one
+
+		elsif ($last_line->{left} eq $current_text_line->{left})
+		    # 		   and $last_line->{font} eq $text_line->{font})
+		    # 		   and $last_line->{height} eq $text_line->{height})
+		{
+		    # concat the results
+
+		    $current_text_block->{content} .= "\n" . $current_text_line->{content};
+		}
+
+		# else
+
+		else
+		{
+		    # push the current text block to the result
+
+		    push @$text_blocks, $current_text_block;
+
+		    # start a new text block
+
+		    $current_text_block = $current_text_line;
+		}
+
+		# remember the last line we parsed
+
+		$last_line = $current_text_line;
+	    }
+
+	}
+
+	# construct a useful result
+
+	my $id_counter = 1;
+
+	foreach my $text_block ( @$text_blocks, )
+	{
+	    my $snippet = (substr $text_block->{content}, 0, 30);
+
+	    if (length $snippet >= 30)
+	    {
+		my $size = length($text_block->{content}) >= 60 ? 30 : length($text_block->{content}) - 30;
+
+		$snippet .= " ... " . (substr $text_block->{content}, - $size, - $size);
+	    }
+
+	    1 while ($snippet =~ s/\n/ /g);
+
+	    my $content = $text_block->{content};
+
+	    push
+		@$result,
+		{
+		 content => $content,
+		 id => $id_counter,
+		 snippet => $snippet,
+		 text_block => $text_block,
+		};
+
+	    $id_counter++;
+
+	}
+    }
+
+    # return result
+
+    return $result;
+}
+
+
 =head2 prepare
 
 Prepare a file containing a document for processing.
@@ -2647,7 +2940,11 @@ Returns a Neurospaces::Documentation::Document.
 
 sub prepare
 {
-    my $filename = shift;
+    my $package = shift;
+
+    my $options = shift;
+
+    my $filename = $options->{filename};
 
     $filename =~ m((.*)/(.*)\.(.*));
 
@@ -2677,11 +2974,25 @@ sub prepare
 	}
     }
 
+    {
+	use File::Copy ();
+
+	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension");
+
+	if (not $copied)
+	{
+	    return undef;
+	}
+    }
+
     my $result
 	= Neurospaces::Documentation::Document->new
 	    (
 	     {
 	      directory_name => $directory_name,
+	      name => $document_name,
+	      extension => $extension,
+	      source_directory => $source_directory,
 	     },
 	    );
 
