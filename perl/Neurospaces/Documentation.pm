@@ -2792,13 +2792,21 @@ sub pdf_2_text_blocks
 
     my $options = shift;
 
+    # get filters that filter out unwanted text blocks
+
     my $filters = $options->{filters};
+
+    # register whether to extract images
+
+    my $images = $options->{images};
+
+    # get whether to pack multiline text blocks
 
     my $packing = $options->{packing};
 
-    my $verbose = $options->{verbose};
+    # set verbose mode
 
-    my $whitespace = $options->{whitespace};
+    my $verbose = $options->{verbose};
 
     # by default: empty result
 
@@ -2822,6 +2830,8 @@ sub pdf_2_text_blocks
     my $pdf_filename = $document_name . ".pdf";
 
     my $xml_string = `pdftohtml "$pdf_filename" -xml -stdout`;
+
+    my $images = `pdfimages "$pdf_filename" figures/figure`;
 
     if (not chdir $cwd)
     {
@@ -2990,22 +3000,19 @@ sub pdf_2_text_blocks
 		       width => $3,
 		      };
 
-		# if only white space
+		# filter unwanted text blocks
 
 		my $skip = 0;
 
-		if (not $options->{whitespace})
+		foreach my $filter_name (keys %$filters)
 		{
-		    foreach my $filter_name (keys %$filters)
+		    my $filter = $filters->{$filter_name};
+
+		    $skip = ($current_text_line->{content} =~ m/$filter/);
+
+		    if ($skip)
 		    {
-			my $filter = $filters->{$filter_name};
-
-			$skip = ($current_text_line->{content} =~ m/$filter/);
-
-			if ($skip)
-			{
-			    last;
-			}
+			last;
 		    }
 		}
 
@@ -3038,7 +3045,7 @@ sub pdf_2_text_blocks
 		       # 		   and $last_line->{font} eq $text_line->{font})
 		       # 		   and $last_line->{height} eq $text_line->{height})
 		       )
-		       and not $options->{packing})
+		       and ($options->{packing} eq 'multiline'))
 		{
 		    # concat the results
 
@@ -3126,7 +3133,13 @@ sub prepare
 
     my $options = shift;
 
+    # filename of the document, full pathname and extension
+
     my $filename = $options->{filename};
+
+    # a customizable path prefix
+
+    my $application_name = $options->{application_name};
 
     $filename =~ m((.*)/(.*)\.(.*));
 
@@ -3136,10 +3149,10 @@ sub prepare
 
     my $extension = $3;
 
-    my $directory_name = "/tmp/$$/$document_name";
+    my $directory_name = "/tmp/${application_name}_$$/$document_name";
 
     {
-	my $created = mkdir "/tmp/$$";
+	my $created = mkdir "/tmp/${application_name}_$$";
 
 	if (not $created)
 	{
@@ -3148,7 +3161,7 @@ sub prepare
     }
 
     {
-	my $created = mkdir "/tmp/$$/$document_name";
+	my $created = mkdir "/tmp/${application_name}_$$/$document_name";
 
 	if (not $created)
 	{
@@ -3162,6 +3175,17 @@ sub prepare
 	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension");
 
 	if (not $copied)
+	{
+	    return undef;
+	}
+    }
+
+    {
+	my $figures_directory = "$directory_name/figures";
+
+	my $created = mkdir $figures_directory;
+
+	if (not $created)
 	{
 	    return undef;
 	}
