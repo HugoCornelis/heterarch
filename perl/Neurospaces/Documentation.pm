@@ -3120,7 +3120,7 @@ sub pdf_2_text_blocks
 
 Prepare a file containing a document for processing.
 
-This sub places the document ino a temporary location, unrelated to a
+This sub places the document in a temporary location, unrelated to a
 publicly known documentation set.
 
 Returns a Neurospaces::Documentation::Document.
@@ -3154,7 +3154,7 @@ sub prepare
     {
 	my $created = mkdir "/tmp/${application_name}_$$";
 
-	if (not $created)
+	if (not -d "/tmp/${application_name}_$$")
 	{
 	    return undef;
 	}
@@ -3163,7 +3163,7 @@ sub prepare
     {
 	my $created = mkdir "/tmp/${application_name}_$$/$document_name";
 
-	if (not $created)
+	if (not -d "/tmp/${application_name}_$$/$document_name")
 	{
 	    return undef;
 	}
@@ -3192,7 +3192,7 @@ sub prepare
     }
 
     my $result
-	= Neurospaces::Documentation::Document->new
+	= $package->new
 	    (
 	     {
 	      directory_name => $directory_name,
