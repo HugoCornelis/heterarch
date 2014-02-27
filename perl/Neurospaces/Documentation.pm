@@ -3185,7 +3185,7 @@ sub prepare
 
 	my $created = mkdir $figures_directory;
 
-	if (not $created)
+	if (not -d "$directory_name/figures")
 	{
 	    return undef;
 	}
