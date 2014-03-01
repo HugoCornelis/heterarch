@@ -3173,7 +3173,12 @@ sub prepare
 	}
     }
 
+    # only if the file already exist
+
+    if (-e $filename)
     {
+	# try to copy it
+
 	print STDERR "$directory_name/$document_name.$extension\n";
 
 	use File::Copy ();
