@@ -3141,18 +3141,18 @@ sub prepare
 
     my $application_name = $options->{application_name};
 
-    $filename =~ m((.*)/(.*)\.(.*));
+    $filename =~ m(((.*)/)?(.*)\.(.*));
 
     my $source_directory = $1;
 
-    my $document_name = $2;
+    my $document_name = $3;
 
-    my $extension = $3;
+    my $extension = $4;
 
     my $directory_name = "/tmp/${application_name}_$$/$document_name";
 
     {
-	print STDERR "/tmp/${application_name}_$$\n;";
+	print STDERR "/tmp/${application_name}_$$\n";
 
 	my $created = mkdir "/tmp/${application_name}_$$";
 
@@ -3178,7 +3178,7 @@ sub prepare
 
 	use File::Copy ();
 
-	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension\n");
+	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension");
 
 	if (not $copied)
 	{
