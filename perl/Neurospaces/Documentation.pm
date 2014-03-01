@@ -3174,11 +3174,11 @@ sub prepare
     }
 
     {
-	print STDERR "/tmp/${application_name}_$$/$directory_name/$document_name.$extension\n";
+	print STDERR "$directory_name/$document_name.$extension\n";
 
 	use File::Copy ();
 
-	my $copied = File::Copy::copy($filename, "/tmp/${application_name}_$$/$directory_name/$document_name.$extension");
+	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension");
 
 	if (not $copied)
 	{
@@ -3187,9 +3187,9 @@ sub prepare
     }
 
     {
-	print STDERR "/tmp/${application_name}_$$/$directory_name/figures\n";
+	print STDERR "$directory_name/figures\n";
 
-	my $figures_directory = "/tmp/${application_name}_$$/$directory_name/figures";
+	my $figures_directory = "$directory_name/figures";
 
 	my $created = mkdir $figures_directory;
 
