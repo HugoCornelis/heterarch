@@ -3208,6 +3208,7 @@ sub prepare
 	= $package->new
 	    (
 	     {
+	      %$options,
 	      directory_name => $directory_name,
 	      name => $document_name,
 	      extension => $extension,
