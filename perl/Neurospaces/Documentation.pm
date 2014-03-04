@@ -2798,7 +2798,7 @@ sub pdf_2_text_blocks
 
     # register whether to extract images
 
-    my $images = $options->{images};
+#     my $images = $options->{images};
 
     # get whether to pack multiline text blocks
 
