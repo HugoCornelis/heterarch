@@ -2790,6 +2790,8 @@ sub pdf_2_text_blocks
 {
     my $self = shift;
 
+    my $package = shift;
+
     my $options = shift;
 
     # get filters that filter out unwanted text blocks
@@ -3098,12 +3100,15 @@ sub pdf_2_text_blocks
 
 	    push
 		@$result,
-		{
-		 content => $content,
-		 id => $id_counter,
-		 snippet => $snippet,
-		 text_block => $text_block,
-		};
+		    $package->new
+			(
+			 {
+			  content => $content,
+			  id => $id_counter,
+			  snippet => $snippet,
+			  text_block => $text_block,
+			 },
+			);
 
 	    $id_counter++;
 
@@ -3778,6 +3783,49 @@ sub replacement_string
     # return replacement_string
 
     return $content;
+}
+
+
+package Neurospaces::Documentation::TextBlock;
+
+
+=head2 new
+
+Construct a new text block abstraction.
+
+If the document is not given a name, it is inferred from the
+directory_name option.
+
+=cut
+
+sub new
+{
+    my $package = shift;
+
+    my $options = shift;
+
+    my $self
+	= {
+	   %$options,
+	  };
+
+    if (not exists $self->{name})
+    {
+	if (exists $self->{directory_name})
+	{
+	    my $directory_name = $self->{directory_name};
+
+	    my @dirs = split(/\//, $directory_name);
+
+	    my $name = $dirs[-1];
+
+	    $self->{name} = $name;
+	}
+    }
+
+    bless $self, $package;
+
+    return $self;
 }
 
 
