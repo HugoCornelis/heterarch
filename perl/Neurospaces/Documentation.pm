@@ -3091,7 +3091,7 @@ sub pdf_2_text_blocks
 	    {
 		my $size = length($text_block->{content}) >= 60 ? 30 : length($text_block->{content}) - 30;
 
-		$snippet .= " ... " . (substr $text_block->{content}, - $size, - $size);
+		$snippet .= " ... ... " . (substr $text_block->{content}, - $size,);
 	    }
 
 	    1 while ($snippet =~ s/\n/ /g);
