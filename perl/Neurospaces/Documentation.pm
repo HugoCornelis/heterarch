@@ -3106,6 +3106,7 @@ sub pdf_2_text_blocks
 			  content => $content,
 			  id => $id_counter,
 			  snippet => $snippet,
+			  source => "$directory_name/$pdf_filename",
 			  text_block => $text_block,
 			 },
 			);
