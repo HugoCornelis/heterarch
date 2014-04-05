@@ -846,6 +846,20 @@ sub rotate_logs
 }
 
 
+# for bulk mailing, see
+#
+# https://support.google.com/mail/answer/81126?hl=en#format
+# and
+# https://support.google.com/mail/answer/188131?hl=en
+#
+# for more information, google for this text
+#
+# [91.183.94.6      12] Our system has detected that this message is
+# likely unsolicited mail. To reduce the amount of spam sent to Gmail,
+# this message has been blocked. Please visit
+# http://support.google.com/mail/bin/answer.py?hl=en&answer=188131 for
+#
+
 sub try_to_mail
 {
     my $subject = shift;
