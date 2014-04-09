@@ -3559,6 +3559,15 @@ sub select
 }
 
 
+=head2 sub select_compiled_html
+
+Create the output target directory and cp the existing HTML converted
+output to the output target directory.
+
+At the time of writing, the selected source_format is htlatex.
+
+=cut
+
 sub select_compiled_html
 {
     my $self = shift;
@@ -3790,7 +3799,7 @@ sub replacement_string
 package Neurospaces::Documentation::TextBlock;
 
 
-=head2 new
+=head2 sub new
 
 Construct a new text block abstraction.
 
