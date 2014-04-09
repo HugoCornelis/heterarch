@@ -3290,14 +3290,14 @@ sub prepare
 	    (
 	     {
 	      %$options,
-	      bless (
-		     descriptor => {
+	      descriptor => bless (
+				   {
 				    tags => [
 					     "draft",
 					     $extension,
 					    ],
-				   }
-		    ) "Neurospaces::Documentation::Descriptor",
+				   }, "Neurospaces::Documentation::Descriptor",
+				  ),
 	      directory_name => $directory_name,
 	      name => $document_name,
 	      extension => $extension,
