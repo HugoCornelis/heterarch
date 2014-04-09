@@ -3158,8 +3158,6 @@ sub prepare
     my $directory_name = "/tmp/${application_name}_$$/$document_name";
 
     {
-	print STDERR "/tmp/${application_name}_$$\n";
-
 	my $created = mkdir "/tmp/${application_name}_$$";
 
 	if (not -d "/tmp/${application_name}_$$")
@@ -3169,8 +3167,6 @@ sub prepare
     }
 
     {
-	print STDERR "/tmp/${application_name}_$$/$document_name\n";
-
 	my $created = mkdir "/tmp/${application_name}_$$/$document_name";
 
 	if (not -d "/tmp/${application_name}_$$/$document_name")
@@ -3185,8 +3181,6 @@ sub prepare
     {
 	# try to copy it
 
-	print STDERR "$directory_name/$document_name.$extension\n";
-
 	use File::Copy ();
 
 	my $copied = File::Copy::copy($filename, "$directory_name/$document_name.$extension");
@@ -3198,8 +3192,6 @@ sub prepare
     }
 
     {
-	print STDERR "$directory_name/figures\n";
-
 	my $figures_directory = "$directory_name/figures";
 
 	my $created = mkdir $figures_directory;
