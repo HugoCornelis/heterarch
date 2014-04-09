@@ -410,7 +410,7 @@ sub compile
 
     # read the descriptor
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {
@@ -1743,7 +1743,7 @@ sub check
 
     print "$0: Checking $self->{name}\n";
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {
@@ -1867,6 +1867,89 @@ sub copy
     chdir '..';
 
     return $result;
+}
+
+
+=head2 sub descriptor_generate
+
+Generate the file with the document descriptor information, based on
+what is found in the ->{descriptor} key.
+
+=cut
+
+sub descriptor_generate
+{
+    my $self = shift;
+
+    my $filename;
+
+    if (exists $self->{directory_name})
+    {
+	$filename = $self->{directory_name} . "/descriptor.yml";
+    }
+    else
+    {
+	return "document $self->{name} does not have a directory_name set, cannot generate a descriptor";
+    }
+
+    eval
+    {
+	YAML::DumpFile($filename, $self->{descriptor});
+    };
+
+    if ($@)
+    {
+	return $@;
+    }
+    else
+    {
+	return undef;
+    }
+}
+
+
+=head2 sub descriptor_read
+
+Read the file with the document descriptor information into the
+->{descriptor} key.
+
+=cut
+
+sub descriptor_read
+{
+    my $self = shift;
+
+    my $filename;
+
+    if (not exists $self->{directory_name})
+    {
+	$filename = $self->{name} . "/descriptor.yml";
+    }
+    else
+    {
+	$filename = $self->{directory_name} . "/descriptor.yml";
+    }
+
+    if ($self->{descriptor})
+    {
+	return '';
+    }
+
+    eval
+    {
+	$self->{descriptor} = YAML::LoadFile($filename);
+    };
+
+    if ($@)
+    {
+	return $@;
+    }
+    else
+    {
+	bless $self->{descriptor}, "Neurospaces::Documentation::Descriptor";
+
+	return undef;
+    }
 }
 
 
@@ -2232,7 +2315,7 @@ sub expand
 }
 
 
-=head2 is_wav
+=head2 sub find_snippets
 
 Find the snippets available for this document.
 
@@ -2302,7 +2385,7 @@ sub has_tag
 
     my $tag = shift;
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {
@@ -2452,7 +2535,7 @@ sub is_redirect
 {
     my $self = shift;
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {
@@ -3207,6 +3290,14 @@ sub prepare
 	    (
 	     {
 	      %$options,
+	      bless (
+		     descriptor => {
+				    tags => [
+					     "draft",
+					     $extension,
+					    ],
+				   }
+		    ) "Neurospaces::Documentation::Descriptor",
 	      directory_name => $directory_name,
 	      name => $document_name,
 	      extension => $extension,
@@ -3241,7 +3332,7 @@ sub publish
 
     # read the descriptor
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {
@@ -3338,51 +3429,13 @@ sub publish
 }
 
 
-sub read_descriptor
-{
-    my $self = shift;
-
-    my $filename;
-
-    if (not exists $self->{directory_name})
-    {
-	$filename = $self->{name} . "/descriptor.yml";
-    }
-    else
-    {
-	$filename = $self->{directory_name} . "/descriptor.yml";
-    }
-
-    if ($self->{descriptor})
-    {
-	return '';
-    }
-
-    eval
-    {
-	$self->{descriptor} = YAML::LoadFile($filename);
-    };
-
-    if ($@)
-    {
-	return $@;
-    }
-    else
-    {
-	bless $self->{descriptor}, "Neurospaces::Documentation::Descriptor";
-
-	return undef;
-    }
-}
-
-
 sub related_tags
 {
     my $self = shift;
 
     my $result;
 
-    my $descriptor_error = $self->read_descriptor();
+    my $descriptor_error = $self->descriptor_read();
 
     if ($descriptor_error)
     {

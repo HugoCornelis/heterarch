@@ -168,11 +168,11 @@ sub main
 		my $operations
 		    = [
 		       $option_report_tags
-		       ? 'read_descriptor'
+		       ? 'descriptor_read'
 		       : (
 			  $option_check
 			  ? 'check'
-			  : qw(read_descriptor
+			  : qw(descriptor_read
 			       copy
 			       expand
 			       compile

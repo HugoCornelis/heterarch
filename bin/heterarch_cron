@@ -334,7 +334,7 @@ This is a listing of all published documents in the ${package_name} documentatio
 	    $suffix = ".pdf";
 	}
 
-	$document->read_descriptor();
+	$document->descriptor_read();
 
 	print CONTENTS "<li><a href=\"";
 
