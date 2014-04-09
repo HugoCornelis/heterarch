@@ -3415,6 +3415,19 @@ sub related_tags
 }
 
 
+=head2 sub select
+
+Apply a series of XPath selectors to the given document and return the
+result as a string.
+
+Depending on the options, the source document can be either an HTML or
+an XML output from a previous latexml compilation.
+
+The result can be either XML formatted or formatted similar to grep
+output.
+
+=cut
+
 sub select
 {
     my $self = shift;
