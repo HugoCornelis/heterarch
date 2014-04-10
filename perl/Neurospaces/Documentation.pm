@@ -1268,32 +1268,32 @@ sub compile_msword
 
     mkdir "output/pdf";
 
-    system "soffice --accept='socket,port=8100;urp;' --invisible &";
+    system "soffice -accept='socket,port=8100;urp;' -invisible &";
 
     sleep 1;
 
     if ($?)
     {
-	$result = "soffice --accept='socket,port=8100;urp;' --invisible &";
+	$result = "soffice -accept='socket,port=8100;urp;' -invisible &";
     }
     else
     {
 	if ($self->has_tag("doc"))
 	{
-	    system "jodconverter $directory.doc $directory.pdf";
+	    system "sudo chmod o+w . && jodconverter $directory.doc $directory.pdf";
 	}
 	elsif ($self->has_tag("docx"))
 	{
-	    system "jodconverter $directory.docx $directory.pdf";
+	    system "sudo chmod o+w . && jodconverter $directory.docx $directory.pdf";
 	}
 	elsif ($self->has_tag("odt"))
 	{
-	    system "jodconverter $directory.odt $directory.pdf";
+	    system "sudo chmod o+w . && jodconverter $directory.odt $directory.pdf";
 	}
 
 	if ($?)
 	{
-	    $result = "jodconverter $directory.(doc|docx|odt) $directory.pdf";
+	    $result = "sudo chmod o+w . && jodconverter $directory.(doc|docx|odt) $directory.pdf";
 	}
 	else
 	{
