@@ -1762,6 +1762,108 @@ sub check
 }
 
 
+=head2 sub content_read
+
+Retrieve the content text from a document.
+
+Currently works only for msword type of documents.
+
+=cut
+
+sub content_read
+{
+    my $self = shift;
+
+    my $options = shift;
+
+    my $result;
+
+    if ($self->is_odt())
+    {
+	my $directory = $self->{name};
+
+	if ($options->{verbose})
+	{
+	    print "$0: entering $directory\n";
+	}
+
+	chdir $directory;
+
+	my $work_directory = "odt";
+
+	my $created = mkdir "$work_directory";
+
+	if (not -d "$work_directory")
+	{
+	    return \ "unable to create the $work_directory output directory";
+	}
+
+	chdir "$work_directory";
+
+	if ($options->{verbose})
+	{
+	    print "$0: entering $work_directory\n";
+	}
+
+	my $filename = $self->{name} . "." . $self->{extension};
+
+	system "cp ../$filename .";
+
+	if ($?)
+	{
+	    $result = \ "copying $filename to the $work_directory directory (cp ../$filename ., $?)";
+	}
+
+	system "unzip $filename";
+
+	if ($?)
+	{
+	    $result = \ "unzipping $filename (unzip $filename, $?)";
+	}
+
+	{
+	    my $content = "content.xml";
+
+	    open my $file, $content
+		or die $!;
+
+	    local $/;
+
+	    $result = <$file>;
+
+	    close $file;
+	}
+
+	if ($options->{verbose})
+	{
+	    print "$0: leaving $work_directory\n";
+	}
+
+	chdir '..';
+
+	if ($options->{verbose})
+	{
+	    print "$0: leaving $directory\n";
+	}
+
+	chdir '..';
+
+    }
+    else
+    {
+	$result = \ "not an odt type of document";
+    }
+
+    return $result;
+}
+
+
+=head2 sub copy
+
+Prepare the output directory by copying source files.
+
+=cut
+
 sub copy
 {
     my $self = shift;
@@ -2454,7 +2556,7 @@ sub is_mp3
 
 =head2 is_msword
 
-Is the document an MSWord file?
+Is the document an MSWord compatible file?
 
 =cut
 
@@ -2480,6 +2582,20 @@ sub is_obsolete
     my $self = shift;
 
     return $self->has_tag('obsolete');
+}
+
+
+=head2 is_odt
+
+Is the document an open office odt file?
+
+=cut
+
+sub is_odt
+{
+    my $self = shift;
+
+    return ($self->has_tag('odt'));
 }
 
 
