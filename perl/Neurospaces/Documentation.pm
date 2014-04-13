@@ -1280,20 +1280,20 @@ sub compile_msword
     {
 	if ($self->has_tag("doc"))
 	{
-	    system "sudo chmod o+w . && jodconverter $directory.doc $directory.pdf";
+	    system "jodconverter $directory.doc $directory.pdf";
 	}
 	elsif ($self->has_tag("docx"))
 	{
-	    system "sudo chmod o+w . && jodconverter $directory.docx $directory.pdf";
+	    system "jodconverter $directory.docx $directory.pdf";
 	}
 	elsif ($self->has_tag("odt"))
 	{
-	    system "sudo chmod o+w . && jodconverter $directory.odt $directory.pdf";
+	    system "jodconverter $directory.odt $directory.pdf";
 	}
 
 	if ($?)
 	{
-	    $result = "sudo chmod o+w . && jodconverter $directory.(doc|docx|odt) $directory.pdf";
+	    $result = "jodconverter $directory.(doc|docx|odt) $directory.pdf";
 	}
 	else
 	{
