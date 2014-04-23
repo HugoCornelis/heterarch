@@ -1057,6 +1057,38 @@ sub parameter
 }
 
 
+#
+# parameter_path()
+#
+# Basically a Poetical::FormType specific frontend to CGI::param().
+#
+
+sub parameter_path
+{
+    my $self = shift;
+
+    my $type = shift;
+
+    my $parameter_name = shift;
+
+    my $query_params = shift;
+
+    my $document_name = $self->{name};
+
+    my $separator = $self->{separator} || '_';
+
+    $parameter_name = "${type}${separator}${document_name}${separator}${parameter_name}";
+
+    my $value = $query_params->{$parameter_name};
+
+    print STDERR "Obtained $parameter_name\n", Dumper($value);
+
+    #t could do sanity checking here : numeric value for numeric type etc.
+
+    return $value;
+}
+
+
 sub parse_buttons
 {
     my $self = shift;

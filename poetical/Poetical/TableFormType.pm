@@ -15,6 +15,320 @@ use Poetical::StaticFormType;
 our @ISA = ("Poetical::StaticFormType");
 
 
+sub detransform
+{
+    my $self = shift;
+
+    my $query_params = shift;
+
+    my $result = {};
+
+    my $separator = $self->{separator} || '_';
+
+#     # if factory settings request
+
+#     if ($self->parse_factory($result))
+#     {
+# 	# return without further processing
+
+# 	return $result;
+#     }
+
+#     # figure out the submitted section
+
+#     if ($self->parse_submits($result))
+#     {
+# 	return $result;
+#     }
+
+#     # figure out the pressed button
+
+#     if ($self->parse_buttons($result))
+#     {
+# 	return $result;
+#     }
+
+#     # if there is nothing to parse for this document
+
+#     #t consolidate 'cmd' with 'button' will remove the indirection on
+#     #t the second key (ie. {$result->{cmd}->{action}}).
+
+#     if ($result->{$result->{cmd}->{action}}->{request} !~ /^$self->{name}_/)
+#     {
+# 	return $result;
+#     }
+
+    # the keys that should be handled.
+
+    my $keys_to_handle = [ keys %$query_params, ];
+
+    # loop over the submitted fields
+
+    my $decapsulated;
+
+    #t unchecked checkboxes are not passed through by CGI, so are not
+    #t in $query_params.  Perhaps this can be solved by using default
+    #t default values ?
+
+    #t loop over all fields from the table format
+    #t   assign default value
+    #t     perhaps only for certain field types like checkboxes.
+
+    while (scalar @$keys_to_handle)
+    {
+	my $key = pop @$keys_to_handle;
+
+	if ($key !~ /^field$separator/
+	    && $key !~ /^checkbox$separator/)
+	{
+	    next;
+	}
+
+# 	$keys_to_handle++;
+
+	# remove type indicator
+
+# 	$key =~ s/^field$separator//;
+	$key =~ s/^([^${separator}]*?)${separator}//;
+
+	my $type = $1;
+
+	# remove name of the document
+
+	$key =~ s/^[^${separator}]*?${separator}//;
+
+	# get name of the column and row
+
+	$key =~ m/^([^${separator}]*?)${separator}(.*)$/;
+
+	my $column_key = $1;
+
+	my $row = $2;
+
+	# find the column in the format
+
+	my $column_number = 0;
+
+	my $format_columns = $self->{format}->{columns};
+
+	foreach my $format_column ( ( @$format_columns, ) )
+	{
+	    if ($format_column->{key_name})
+	    {
+		if ($format_column->{key_name} eq $column_key)
+		{
+		    # fetch the value from CGI
+
+		    my $parameter_name = "${column_key}$separator${row}";
+
+		    my $value = $self->parameter_path($type, $parameter_name, $query_params);
+
+		    # if we have a valid value
+
+		    #! we should not get here with 'undef' values.
+
+		    if (defined $value)
+		    {
+			# start determining what decapsulator to use
+
+			my $decapsulator;
+
+			# start assembling options for the decapsulator
+
+			my $format_decapsulator_options = $format_column->{encapsulator}->{options} || {};
+
+			my $decapsulator_options
+			    = {
+			       %$format_decapsulator_options,
+			      };
+
+			#t need to do this in a derived class
+
+			print STDERR "column_key is $column_key, columns is " . @{$self->{format}->{columns}} . "\n";
+
+			if (
+			    exists $self->{gui_units}->{$row}
+			    && scalar @{$self->{format}->{columns}} == 2
+			    && $column_number == 1
+			   )
+			{
+			    $decapsulator_options->{gui_units} = $self->{gui_units}->{$row};
+			}
+
+			# if the document is not editable
+
+			if (exists $self->{editable}
+			    && !$self->{editable})
+			{
+			    # use the constant decapsulator
+
+			    $decapsulator = "_decapsulate_constant";
+			}
+
+			# if there is a regex decapsulator
+
+			my $regex_decapsulator
+			    = $self->has_regex_encapsulator("$self->{name}${separator}${column_key}${separator}${row}", $value, );
+
+			if (
+			    $regex_decapsulator
+			    && !$decapsulator
+			   )
+			{
+			    # use the regex decapsulator with its options
+
+			    my $regex_decapsulator_options = $regex_decapsulator->{encapsulator}->{options} || {};
+
+			    $decapsulator_options
+				= {
+				   %$decapsulator_options,
+				   %$regex_decapsulator_options,
+				  };
+
+			    if (exists $regex_decapsulator->{type})
+			    {
+				$decapsulator = "_encapsulate_$regex_decapsulator->{type}";
+			    }
+			    elsif (exists $regex_decapsulator->{code})
+			    {
+				$decapsulator = $regex_decapsulator->{code};
+			    }
+			}
+
+			# if a type has been defined for this field
+
+			if (
+			    $self->{gui_encapsulators}->{$row}
+			    && scalar @{$self->{format}->{columns}} == 2
+			    && $column_number == 1
+			    && !$decapsulator
+			   )
+			{
+			    # use the type decapsulator with its options
+
+			    my $gui_decapsulator = $self->{gui_encapsulators}->{$row};
+
+			    my $gui_decapsulator_options = $gui_decapsulator->{options} || {};
+
+			    $decapsulator_options
+				= {
+				   %$decapsulator_options,
+				   %$gui_decapsulator_options,
+				  };
+
+			    if (exists $gui_decapsulator->{type})
+			    {
+				$decapsulator = "_decapsulate_$gui_decapsulator->{type}";
+			    }
+			    elsif (exists $gui_decapsulator->{code})
+			    {
+				$decapsulator = $gui_decapsulator->{code};
+			    }
+
+			}
+
+			# default : the field has not been decapsulated yet
+
+			my $is_decapsulated = 0;
+
+			my ($decapsulated_key, $decapsulated_data);
+
+			if ($decapsulator && !$decapsulated)
+			{
+			    if (!ref $decapsulator)
+			    {
+				($decapsulated_key, $decapsulated_data)
+				    = $self->$decapsulator
+					(
+					 $key,
+					 $row,
+					 $column_number,
+					 $decapsulated,
+					 $value,
+					 $decapsulator_options,
+					);
+			    }
+			    elsif (ref $decapsulator eq 'CODE')
+			    {
+				($decapsulated_key, $decapsulated_data)
+				    = $self->_decapsulate_constant
+					(
+					 $key,
+					 $row,
+					 $column_number,
+					 $decapsulated,
+					 $value,
+					 $decapsulator_options,
+					);
+			    }
+
+			    # register that the field has been decapsulated
+
+			    $is_decapsulated = 1;
+			}
+
+			# else : do the default type based deapsulation
+
+			if (!$is_decapsulated)
+			{
+			    # determine the type
+
+			    local $_ = $format_column->{type} eq 'code' ? 'constant' : $format_column->{type};
+
+			    my $decapsulator = "_decapsulate_$_";
+
+			    print STDERR "Entry $row, $column_key == $_ : $decapsulator\n";
+
+			    ($decapsulated_key, $decapsulated_data)
+				= $self->$decapsulator
+				    (
+				     $key,
+				     $row,
+				     $column_number,
+				     $decapsulated,
+				     $value,
+				     $decapsulator_options,
+				    );
+			}
+
+			# fill in the entry in the data
+
+			$decapsulated->{$row}->{$column_key} = $decapsulated_data;
+		    }
+		    else
+		    {
+			print STDERR "FormType error: CGI key $key does not have a defined value\n";
+
+			$self->register_error("CGI key $key does not have a defined value");
+		    }
+
+# 		    # break search loop
+
+# 		    last;
+		}
+	    }
+	    elsif ($self->{format}->{hash_key} eq $column_key)
+	    {
+		#t not sure, not supported for the moment
+
+		#t Should take the new hash and fill it in the original hash with this value as hash key.
+		#t I think this is not possible in the general case.
+	    }
+
+	    $column_number++;
+	}
+    }
+
+    #t apply detransformations
+
+    # fill in the decapsulated data
+
+    $result->{detransformed} = $decapsulated;
+
+    return $result;
+}
+
+
 sub form_info_contents
 {
     my $self = shift;
@@ -760,11 +1074,9 @@ sub parse_input
 
 	my $column_number = 0;
 
-	my $format_column;
-
 	my $format_columns = $self->{format}->{columns};
 
-	foreach $format_column (@$format_columns)
+	foreach my $format_column (@$format_columns)
 	{
 	    if ($format_column->{key_name})
 	    {
@@ -894,6 +1206,7 @@ sub parse_input
 				    = $self->$decapsulator
 					(
 					 $key,
+					 $row,
 					 $column_number,
 					 $decapsulated,
 					 $value,
@@ -906,6 +1219,7 @@ sub parse_input
 				    = $self->_decapsulate_constant
 					(
 					 $key,
+					 $row,
 					 $column_number,
 					 $decapsulated,
 					 $value,
@@ -934,6 +1248,7 @@ sub parse_input
 				= $self->$decapsulator
 				    (
 				     $key,
+				     $row,
 				     $column_number,
 				     $decapsulated,
 				     $value,
