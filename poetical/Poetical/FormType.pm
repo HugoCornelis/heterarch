@@ -217,51 +217,42 @@ function $validator_name(form_name)
 }
 
 
-sub new
+sub commands
 {
-    my $proto = shift;
-    my $class = ref($proto) || $proto;
-    my %options = @_;
-    my $self = {};
+    my $self = shift;
 
-    foreach my $key (keys %options)
+    my $parameters = shift;
+
+    my $commands = [ grep { /^submit_[^_]*/ } keys %$parameters, ];
+
+    if (@$commands > 1)
     {
-	$self->{$key} = $options{$key};
+	print STDERR "FormType error: more than one submit in CGI parameters\n";
+
+	$self->register_error("more than one submit in CGI parameters");
     }
 
-    if ($self->{name} =~ /_/
-        or $self->{name} =~ m|/|)
+    foreach my $command (@$commands)
     {
-	print STDERR "FormType Error: FormType names must not contain an '_' or a '/'\n";
+	print STDERR "FormType command $command\n";
 
-	my (
-	    $package,
-	    $filename,
-	    $line,
-	    $subroutine,
-	    $hasargs,
-	    $wantarray,
-	    $evaltext,
-	    $is_require,
-	    $hints,
-	    $bitmask
-	   )
-	    = caller(1);
+	# figure out the name of the form in case we are dealing with shared forms
 
-	print STDERR "FormType Error: at $filename:$line, $subroutine\n";
+	my $name = $command;
 
-	require Carp;
+	$name =~ s/^submit_//;
 
-	Carp::cluck "FormType Error: at $filename:$line, $subroutine\n";
+	my $code = $self->{commands}->{$name};
+
+	if ($code)
+	{
+	    &$code($self);
+	}
     }
 
-    bless ($self, $class);
+    # return : continue processing
 
-    $self->set_is_empty();
-
-#     print STDERR Data::Dumper::Dumper($self);
-
-    return $self;
+    return 0;
 }
 
 
@@ -783,8 +774,8 @@ sub merge_data
 
     # if a submit for this document has been done.
 
-    if ($data->{cmd}->{action} eq 'submit'
-        && $data->{cmd}->{request} eq $self->{name})
+#     if ($data->{cmd}->{action} eq 'submit'
+#         && $data->{cmd}->{request} eq $self->{name})
     {
 	# copy the detransformed values into the contents data.
 
@@ -1024,6 +1015,54 @@ sub merge_data
     print STDERR Dumper($contents);
 
     $self->{contents} = $contents;
+}
+
+
+sub new
+{
+    my $proto = shift;
+    my $class = ref($proto) || $proto;
+    my %options = @_;
+    my $self = {};
+
+    foreach my $key (keys %options)
+    {
+	$self->{$key} = $options{$key};
+    }
+
+    if ($self->{name} =~ /_/
+        or $self->{name} =~ m|/|)
+    {
+	print STDERR "FormType Error: FormType names must not contain an '_' or a '/'\n";
+
+	my (
+	    $package,
+	    $filename,
+	    $line,
+	    $subroutine,
+	    $hasargs,
+	    $wantarray,
+	    $evaltext,
+	    $is_require,
+	    $hints,
+	    $bitmask
+	   )
+	    = caller(1);
+
+	print STDERR "FormType Error: at $filename:$line, $subroutine\n";
+
+	require Carp;
+
+	Carp::cluck "FormType Error: at $filename:$line, $subroutine\n";
+    }
+
+    bless ($self, $class);
+
+    $self->set_is_empty();
+
+#     print STDERR Data::Dumper::Dumper($self);
+
+    return $self;
 }
 
 
