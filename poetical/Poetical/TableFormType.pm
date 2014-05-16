@@ -343,6 +343,8 @@ sub form_info_contents
 
     my $separator = $self->{separator} || '_';
 
+    $str .= "<tbody>\n";
+
     # call the preprocessor
 
     if (exists $self->{preprocessor})
@@ -352,239 +354,236 @@ sub form_info_contents
 	$contents = $preprocessor->transform($contents);
     }
 
-    print STDERR "Table FormType contents after preprocessing : \n", Dumper($contents);
-
     if (exists $self->{row_initialize})
     {
 	$str .= &{$self->{row_initialize}};
     }
 
-    foreach my $row_key (sort
-			 {
-			     defined $self->{sort}
-				 ? &{$self->{sort}}
-				     ($a, $b, $contents->{$a}, $contents->{$b})
-			         : -1;
-			 }
-			 keys %$contents)
+    if (("$contents" =~ /HASH/)
+        or ("$contents" =~ /ARRAY/))
     {
-	my $row = $contents->{$row_key};
+	my $row_keys;
 
-# 	print STDERR Data::Dumper::Dumper($row);
-
-	my $filter_data = 1;
-
-	if (exists $self->{row_filter})
+	if ("$contents" =~ /HASH/)
 	{
-	    $filter_data = &{$self->{row_filter}}($row_key, $row);
+	    $row_keys
+		= [
+		   sort
+		   {
+		       defined $self->{sort}
+			   ? &{$self->{sort}}
+			       ($a, $b, $contents->{$a}, $contents->{$b})
+				   : -1;
+		   }
+		   keys %$contents,
+		  ];
+	}
+	else
+	{
+	    $row_keys = $contents;
 	}
 
-	next if !$filter_data;
-
-# 	print STDERR Data::Dumper::Dumper($filter_data);
-
- 	print STDERR "Setting $self->{name} not empty because of row_key $row_key.\n";
-	$self->set_not_empty();
-
-	# call the row inserter if any
-
-	if ($self->{'row_inserters'})
+	foreach my $row_key (@$row_keys)
 	{
-	    $str .= $self->row_inserter($row_key, );
-	}
+	    my $row;
 
-	$str .= "<tr $main::cb>" ;
-
-	my $column_number = 0;
-
-	foreach my $column (@{$self->{format}->{columns}})
-	{
-	    my $column_key = $column->{key_name};
-
-	    $str .= '<td  style="border-right-style: hidden"';
-
-	    if (exists $column->{alignment})
+	    if ("$contents" =~ /HASH/)
 	    {
-		$str .= "align='$column->{alignment}'";
+		$row = $contents->{$row_key};
 	    }
 	    else
 	    {
-		$str .= "align='center'";
+		$row = $row_key;
+
+		$row_key = "->[$row_count]";
 	    }
 
-	    $str .= ">";
+	    my $filter_data = 1;
 
-	    # if we don't have an entry in the hash (column is hashkey)
-
-	    my $format_hashkey
-		= exists $self->{format}->{hashkey}
-		    && defined $self->{format}->{hashkey}
-			&& exists $column->{header}
-			    && defined $column->{header}
-				&& $self->{format}->{hashkey} eq $column->{header};
-
-	    # or if the key must be defined and is present in the filter
-	    # data or hash
-
-	    my $data_defined
-		= (exists $column->{be_defined} && $column->{be_defined} eq 1)
-		    && ((ref $row eq 'HASH' && $column_key && defined $row->{$column_key})
-			|| ref $row eq 'ARRAY');
-
-	    my $filter_defined
-		= (exists $column->{filter_defined} && $column->{filter_defined} eq 1)
-		    && ((ref $filter_data eq 'HASH' && defined $filter_data->{$column_key})
-			|| ref $filter_data eq 'ARRAY');
-
-# 	    if ($self->{format}->{hashkey} eq $column->{header}
-
-# 		# or if the key must be defined and is present in the filter
-# 		# data or hash
-
-# 		|| ((exists $column->{be_defined} && $column->{be_defined} eq 1)
-# 		    && defined $row->{$column_key})
-# 		|| ((exists $column->{filter_defined} && $column->{filter_defined} eq 1)
-# 		    && defined $filter_data->{$column_key}))
-	    if ($format_hashkey || $data_defined || $filter_defined)
+	    if (exists $self->{row_filter})
 	    {
-		# If the column key is undefined, it is the key of the hash
-		# being handled.  We replace this column_key with the string
-		# that is used as the hashkey.
+		$filter_data = &{$self->{row_filter}}($row_key, $row);
+	    }
 
-		my $column_label = defined $column_key ? $column_key : $self->{format}->{hashkey};
+	    next if !$filter_data;
 
-		# construct a sensible default value for textfields and constants.
+	    $self->set_not_empty();
 
-		my $content
-		    = ($self->{format}->{hashkey}
-		       && $self->{format}->{hashkey} eq $column->{header})
-			? $row_key # $column->{header}
-			    : (defined $column_key
-			       && ref $filter_data eq 'HASH'
-			       && exists $filter_data->{$column_key})
-				? $filter_data->{$column_key}
-				    : ref $row eq 'HASH'
-					? $row->{$column_key}
-					    : $row->[$column_number];
+	    # call the row inserter if any
 
-		# start determining what encapsulator to use
+	    if ($self->{'row_inserters'})
+	    {
+		$str .= $self->row_inserter($row_key, );
+	    }
 
-		my $encapsulator;
+	    $str .= "<tr>" ;
 
-		# start assembling options for the encapsulator
+	    my $column_number = 0;
 
-		my $format_encapsulator_options = $column->{encapsulator}->{options} || {};
+	    foreach my $column (@{$self->{format}->{columns}})
+	    {
+		my $column_key = $column->{key_name};
 
-		my $encapsulator_options
-		    = {
-		       %$format_encapsulator_options,
-		      };
+		$str .= '<td  style="border-right-style: hidden"';
 
-		#t need to do this in a derived class
-
-		print STDERR "column_number is $column_number, columns is " . @{$self->{format}->{columns}} . "\n";
-
-		if (
-		    exists $self->{gui_units}->{$row_key}
-		    && scalar @{$self->{format}->{columns}} == 2
-		    && $column_number == 1
-		   )
+		if (exists $column->{alignment})
 		{
-		    $encapsulator_options->{gui_units} = $self->{gui_units}->{$row_key};
+		    $str .= "align='$column->{alignment}'";
+		}
+		else
+		{
+		    $str .= "align='center'";
 		}
 
-		# if the document is not editable
+		$str .= ">";
 
-		if (exists $self->{editable}
-		    && !$self->{editable})
+		# if we don't have an entry in the hash (column is hashkey)
+
+		my $format_hashkey
+		    = exists $self->{format}->{hashkey}
+			&& defined $self->{format}->{hashkey}
+			    && exists $column->{header}
+				&& defined $column->{header}
+				    && $self->{format}->{hashkey} eq $column->{header};
+
+		# or if the key must be defined and is present in the filter
+		# data or hash
+
+		my $data_defined
+		    = (exists $column->{be_defined} && $column->{be_defined} eq 1)
+			&& ((ref $row eq 'HASH' && $column_key && defined $row->{$column_key})
+			    || ref $row eq 'ARRAY');
+
+		my $filter_defined
+		    = (exists $column->{filter_defined} && $column->{filter_defined} eq 1)
+			&& ((ref $filter_data eq 'HASH' && defined $filter_data->{$column_key})
+			    || ref $filter_data eq 'ARRAY');
+
+		if ($format_hashkey || $data_defined || $filter_defined)
 		{
-		    # use the constant encapsulator
+		    # If the column key is undefined, it is the key of the hash
+		    # being handled.  We replace this column_key with the string
+		    # that is used as the hashkey.
 
-		    $encapsulator = "_encapsulate_constant";
-		}
+		    my $column_label = defined $column_key ? $column_key : $self->{format}->{hashkey};
 
-		# if there is a regex encapsulator that would like to encapsulate
+		    # construct a sensible default value for textfields and constants.
 
-		my $regex_encapsulator
-		    = $self->has_regex_encapsulator("$self->{name}${separator}${column_label}${separator}${row_key}", $content, );
+		    my $content
+			= ($self->{format}->{hashkey}
+			   && $self->{format}->{hashkey} eq $column->{header})
+			    ? $row_key # $column->{header}
+				: (defined $column_key
+				   && ref $filter_data eq 'HASH'
+				   && exists $filter_data->{$column_key})
+				    ? $filter_data->{$column_key}
+					: ref $row eq 'HASH'
+					    ? $row->{$column_key}
+						: $row->[$column_number];
 
-		if (
-		    $regex_encapsulator
-		    && !$encapsulator
-		   )
-		{
-		    # use the regex encapsulator with its options
+		    # start determining what encapsulator to use
 
-		    my $regex_encapsulator_options = $regex_encapsulator->{encapsulator}->{options} || {};
+		    my $encapsulator;
 
-		    $encapsulator_options
+		    # start assembling options for the encapsulator
+
+		    my $format_encapsulator_options = $column->{encapsulator}->{options} || {};
+
+		    my $encapsulator_options
 			= {
-			   %$encapsulator_options,
-			   %$regex_encapsulator_options,
+			   %$format_encapsulator_options,
 			  };
 
-		    if (exists $regex_encapsulator->{type})
+		    #t need to do this in a derived class
+
+		    if (
+			exists $self->{gui_units}->{$row_key}
+			&& scalar @{$self->{format}->{columns}} == 2
+			&& $column_number == 1
+		       )
 		    {
-			$encapsulator = "_encapsulate_$regex_encapsulator->{type}";
-		    }
-		    elsif (exists $regex_encapsulator->{code})
-		    {
-			$encapsulator = $regex_encapsulator->{code};
-		    }
-		}
-
-		# if a type has been defined for this field
-
-		if (
-		    $self->{gui_encapsulators}->{$row_key}
-		    && scalar @{$self->{format}->{columns}} == 2
-		    && $column_number == 1
-		    && !$encapsulator
-		   )
-		{
-		    # use the type encapsulator with its options
-
-		    my $gui_encapsulator = $self->{gui_encapsulators}->{$row_key};
-
-		    my $gui_encapsulator_options = $gui_encapsulator->{options} || {};
-
-		    $encapsulator_options
-			= {
-			   %$encapsulator_options,
-			   %$gui_encapsulator_options,
-			  };
-
-		    if (exists $gui_encapsulator->{type})
-		    {
-			$encapsulator = "_encapsulate_$gui_encapsulator->{type}";
-		    }
-		    elsif (exists $gui_encapsulator->{code})
-		    {
-			$encapsulator = $gui_encapsulator->{code};
+			$encapsulator_options->{gui_units} = $self->{gui_units}->{$row_key};
 		    }
 
-		}
+		    # if the document is not editable
 
-		# default : the field has not been encapsulated yet
+		    if (exists $self->{editable}
+			&& !$self->{editable})
+		    {
+			# use the constant encapsulator
 
-		my $encapsulated = 0;
+			$encapsulator = "_encapsulate_constant";
+		    }
 
-		if ($encapsulator && !$encapsulated)
-		{
-		    $str
-			.= $self->encapsulate_start
-			    (
-			     "$self->{name}${separator}${column_label}${separator}${row_key}",
-			     $row_count,
-			     $column_number,
-			     $content,
-			     $encapsulator_options,
-			    );
+		    # if there is a regex encapsulator that would like to encapsulate
 
-		    if (!ref $encapsulator)
+		    my $regex_encapsulator
+			= $self->has_regex_encapsulator("$self->{name}${separator}${column_label}${separator}${row_key}", $content, );
+
+		    if (
+			$regex_encapsulator
+			&& !$encapsulator
+		       )
+		    {
+			# use the regex encapsulator with its options
+
+			my $regex_encapsulator_options = $regex_encapsulator->{encapsulator}->{options} || {};
+
+			$encapsulator_options
+			    = {
+			       %$encapsulator_options,
+			       %$regex_encapsulator_options,
+			      };
+
+			if (exists $regex_encapsulator->{type})
+			{
+			    $encapsulator = "_encapsulate_$regex_encapsulator->{type}";
+			}
+			elsif (exists $regex_encapsulator->{code})
+			{
+			    $encapsulator = $regex_encapsulator->{code};
+			}
+		    }
+
+		    # if a type has been defined for this field
+
+		    if (
+			$self->{gui_encapsulators}->{$row_key}
+			&& scalar @{$self->{format}->{columns}} == 2
+			&& $column_number == 1
+			&& !$encapsulator
+		       )
+		    {
+			# use the type encapsulator with its options
+
+			my $gui_encapsulator = $self->{gui_encapsulators}->{$row_key};
+
+			my $gui_encapsulator_options = $gui_encapsulator->{options} || {};
+
+			$encapsulator_options
+			    = {
+			       %$encapsulator_options,
+			       %$gui_encapsulator_options,
+			      };
+
+			if (exists $gui_encapsulator->{type})
+			{
+			    $encapsulator = "_encapsulate_$gui_encapsulator->{type}";
+			}
+			elsif (exists $gui_encapsulator->{code})
+			{
+			    $encapsulator = $gui_encapsulator->{code};
+			}
+		    }
+
+		    # default : the field has not been encapsulated yet
+
+		    my $encapsulated = 0;
+
+		    if ($encapsulator && !$encapsulated)
 		    {
 			$str
-			    .= $self->$encapsulator
+			    .= $self->encapsulate_start
 				(
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
 				 $row_count,
@@ -592,59 +591,69 @@ sub form_info_contents
 				 $content,
 				 $encapsulator_options,
 				);
-		    }
-		    elsif (ref $encapsulator eq 'CODE')
-		    {
+
+			if (!ref $encapsulator)
+			{
+			    $str
+				.= $self->$encapsulator
+				    (
+				     "$self->{name}${separator}${column_label}${separator}${row_key}",
+				     $row_count,
+				     $column_number,
+				     $content,
+				     $encapsulator_options,
+				    );
+			}
+			elsif (ref $encapsulator eq 'CODE')
+			{
+			    $str
+				.= &$encapsulator
+				    (
+				     $self,
+				     "$self->{name}${separator}${column_label}${separator}${row_key}",
+				     $row_count,
+				     $column_number,
+				     $content,
+				     $encapsulator_options,
+				    );
+			}
+
 			$str
-			    .= &$encapsulator
+			    .= $self->encapsulate_end
 				(
-				 $self,
 				 "$self->{name}${separator}${column_label}${separator}${row_key}",
 				 $row_count,
 				 $column_number,
 				 $content,
 				 $encapsulator_options,
 				);
+
+			# register that the field has been encapsulated
+
+			$encapsulated = 1;
 		    }
 
-		    $str
-			.= $self->encapsulate_end
-			    (
-			     "$self->{name}${separator}${column_label}${separator}${row_key}",
-			     $row_count,
-			     $column_number,
-			     $content,
-			     $encapsulator_options,
-			    );
+		    # else : do the default type based encapsulation
 
-		    # register that the field has been encapsulated
-
-		    $encapsulated = 1;
-		}
-
-		# else : do the default type based encapsulation
-
-		if (!$encapsulated)
-		{
-		    # determine the type
-
-		    local $_ = $column->{type};
-
-		TYPE:
+		    if (!$encapsulated)
 		    {
-			/^button$/
-			    || /^checkbox$/
-				|| /^constant$/
-				    || /^ip_address$/
-					|| /^number$/
-					    || /^textarea$/
-						|| /^textfield$/
-						    || /^url$/
-					and do
+			# determine the type
+
+			local $_ = $column->{type};
+
+		    TYPE:
+			{
+			    /^button$/
+				|| /^checkbox$/
+				    || /^constant$/
+					|| /^ip_address$/
+					    || /^number$/
+						|| /^textarea$/
+						    || /^textfield$/
+							|| /^url$/
+							    and do
 				    {
 					my $encapsulator = "_encapsulate_$_";
-
-					print STDERR "Entry $row_key, $column_label == $_ : $encapsulator\n";
 
 					$str
 					    .= $self->encapsulate_start
@@ -679,63 +688,70 @@ sub form_info_contents
 					last TYPE;
 				    };
 
-			/^hidden$/
-			    and do
-			    {
-				$str .= "<input type=\"hidden\" name=\"$self->{name}${separator}${column_label}${separator}${row_key}\" id=\"$self->{name}${separator}${column_label}${separator}${row_key}\" value=\"$content\" /><br />";
+			    /^hidden$/
+				and do
+				{
+				    $str .= "<input type=\"hidden\" name=\"$self->{name}${separator}${column_label}${separator}${row_key}\" id=\"$self->{name}${separator}${column_label}${separator}${row_key}\" value=\"$content\" /><br />";
 
-				last TYPE;
-			    };
+				    last TYPE;
+				};
 
-			#		/^code$/ &&
-			# default : generate with sub.
+			    #		/^code$/ &&
+			    # default : generate with sub.
 
-			print STDERR "Entry $row_key, $column_label == $_ : code\n";
+			    $str
+				.= $self->encapsulate_start
+				    (
+				     "$self->{name}${separator}${column_label}${separator}${row_key}",
+				     $row_count,
+				     $column_number,
+				     $content,
+				     $encapsulator_options,
+				    );
 
-			$str
-			    .= $self->encapsulate_start
-				(
-				 "$self->{name}${separator}${column_label}${separator}${row_key}",
-				 $row_count,
-				 $column_number,
-				 $content,
-				 $encapsulator_options,
-				);
+			    $str .= &{$column->{code}}($self, $row_key, $row, $filter_data);
 
-			$str .= &{$column->{code}}($self, $row_key, $row, $filter_data);
-
-			$str
-			    .= $self->encapsulate_end
-				(
-				 "$self->{name}${separator}${column_label}${separator}${row_key}",
-				 $row_count,
-				 $column_number,
-				 $content,
-				 $encapsulator_options,
-				);
-
+			    $str
+				.= $self->encapsulate_end
+				    (
+				     "$self->{name}${separator}${column_label}${separator}${row_key}",
+				     $row_count,
+				     $column_number,
+				     $content,
+				     $encapsulator_options,
+				    );
+			}
 		    }
 		}
-	    }
-	    else
-	    {
-		$str .= "&nbsp;</td><td style='border-left-style: hidden'>";
+		else
+		{
+		    $str .= "&nbsp;</td><td style='border-left-style: hidden'>";
+		}
+
+		$str .= "</td>";
+
+		$column_number++;
 	    }
 
-	    $str .= "</td>";
+	    $str .= "</tr>\n";
 
-	    $column_number++;
+	    $row_count++;
 	}
-
-	$str .= "</tr>\n";
-
-	$row_count++;
+    }
+    elsif ("$contents" =~ /ARRAY/)
+    {
+    }
+    else
+    {
+	die "*** Error: expecting a hash or an array for TableFormType content data.";
     }
 
     if (exists $self->{row_finalize})
     {
 	$str .= &{$self->{row_finalize}}($self);
     }
+
+    $str .= "</tbody>\n";
 
     $self->writer($str);
 }
@@ -761,9 +777,11 @@ sub form_info_header
 
     my $str = '';
 
+    $str .= "<thead>\n";
+
     if (exists $self->{column_headers} && $self->{column_headers})
     {
-	$str .= "<tr $main::tb>" ;
+	$str .= "<tr>" ;
 	foreach my $item (@$columns)
 	{
 	    my $width = $item->{width} ? " width='" . $item->{width} . "'" : '';
@@ -778,6 +796,8 @@ sub form_info_header
 	$str .= "</tr>" ;
     }
 
+    $str .= "</thead>\n";
+
     $self->writer($str);
 }
 
@@ -790,7 +810,17 @@ sub form_info_start
 
     my $border_width = defined $self->{border_width} ? $self->{border_width} : 0;
 
-    $str .= "<table border=\"$border_width\" cellpadding=\"4\" cellspacing=\"0\" style=\"border-collapse: collapse\">";
+    my $id
+	= exists $self->{html_attributes}->{id}
+	    ? "id='$self->{html_attributes}->{id}'"
+		: '';
+
+    my $class
+	= exists $self->{html_attributes}->{class}
+	    ? "class='$self->{html_attributes}->{class}'"
+		: '';
+
+    $str .= "<table $id $class border=\"$border_width\" cellpadding=\"4\" cellspacing=\"0\" style=\"border-collapse: collapse\">";
 
     $self->writer($str);
 }
@@ -957,19 +987,21 @@ sub new
     {
 	my $column_specification = $self->{contents};
 
-	my $units
-	    = {
-	       map
-	       {
-		   exists $column_specification->{$_}->{units}
-		       ? ($_ => $column_specification->{$_}->{units})
-			   : ();
-	       }
-	       keys %$column_specification,
-	      };
+	if ("$column_specification" =~ /HASH/)
+	{
+	    my $units
+		= {
+		   map
+		   {
+		       exists $column_specification->{$_}->{units}
+			   ? ($_ => $column_specification->{$_}->{units})
+			       : ();
+		   }
+		   keys %$column_specification,
+		  };
 
-
-	$self->{gui_units} = $units;
+	    $self->{gui_units} = $units;
+	}
     }
 
     return $self;
