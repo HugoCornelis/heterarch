@@ -567,6 +567,54 @@ sub formalize
 	}
     }
 
+    if ($self->{output_mode} =~ /html/)
+    {
+	$self->writer("\n<p>");
+
+	if ($self->{has_front_reset})
+	{
+	    $self->writer($query->reset() . ' &nbsp; ');
+	}
+
+	if ($self->{has_front_submit})
+	{
+	    $self->writer
+		(
+		 $query->submit(
+				-name => "submit_$self->{name}",
+				-value => ($self->{has_front_submit} ne '1' ? $self->{has_front_submit} : ' Submit Changes '),
+			       )
+		 . " &nbsp; "
+		);
+	}
+
+	if ($self->{has_front_factory})
+	{
+	    $self->writer
+		(
+		 $query->submit(
+				-name  => "factory_$self->{name}",
+				-value => ' Restore Factory Settings ',
+			       )
+		 . " &nbsp; "
+		);
+	}
+
+	if ($self->{has_front_factory_writer})
+	{
+	    $self->writer
+		(
+		 $query->submit(
+				-name  => "factorywrite_$self->{name}",
+				-value => ' Write Factory Settings ',
+			       )
+		 . " &nbsp; "
+		);
+	}
+
+	$self->writer("\n<p>");
+    }
+
     # formalize the real content
 
     $self->formalize_content();
