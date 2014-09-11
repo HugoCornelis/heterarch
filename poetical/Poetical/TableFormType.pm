@@ -810,17 +810,16 @@ sub form_info_start
 
     my $border_width = defined $self->{border_width} ? $self->{border_width} : 0;
 
-    my $id
-	= exists $self->{html_attributes}->{id}
-	    ? "id='$self->{html_attributes}->{id}'"
-		: '';
+    my $html_attributes_string = "";
 
-    my $class
-	= exists $self->{html_attributes}->{class}
-	    ? "class='$self->{html_attributes}->{class}'"
-		: '';
+    my $html_attributes = $self->{html_attributes};
 
-    $str .= "<table $id $class border=\"$border_width\" cellpadding=\"4\" cellspacing=\"0\" style=\"border-collapse: collapse\">";
+    foreach my $html_attribute (keys %$html_attributes)
+    {
+	$html_attributes_string .= " $html_attribute='$html_attributes->{$html_attribute}'";
+    }
+
+    $str .= "<table$html_attributes_string border=\"$border_width\" cellpadding=\"4\" cellspacing=\"0\" style=\"border-collapse: collapse\">";
 
     $self->writer($str);
 }
