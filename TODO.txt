@@ -1,5 +1,11 @@
 -*- outline -*-
 
+* add key management buttons to the neurospaces-manager-gui
+mtn ls keys
+mtn --db ~/neurospaces_project/MTN/agora-classica-web-services.mtn read </tmp/johan.pubkey
+mtn pubkey 'johan.plochaet@gmail.com' --db ~/neurospaces_project/MTN/agora-classica-utilities.mtn
+
+
 * CPAN packages to investigate
 ** Lucy search engine
 http://search.cpan.org/~logie/Lucy-0.3.2/lib/Lucy.pod
