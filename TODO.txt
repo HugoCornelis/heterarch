@@ -18,4 +18,9 @@ package configuration options.
 
 Also add support for this option to the script neurospaces_repositories
 
+neurospaces_update to switch between different branches sometimes
+works, sometimes it does not.
+
+neurospaces_update should use as suggested by monotone:
+mtn: misuse: maybe you want something like --revision=h:agora-classica-web-services
 
