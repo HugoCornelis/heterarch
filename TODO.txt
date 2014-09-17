@@ -10,3 +10,10 @@ mtn pubkey 'johan.plochaet@gmail.com' --db ~/neurospaces_project/MTN/agora-class
 ** Lucy search engine
 http://search.cpan.org/~logie/Lucy-0.3.2/lib/Lucy.pod
 
+
+* add support for the branch_name option of the configuration file
+in the neurospaces-manager-gui.
+Should work via double click on the repository name, which pops up the
+package configuration options.
+
+
