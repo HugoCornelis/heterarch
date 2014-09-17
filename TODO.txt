@@ -16,4 +16,6 @@ in the neurospaces-manager-gui.
 Should work via double click on the repository name, which pops up the
 package configuration options.
 
+Also add support for this option to the script neurospaces_repositories
+
 
