@@ -13,7 +13,7 @@
 
 \begin{document}
 
-\section*{Heterarch: Documentation}
+\section*{HETERARCH: Technical}
 
 {\bf Related Documentation:} \\
 %\href{../genesis-system/genesis-system.tex}{\bf GENESIS\,System}
@@ -47,7 +47,7 @@ username.  However, the easiest way is as root to do (for example for
 user 'joeuser'):
 
 \begin{verbatim}
-        echo 'joeuser ALL=(ALL) ALL' >> /etc/sudoers
+   echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
 \end{verbatim}
 
 During the install process, you will be prompted for your password.
@@ -98,12 +98,14 @@ Install the following packages using the Start Menu.  Type
   \item jodconverter
   \item latex2rtf
   \item latexml
+  \item libapache2-mod-fastcgi
   \item libc6-dev
   \item libcatalyst-devel-perl
   \item libcatalyst-engine-apache-perl
   \item libcatalyst-modules-extra-perl
   \item libcatalyst-modules-perl
   \item libcatalyst-perl
+  \item libcherokee-mod-geoip
   \item libclone-perl
   \item libdbix-class-timestamp-perl
   \item libdevel-ptkdb-perl
@@ -115,6 +117,7 @@ Install the following packages using the Start Menu.  Type
   \item libhtml-tidy-perl
   \item libinline-perl
   \item libintl-perl
+  \item libipc-system-simple-perl
   \item libmodule-install-perl
   \item libncurses5-dev
   \item libperl-dev
@@ -161,7 +164,7 @@ Install the following packages using the Start Menu.  Type
   \item python-wxglade
   \item python-wxgtk2.8
 
-    % mtn-browse
+  % mtn-browse
 
   \item libgtk2-sourceview2-perl
   \item meld
@@ -186,7 +189,8 @@ Install the following packages using the Start Menu.  Type
   \end{itemize}
 \end{itemize}
 
-This \href{scripts/install-dependencies.sh}{script} may be helpfull in installing these dependencies automatically.
+From the command line, the {\tt apt-get} command may be useful to
+install all the packages at once.
 
 This \href{scripts/install-dependencies.sh}{\bf script} may be helpful in installing these dependencies automatically.
 
@@ -194,10 +198,10 @@ This \href{scripts/install-dependencies.sh}{\bf script} may be helpful in instal
 
 \begin{enumerate}[noitemsep,nolistsep]
    \item Download the latest version of the {\bf{\emph{DeveloperPackage}}}, available from the Neurospaces \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf package\,archive}. It is called {\it developer-release-label.tar.gz}, where {\it release-label} is the current release identifier.
-   \item Change to the directory where you downloaded the file.
+   \item In a terminal window change to the directory where you downloaded the file.
    \item Unpack the archive by typing ``{\tt tar xfz developer-release-label.tar.gz}''.
    \item Change to the directory with the content of the archive by typing ``{\tt cd developer-release-label}''.
-   \item Configure by typing ``{\tt ./configure}''.  If this step fails, it is likely due missing dependencies.  If you let us know what dependencies were missing for you, we can update this page, and avoid installation problems for other people.
+   \item Configure by typing ``{\tt ./configure}''.  If this step fails, it is likely due to missing dependencies.  If you let us know what dependencies were missing for you, we can update this page, and minimize installation problems for others.
    \item Compile by typing ``{\tt make}''.
    \item Install by typing ``{\tt sudo make install}''. 
 \end{enumerate}
@@ -248,8 +252,9 @@ Importantly, search for lines containing the string {\tt error\_count}.
 While {\bf\small{Heterarch}} is under rapid development, it is important to frequently
 upgrade your installation with the {\tt neurospaces\_upgrade} command.
 As with {\tt neurospaces\_install}, this is performed in your home
-directory, with the output and error messages directed to a log file.\\
-If Error messages are found in the upgrade log file, they may indicate
+directory, with the output and error messages directed to a log file.
+
+If error messages are found in the upgrade log file, they may indicate
 a new dependency that needs to be installed.  When upgrading an older
 version, sometimes the installation of a particular software component
 will fail, but repeating the {\tt neurospaces\_upgrade} will result in a
@@ -257,7 +262,7 @@ successful installation.  If there have been changes in the {\bf{\emph{Developer
 this package first, by using the command:
 
 \begin{verbatim}
-    neurospaces_upgrade developer
+   neurospaces_upgrade developer
 \end{verbatim}
 and then perform a normal {\tt neurospaces\_upgrade}.
  
@@ -268,7 +273,7 @@ and inspect specific changes implementing new functionality.  {\bf\small Heterar
 \href{../version-control/version-control.tex}{version control}.\\
 To browse the change history stored in a (local) {\bf monotone}
 repository,
-% install the following dependencies:
+%install the following dependencies:
 %\begin{itemize}
 %\item libgtk2-sourceview2-perl
 %\item meld
