@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Library::Satcom;
 
 use strict;
 
+use utf8;
+
 
 use Poetical::FormType::Encapsulators::Library::Standard;
 

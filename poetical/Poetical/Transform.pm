@@ -5,6 +5,10 @@ package Poetical::Transform;
 
 
 use strict;
+
+use utf8;
+
+
 use Data::Dumper;
 
 

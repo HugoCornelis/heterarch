@@ -6,6 +6,8 @@ package Poetical::FormType;
 
 use strict;
 
+use utf8;
+
 
 use CGI;
 

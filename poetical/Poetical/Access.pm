@@ -6,6 +6,8 @@ package Poetical::Access;
 
 use strict;
 
+use utf8;
+
 
 use Data::Dumper;
 

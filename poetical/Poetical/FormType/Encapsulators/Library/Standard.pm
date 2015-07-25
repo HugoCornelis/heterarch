@@ -7,6 +7,8 @@ package Poetical::FormType::Encapsulators::Library::Standard;
 
 use strict;
 
+use utf8;
+
 
 use Data::Dumper;
 

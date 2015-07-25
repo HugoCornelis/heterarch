@@ -6,6 +6,8 @@ package Poetical::TableFormType;
 
 use strict;
 
+use utf8;
+
 
 use Data::Dumper;
 

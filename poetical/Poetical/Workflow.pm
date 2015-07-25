@@ -4,6 +4,9 @@
 package Poetical::Workflow;
 
 
+use utf8;
+
+
 #
 # A workflow object describes the possible flows through different
 # forms, before and after visiting a given form.

@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Logic::Library::Standard;
 
 use strict;
 
+use utf8;
+
 
 #
 # _logic_optional_textfield_disabler()

@@ -6,6 +6,9 @@ package Poetical::StaticFormType;
 
 use strict;
 
+use utf8;
+
+
 use CGI;
 
 use Data::Dumper;

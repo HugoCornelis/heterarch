@@ -6,6 +6,9 @@ package Poetical::TreeFormType;
 
 use strict;
 
+use utf8;
+
+
 use CGI qw(:cgi :html2 :html3 :form);
 use Data::Dumper;
 

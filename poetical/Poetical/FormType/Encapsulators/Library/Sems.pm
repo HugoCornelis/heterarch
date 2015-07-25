@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Library::Sems;
 
 use strict;
 
+use utf8;
+
 
 use Data::Dumper;
 

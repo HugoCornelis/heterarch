@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Validators::Library::Standard;
 
 use strict;
 
+use utf8;
+
 
 sub _validate_mandatory_textfield
 {

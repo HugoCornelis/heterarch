@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Library::Telecom;
 
 use strict;
 
+use utf8;
+
 
 use Data::Dumper;
 

@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Library::ACS;
 
 use strict;
 
+use utf8;
+
 
 use Poetical::FormType::Encapsulators::Library::Standard;
 

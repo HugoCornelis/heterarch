@@ -4,6 +4,9 @@
 package Poetical::DefaultFormType;
 
 
+use utf8;
+
+
 use Data::Dumper;
 
 

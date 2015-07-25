@@ -4,6 +4,9 @@
 package Poetical::LogFormType;
 
 
+use utf8;
+
+
 use Data::Dumper;
 
 use IO::File;

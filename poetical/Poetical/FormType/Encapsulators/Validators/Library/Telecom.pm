@@ -6,6 +6,8 @@ package Poetical::FormType::Encapsulators::Validators::Library::Telecom;
 
 use strict;
 
+use utf8;
+
 
 use Poetical::FormType::Encapsulators::Validators::Library::Standard;
 

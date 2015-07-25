@@ -4,6 +4,9 @@
 package Poetical::Utility;
 
 
+use utf8;
+
+
 #
 # How to add a new config file ?
 #
