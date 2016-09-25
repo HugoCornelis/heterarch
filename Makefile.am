@@ -25,6 +25,7 @@ dist_bin_SCRIPTS = \
 	bin/heterarch-build \
 	bin/heterarch-check \
 	bin/heterarch-create \
+	bin/heterarch-dns-query \
 	bin/heterarch-pull \
 	bin/heterarch-push \
 	bin/heterarch-rename \

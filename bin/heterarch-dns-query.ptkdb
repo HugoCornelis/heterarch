@@ -1,0 +1,25 @@
+$files = {
+           '_</home/hugo/neurospaces_project/heterarch/source/snapshots/0/bin/heterarch-dns-query' => [
+                                                                                                        {
+                                                                                                          'expr' => undef,
+                                                                                                          'value' => '1',
+                                                                                                          'text' => '    foreach my $root_server_name (@$root_servers)
+',
+                                                                                                          'fname' => '/home/hugo/neurospaces_project/heterarch/source/snapshots/0/bin/heterarch-dns-query',
+                                                                                                          'type' => 'user',
+                                                                                                          'line' => '70'
+                                                                                                        },
+                                                                                                        {
+                                                                                                          'expr' => undef,
+                                                                                                          'value' => '1',
+                                                                                                          'text' => '    parse_command_line();
+',
+                                                                                                          'fname' => '/home/hugo/neurospaces_project/heterarch/source/snapshots/0/bin/heterarch-dns-query',
+                                                                                                          'type' => 'user',
+                                                                                                          'line' => 177
+                                                                                                        }
+                                                                                                      ]
+         };
+$expr_list = [];
+$eval_saved_text = undef;
+$main_win_geometry = '1594x820+0+0';

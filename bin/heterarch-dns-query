@@ -1,0 +1,298 @@
+#!/usr/bin/perl -w
+#!/usr/bin/perl -d:ptkdb -w
+#
+
+use strict;
+
+
+use Data::Utilities;
+
+use Getopt::Long;
+
+use Net::DNS::Resolver;
+
+use YAML;
+
+
+package main;
+
+
+our $global_configuration;
+
+our $global_domain_name;
+
+
+$0 =~ m(.*/(.*));
+
+our $program_name = $1;
+
+$program_name =~ m((.*?)-(.*));
+
+our $program_class_name = $1;
+our $program_operation_name = $2;
+
+
+our $option_root_server;
+our $option_verbose = 0;
+
+
+$SIG{'__DIE__'}
+    = sub
+      {
+	  use Carp;
+
+	  print STDERR Carp::longmess(@_);
+
+	  exit 1;
+      };
+
+
+$SIG{'INT'}
+    = sub
+      {
+	  exit 1;
+      };
+
+
+sub configure
+{
+    my $root_servers
+	= [
+	   map
+	   {
+	       my $letter = $_;
+
+	       "$_.root-servers.net";
+	   }
+	   ('a' .. 'm'),
+	  ];
+
+    my $resolver = Net::DNS::Resolver->new();
+
+    foreach my $root_server_name (@$root_servers)
+    {
+	$global_configuration->{root_servers}->{$root_server_name} = {};
+
+	my $root_server = $global_configuration->{root_servers}->{$root_server_name};
+
+	$root_server->{name} = $root_server_name;
+
+	my $query_types
+	     = [
+		undef,
+		'NS',
+		'MX',
+	       ];
+
+	# host address lookup
+
+	{
+	    my $response = $resolver->search($root_server_name);
+
+	    $root_server->{host_address}->{dns_records} = $response;
+
+	    $root_server->{host_address}->{errorstring} = $resolver->errorstring();
+
+	    $root_server->{host_address}->{addresses} = [];
+
+	    my $addresses = $root_server->{host_address}->{addresses};
+
+	    if ($response)
+	    {
+		foreach my $resource_record ($response->answer())
+		{
+		    if ($resource_record->type() eq 'A')
+		    {
+			my $address = $resource_record->address();
+
+			push @$addresses, $address;
+
+			if (not $option_root_server)
+			{
+			    $option_root_server = $address;
+
+			    return;
+			}
+			elsif ($option_root_server eq 1)
+			{
+			    $option_root_server = $address;
+			}
+			elsif ($option_root_server eq $root_server->{name})
+			{
+			    $option_root_server = $address;
+			}
+		    }
+		}
+	    }
+
+	    $root_server->{addresses} = $addresses;
+	}
+
+	# name servers
+
+	{
+	    my $response = $resolver->query($root_server_name, 'NS');
+
+	    $root_server->{name_servers}->{dns_records} = $response;
+
+	    $root_server->{name_servers}->{errorstring} = $resolver->errorstring();
+
+	    $root_server->{name_servers}->{servers} = [];
+
+	    my $servers = $root_server->{name_servers}->{servers};
+
+	    if ($response)
+	    {
+		foreach my $resource_record ($response->answer())
+		{
+		    if ($resource_record->type() eq 'NS')
+		    {
+			push @$servers, $resource_record->nsdname();
+		    }
+		}
+	    }
+	}
+
+	# mail exchange records
+
+	{
+	    my $response = $resolver->query($root_server_name, 'MX');
+
+	    $root_server->{mail_exchange}->{dns_records} = $response;
+
+	    $root_server->{mail_exchange}->{errorstring} = $resolver->errorstring();
+	}
+
+	# server authority records
+
+	{
+	    my $response = $resolver->query($root_server_name, 'SOA');
+
+	    $root_server->{mail_exchange}->{dns_records} = $response;
+
+	    $root_server->{mail_exchange}->{errorstring} = $resolver->errorstring();
+	}
+    }
+}
+
+
+sub main
+{
+    # parse command line
+
+    parse_command_line();
+
+    # resolve the name server of the given domain name
+
+    my $name_server = $option_root_server;
+
+    if ($option_verbose)
+    {
+	print "$0: *** Verbose mode: using name_server $name_server\n";
+    }
+
+    my $resolver = Net::DNS::Resolver->new();
+
+    my $response = $resolver->query($global_domain_name, "NS");
+
+    if ($response)
+    {
+        foreach my $resource_record (grep { $_->type() eq 'NS' } $response->answer())
+	{
+            print "$0: *** Information: name server for $global_domain_name -> " . $resource_record->nsdname(), "\n";
+        }
+    }
+    else
+    {
+        warn "query failed: ", $resolver->errorstring, "\n";
+    }
+}
+
+
+sub parse_command_line
+{
+    my $option_help;
+    my $option_show_configuration;
+    my $option_version;
+
+    my $result
+	= GetOptions
+	    (
+	     "help!" => \$option_help,
+	     "root-server=s" => \$option_root_server,
+	     "show-configuration!" => \$option_show_configuration,
+	     "v|verbose+" => \$option_verbose,
+	     "version" => \$option_version,
+	    );
+
+    if (not $result)
+    {
+	die "$0: *** Error: error in option processing.";
+    }
+
+    if ($option_version)
+    {
+	my $version = version();
+
+	print $version . "\n";
+
+	exit 1;
+    }
+
+    if ($option_help)
+    {
+	print
+	    "
+$0 <options>
+
+$0: DNS resource record inspection and traversal for Fiofro hosting validation.
+
+$0
+
+options:
+    --help                       print usage information.
+    --root-servers               query for all the root servers.  you should normally not need to do this.
+                                 use this root server, either a name, an IP or '1' to use a default root server.
+                                 valid root servers have the format X.root-servers.net with X a letter from a to m.
+    --show-configuration         show the configuration and exit.
+    --verbose                    set verbosity level.
+    --version                    give version information.
+";
+
+	exit 0;
+    }
+
+    configure();
+
+    $global_domain_name = $ARGV[0];
+
+    if ($option_show_configuration)
+    {
+	print YAML::Dump( { global_configuration => $global_configuration, }, );
+
+	exit 0;
+    }
+}
+
+
+=head2 sub version
+
+Return version information.
+
+=cut
+
+sub version
+{
+    # $Format: "    my $version=\"${package}-${label}\";"$
+    my $version="developer-alpha";
+
+    return $version;
+}
+
+
+if (1)
+{
+    main();
+}
+
+
