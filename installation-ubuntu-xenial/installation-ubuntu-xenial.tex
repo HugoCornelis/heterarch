@@ -1,0 +1,320 @@
+\documentclass[12pt]{article}
+\usepackage{verbatim}
+\usepackage[dvips]{epsfig}
+\usepackage{color}
+\usepackage{url}
+\usepackage[colorlinks=true]{hyperref}
+\usepackage{enumitem} % [noitemsep,nolistsep] compact itemize/enumerate etc.
+\usepackage[margin=2cm]{geometry}
+
+% Typeface
+\usepackage[condensed,math]{iwona}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+
+\section*{HETERARCH: Technical}
+
+{\bf Related Documentation:} \\
+%\href{../genesis-system/genesis-system.tex}{\bf GENESIS\,System}
+% start: userdocs-tag-replace-items related-do-nothing
+% end: userdocs-tag-replace-items related-do-nothing
+
+\section*{Developer Installation Ubuntu (Raring)}
+
+Installing HETERARCH on Ubuntu requires executing the following major steps. {\bf Note}: Installation requires administrator privileges.
+\begin{description}[noitemsep,nolistsep] 
+   \item Prepare and upgrade the system software.
+   \item Download and install the {\it DeveloperPackage}.
+   \item Install the software packages.
+   \item Check if the installation was successful. 
+\end{description}
+
+\subsection*{Prepare and upgrade the system software}
+
+\subsubsection*{Note on configuring {\emph{sudo}}}
+
+When you install the {\bf \small{Heterarch}} developers release, it will create a
+``neurospaces\_project'' directory for development work in the home
+directory of the user doing the installation.  This will hold
+subdirectories for each of the  {\bf \small Heterarch} software components.  Normally, you
+will want this user to be yourself, rather than root.  In order to
+make it possible to install files in system directories, the install
+process makes use of sudo.  Thus, you will need to install sudo and
+add yourself to the {\it /etc/sudoers file}.  Ideally, you should use
+a tool called {\it visudo} to edit this file, in order to add your
+username.  However, the easiest way on a secure single-user system,
+such as a personal laptop, is as root to do (for example for user
+'joeuser'):
+
+\begin{verbatim}
+   echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+\end{verbatim}
+
+During the install process, you will be prompted for your password.
+However, when directing the output of an install or a
+{\tt neurospaces\_check} to a file, this can become a problem. The
+automated tests performed by a check take a long time, and it is easy
+to miss a password request and have it time out.  If you are on a
+secure single-user system, you may wish to avoid the password check
+and set it with (for example):
+
+\begin{verbatim}
+        echo 'joeuser ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+\end{verbatim}
+
+\subsubsection*{Configuring sudo for Mac OS X}
+
+At a command line prompt in a terminal window enter the following command to open the visudo editor:
+
+\begin{verbatim}
+   sudo visudo -f /etc/sudoers
+\end{verbatim}
+In the editor window add the following line at the end of the file (employing the standard {\tt vi} commands, e.g. {\tt i}--insert):        
+\begin{verbatim}
+   joeuser ALL=(ALL) NOPASSWD:ALL
+\end{verbatim}
+
+\subsubsection*{Packages to Install}
+
+Install the following packages using the Start Menu.  Type 'software'
+in the edit box of the Start Menu and use any of the proposed software
+package management systems.  We have used the management system called
+'Synaptic' (if 'Synaptic' is not installed, it can be installed using
+the 'Muon' program available from the Start Menu).  Always follow the
+option to install additional dependencies.
+\begin{description}[noitemsep,nolistsep] 
+\item ant
+\item auctex
+\item autoconf
+\item automake
+\item biblatex
+\item bison
+\item cpanminus
+\item css-mode
+\item doxygen
+\item flex
+\item gnuplot-mode
+\item jodconverter
+\item latex2rtf
+\item latexml
+\item libapache2-mod-fastcgi
+\item libc6-dev
+\item libcatalyst-devel-perl
+\item libcatalyst-engine-apache-perl
+\item libcatalyst-modules-extra-perl
+\item libcatalyst-modules-perl
+\item libcatalyst-perl
+
+\item libcatalyst-plugin-unicode-encoding-perl
+
+\item libcherokee-mod-geoip
+\item libclone-perl
+\item libdbix-class-timestamp-perl
+\item libdevel-ptkdb-perl
+\item libdigest-sha-perl
+\item libexpect-perl
+\item libfile-find-rule-perl
+\item libgraphviz-perl
+\item libgtk2-perl
+\item libhtml-tidy-perl
+\item libinline-perl
+\item libintl-perl
+\item libipc-system-simple-perl
+\item libmodule-install-perl
+\item libncurses5-dev
+\item libperl-dev
+\item libreadline-dev
+\item libsdl-perl
+\item libterm-readline-gnu-perl
+\item libxml-simple-perl
+\item libxml-xslt-perl
+\item libyaml-perl
+\item make
+\item monotone
+\item ocaml-mode
+\item octave3.2-emacsen
+\item patch
+\item psgml
+\item python-dev
+\item python-mode
+\item python-yaml
+\item rst2pdf
+\item swig
+\item tex4ht
+\item texlive-fonts-extra
+\item texlive-fonts-recommended
+\item texlive-humanities
+\item texlive-latex3
+\item texlive-xetex
+\item tidy
+\item unrtf
+\item x-face-el
+\item xaw3dg
+\item xemacs21
+\item xemacs21-basesupport
+\item xemacs21-basesupport-el
+\item xemacs21-bin
+\item xemacs21-mule-canna-wnn
+\item xemacs21-mulesupport
+\item xemacs21-mulesupport-el
+\item xemacs21-support
+\item xemacs21-supportel
+
+
+  % g-tube
+
+\item mercurial
+\item python-numpy
+\item python-wxglade
+\item python-wxgtk2.8
+
+  % mtn-browse
+
+\item libgtk2-sourceview2-perl
+\item meld
+
+% missing, maybe not required.
+% 
+% installing node.js
+% 
+% sudo apt-get install python g++ make checkinstall
+% mkdir ~/src && cd $_
+% wget -N http://nodejs.org/dist/node-latest.tar.gz
+% tar xzvf node-latest.tar.gz && cd node-v*
+% ./configure
+% checkinstall #(remove the "v" in front of the version number in the dialog)
+% sudo dpkg -i node_*
+%
+% installing phonegap
+% 
+% sudo npm install -g phonegap
+% 
+
+\end{description}
+
+From the command line, the {\tt apt-get} command may be useful to
+install all the packages at once.
+
+
+\subsection*{Download and Install the {\emph{DeveloperPackage}}}
+
+\begin{enumerate}[noitemsep,nolistsep]
+   \item Download the latest version of the {\it DeveloperPackage}, available from the Neurospaces \href{http://repo-genesis3.cbi.utsa.edu/src/}{\bf package\,archive}. It is called {\it developer-release-label.tar.gz}, where {\it release-label} is the current release identifier.
+   \item In a terminal window change to the directory where you downloaded the file.
+   \item Unpack the archive by typing ``{\tt tar xfz developer-release-label.tar.gz}''.
+   \item Change to the directory with the content of the archive by typing ``{\tt cd developer-release-label}''.
+   \item Configure by typing ``{\tt ./configure}''.  If this step fails, it is likely due to missing dependencies.  If you let us know what dependencies were missing for you, we can update this page, and minimize installation problems for others.
+   \item Compile by typing ``{\tt make}''.
+   \item Install by typing ``{\tt sudo make install}''. 
+\end{enumerate}
+
+\subsection*{Install software packages}
+
+\begin{enumerate}[noitemsep,nolistsep]
+   \item Use the installer script to create the correct directory layout by typing ``{\tt neurospaces\_create\_directories}''.
+   \item Pull the archives of the source code by typing ``{\tt neurospaces\_pull}''.
+   \item Update the source code in the working directories by typing ``{\tt neurospaces\_update}''.
+   \item Generate {\it make} files by typing ``{\tt neurospaces\_configure}''.
+   \item Compile and install the software by typing ``{\tt neurospaces\_install}''.
+\end{enumerate}
+
+\subsection*{Check if the installation was successful}
+
+This step is optional but strongly advised.
+
+\begin{description}[noitemsep,nolistsep]
+   \item Run tests of all the packages and save tester output to a file  by typing:
+   \begin{verbatim}
+neurospaces\_check >/tmp/check.out 2>&1
+   \end{verbatim}
+   \item Check the output by typing:
+   \begin{verbatim}
+less /tmp/check.out
+   \end{verbatim}
+   \item Importantly, search for lines containing the string {\tt error\_count}.
+\end{description}
+    
+
+%\subsection*{Optional Dependencies}
+
+%\subsubsection*{G-Tube}
+
+%As the G-Tube is becoming more mature as the official G-3 GUI, it is
+%strongly recommended that you also install the dependencies of the G-Tube:
+
+%\begin{itemize}
+%\item mercurial
+%\item python-numpy
+%\item python-wxgtk2.8
+%\item python-wxglade
+%\end{itemize}
+
+%\subsubsection*{Neurospaces Studio Testing (Optional)}
+
+%After successful installation, issue the shell command ``{\tt
+%  neurospaces cells/purkinje/edsjb1994.ndf --gui}'' to check that the
+%graphical component works of the Neurospaces Studio are working
+%correctly.
+
+\subsection*{Upgrading an Installation}
+
+While {\bf\small{Heterarch}} is under rapid development, it is important to frequently
+upgrade your installation with the {\tt neurospaces\_upgrade} command.
+As with {\tt neurospaces\_install}, this is performed in your home
+directory, with the output and error messages directed to a log file.
+
+If error messages are found in the upgrade log file, they may indicate
+a new dependency that needs to be installed.  When upgrading an older
+version, sometimes the installation of a particular software component
+will fail, but repeating the {\tt neurospaces\_upgrade} will result in a
+successful installation.  If there have been changes in the {\it
+  DeveloperPackage} that prevent a successful upgrade, you may update
+this package first, by using the command:
+
+\begin{verbatim}
+   neurospaces_upgrade developer
+\end{verbatim}
+and then perform a normal {\tt neurospaces\_upgrade}.
+ 
+\subsection*{Optional: Browsing Version History}
+
+It may be useful to core developers to browse recent version history
+and inspect specific changes implementing new functionality.  {\bf\small{Heterarch}} uses {\bf monotone} for
+\href{../version-control/version-control.tex}{\bf version\,control}.
+
+To browse the change history stored in a (local) {\bf monotone}
+repository,
+%install the following dependencies:
+%\begin{itemize}
+%\item libgtk2-sourceview2-perl
+%\item meld
+%\end{itemize}
+%Then
+ download and install \href{http://www.coosoft.plus.com/software.html}{\bf mtn-browse}.
+
+
+\subsection*{Uninstalling Heterarch Components}
+
+The script ``neurospaces\_uninstall'' will uninstall
+{\bf\small{Heterarch}} but leave the workspaces unaltered.  The script
+will also uninstall the developer package, so it can best be used with
+a selection of the components you want to uninstall:
+
+\begin{verbatim}
+   neurospaces_uninstall model-container
+\end{verbatim}
+A special script uninstalls all the {\bf\small{Heterarch}} components but reinstalls the
+{\it DeveloperPackage} afterwards.
+\begin{verbatim}
+   neurospaces_dev_uninstall developer
+\end{verbatim}
+Note that these commands leave the workspaces unaltered.
+
+
+\end{document}
+
+%%% Local Variables: 
+%%% mode: latex
+%%% TeX-master: t
+%%% End: 
