@@ -108,7 +108,7 @@ sub main
     }
     else
     {
-	my $publication_directory = "$ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project/${documentation_set_name}";
+	my $publication_directory = "$ENV{HOME}/heterarch_projects/$documentation_set_name/source/snapshots/0/html/htdocs/heterarch_projects/${documentation_set_name}";
 
 	# start the publication process
 
@@ -246,7 +246,7 @@ sub main
 	{
 	    my $configuration = {};
 
-# 	    my $html_ouput_directory = "html/htdocs/neurospaces_project";
+# 	    my $html_ouput_directory = "html/htdocs/heterarch_projects";
 
 # 	    Neurospaces::Documentation::Publications::copy_html_data($configuration, $html_ouput_directory);
 
@@ -378,7 +378,7 @@ options:
 example usage:
     $0 $option_set_name-homepage
 
-    firefox -new-window $ENV{HOME}/neurospaces_project/$documentation_set_name/source/snapshots/0/html/htdocs/neurospaces_project/$option_set_name/contents.html
+    firefox -new-window $ENV{HOME}/heterarch_projects/$documentation_set_name/source/snapshots/0/html/htdocs/heterarch_projects/$option_set_name/contents.html
 ";
 
 	exit 0;

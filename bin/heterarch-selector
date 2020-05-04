@@ -88,6 +88,8 @@ sub main
 
     my $build_directory = Neurospaces::Documentation::build_directory();
 
+#     $build_directory = '/home/hugo/heterarch_projects/jokes-on-you/source/snapshots/jokes-on-you';
+
     if (!chdir $build_directory)
     {
 	die "$0: cannot change to the build directory ($build_directory)";
@@ -201,6 +203,8 @@ sub read_cmd_line
     # switch to the build directory
 
     my $build_directory = Neurospaces::Documentation::project_directory();
+
+#     $build_directory = '/home/hugo/heterarch_projects/jokes-on-you/source/snapshots/jokes-on-you';
 
     if (!chdir $build_directory)
     {

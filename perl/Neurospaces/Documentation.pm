@@ -121,7 +121,7 @@ sub project_directory
 
     $documentation_set_name = $::option_set_name || $documentation_set_name;
 
-    my $result = "$ENV{HOME}/neurospaces_project/${documentation_set_name}/source/snapshots/0";
+    my $result = "$ENV{HOME}/heterarch_projects/${documentation_set_name}/source/snapshots/0";
 
     return $result;
 }
@@ -2065,7 +2065,7 @@ sub email
 
     my $set_name = $options->{set_name} || "${documentation_set_name}";
 
-    my $build_directory = "$ENV{HOME}/neurospaces_project/$set_name/source/snapshots/0/";
+    my $build_directory = "$ENV{HOME}/heterarch_projects/$set_name/source/snapshots/0/";
 
     my $document_name = $self->{name};
 
@@ -2287,7 +2287,7 @@ sub expand
 
 		# if the component is locally installed
 
-		if (-d "$ENV{HOME}/neurospaces_project/$component_name")
+		if (-d "$ENV{HOME}/heterarch_projects/$component_name")
 		{
 		    # keep these links local
 
@@ -2296,7 +2296,7 @@ sub expand
 			print "$0: Converting to a local href ($document_path)\n";
 		    }
 
-		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{../../../../../html/htdocs/neurospaces_project/$component_name/$document_path\}\{$link_text\})gs)
+		    if ($contents =~ s(($prefixqm)\\heterarchxref\{../../../../../($component_nameqm)/source/snapshots/0/($document_pathqm)\}\{($link_textqm)\})($prefix\\href\{../../../../../html/htdocs/heterarch_projects/$component_name/$document_path\}\{$link_text\})gs)
 		    {
 		    }
 		    else
