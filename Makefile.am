@@ -94,9 +94,11 @@ test: check
 
 #TESTS = $(srcdir)/tests/neurospaces_harness
 
+new_projects_directory = projects
+
 html-upload-prepare:
-	rm -fr html/htdocs/heterarch_projects/$(PACKAGE)
-	mkdir -p html/htdocs/heterarch_projects/$(PACKAGE)
+	rm -fr html/htdocs/$(new_projects_directory)/$(PACKAGE)
+	mkdir -p html/htdocs/$(new_projects_directory)/$(PACKAGE)
 # $Format: "	( cd tests && neurospaces_harness_2_html --header '<img src=\"ns-main-logo-dark2-notext-32x32.jpg\" alt=\"Main Neurospaces logo\"> ${package}, ${label}, ${email} <hr>' --introduction introduction.html )" $
 	( cd tests && neurospaces_harness_2_html --header '<img src="ns-main-logo-dark2-notext-32x32.jpg" alt="Main Neurospaces logo"> neurospaces 0.1675 Thu, 27 Dec 2007 15:58:18 -0600 hugo<hr>' --introduction introduction.html )
 
@@ -106,7 +108,7 @@ html-upload: html-upload-prepare
 	scp -pr html/htdocs/* hcornelis,neurospaces@web.sourceforge.net:/home/groups/n/ne/neurospaces/htdocs/
 
 website-clean:
-	$(RM) -fr html/htdocs/heterarch_projects/heterarch/
+	$(RM) -fr html/htdocs/$(new_projects_directory)/heterarch/
 
 website-prepare:
 	heterarch-build --tags published
@@ -117,9 +119,9 @@ website-prepare-local:
 website-upload: website-clean website-prepare html-upload
 
 webcheck:
-	rm -rf html/htdocs/heterarch_projects/heterarch/webcheck
-	mkdir html/htdocs/heterarch_projects/heterarch/webcheck
-	webcheck -o html/htdocs/heterarch_projects/heterarch/webcheck html/htdocs/heterarch_projects/heterarch --redirects=3
+	rm -rf html/htdocs/$(new_projects_directory)/heterarch/webcheck
+	mkdir html/htdocs/$(new_projects_directory)/heterarch/webcheck
+	webcheck -o html/htdocs/$(new_projects_directory)/heterarch/webcheck html/htdocs/$(new_projects_directory)/heterarch --redirects=3
 
 docs-level1:
 

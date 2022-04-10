@@ -42,6 +42,8 @@ $program_name =~ m((.*)[_-](.*));
 my $documentation_set_name = $1;
 my $root_operation_name = $2;
 
+our $new_projects_directory = 'projects';
+
 
 $SIG{__DIE__}
     = sub {
@@ -108,7 +110,7 @@ sub main
     }
     else
     {
-	my $publication_directory = "$ENV{HOME}/heterarch_projects/$documentation_set_name/source/snapshots/0/html/htdocs/heterarch_projects/${documentation_set_name}";
+	my $publication_directory = "$ENV{HOME}/$new_projects_directory/$documentation_set_name/source/snapshots/0/html/htdocs/$new_projects_directory/${documentation_set_name}";
 
 	# start the publication process
 
@@ -246,7 +248,7 @@ sub main
 	{
 	    my $configuration = {};
 
-# 	    my $html_ouput_directory = "html/htdocs/heterarch_projects";
+# 	    my $html_ouput_directory = "html/htdocs/$new_projects_directory";
 
 # 	    Neurospaces::Documentation::Publications::copy_html_data($configuration, $html_ouput_directory);
 
@@ -378,7 +380,7 @@ options:
 example usage:
     $0 $option_set_name-homepage
 
-    firefox -new-window $ENV{HOME}/heterarch_projects/$documentation_set_name/source/snapshots/0/html/htdocs/heterarch_projects/$option_set_name/contents.html
+    firefox -new-window $ENV{HOME}/$new_projects_directory/$documentation_set_name/source/snapshots/0/html/htdocs/$new_projects_directory/$option_set_name/contents.html
 ";
 
 	exit 0;

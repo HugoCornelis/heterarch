@@ -77,6 +77,9 @@ my $option_verbose;
 
 our $option_set_name = $documentation_set_name || "userdocs";
 
+our $new_projects_directory = 'projects';
+
+
 
 sub main
 {
@@ -88,7 +91,7 @@ sub main
 
     my $build_directory = Neurospaces::Documentation::build_directory();
 
-#     $build_directory = '/home/hugo/heterarch_projects/jokes-on-you/source/snapshots/jokes-on-you';
+#     $build_directory = '/home/hugo/$new_projects_directory/jokes-on-you/source/snapshots/jokes-on-you';
 
     if (!chdir $build_directory)
     {
@@ -204,7 +207,7 @@ sub read_cmd_line
 
     my $build_directory = Neurospaces::Documentation::project_directory();
 
-#     $build_directory = '/home/hugo/heterarch_projects/jokes-on-you/source/snapshots/jokes-on-you';
+#     $build_directory = '/home/hugo/$new_projects_directory/jokes-on-you/source/snapshots/jokes-on-you';
 
     if (!chdir $build_directory)
     {
